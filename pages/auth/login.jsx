@@ -1,73 +1,39 @@
-import { useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
+import React, { useState, useContext, useEffect } from "react";
+import Image from "next/image";
 
-import styles from "@/styles/Home.module.css";
+//Mui components
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
 
-export default function Login() {
-  const [userName, setUsername] = useState("");
-  const [pass, setPass] = useState("");
+//Mui components
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
-  const { data: session, status } = useSession();
+//Icons
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-  const onSubmit = async () => {
-    const result = await signIn("credentials", {
-      username: userName,
-      password: pass,
-      redirect: false,
-      callbackUrl: "/",
-    });
-  };
+export default function Login(props) {
+  const { children, title } = props;
 
   return (
-    <>
-      <div className={styles.body}>
-        {session?.user ? (
-          <div className={styles.loggedIn}>
-            <span>USUÁRIO LOGADO</span>
-          </div>
-        ) : (
-          <div className={styles.notLoggedIn}>
-            <span>USUÁRIO NÃO LOGADO</span>
-          </div>
-        )}
-        {/* 
-        {status === "unauthenticated" ? (
-          <div className={styles.form}>
-            <input
-              type="text"
-              onChange={(e) => {
-                setUsername(e.target.value);
-              }}
-            />
-            <input
-              type="password"
-              onChange={(e) => {
-                setPass(e.target.value);
-              }}
-            />
-            <button onClick={onSubmit}>LOGIN</button>
-          </div>
-        ) : (
-          <></>
-        )} */}
-
-        <button
-          onClick={() => signIn("google")}
-          className={styles.googleButton}
-        >
-          LOGIN GOOGLE
-        </button>
-
-        {/* <button onClick={() => {}} className={styles.facebookButton}>
-          LOGIN FACEBOOK
-        </button> */}
-
-        {session?.user && (
-          <a onClick={() => signOut()} className={styles.logoutButton}>
-            LOGOUT
-          </a>
-        )}
-      </div>
-    </>
+    <Box
+      sx={{
+        width: "100%",
+        minHeight: "100vh",
+        height: "100%",
+        backgroundColor: "red",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    ></Box>
   );
 }
