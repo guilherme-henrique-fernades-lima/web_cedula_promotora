@@ -11,7 +11,7 @@ export default function ContentWrapper(props) {
       sx={{
         width: "100%",
         padding: "20px",
-        boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
+        boxShadow: "rgba(100, 100, 111, 0.3) 0px 7px 29px 0px",
         marginBottom: 1,
         display: "flex",
         alignItems: "flex-start",
@@ -23,12 +23,16 @@ export default function ContentWrapper(props) {
       <Typography
         component="h2"
         variant="h2"
-        sx={{ fontSize: 20, fontWeight: 700 }}
+        sx={{
+          fontSize: { xs: 14, sm: 14, md: 16, lg: 18, xl: 20 },
+          fontWeight: 700,
+          color: "#212121",
+        }}
       >
         {title}
       </Typography>
 
-      {title && <Divider sx={{ width: "100%" }} />}
+      {title && <Divider sx={{ width: "100%", mt: 1 }} />}
 
       {children}
     </Paper>

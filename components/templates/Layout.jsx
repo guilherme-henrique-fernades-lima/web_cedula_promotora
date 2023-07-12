@@ -1,23 +1,25 @@
 import * as React from "react";
-import { styled, useTheme } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import Typography from "@mui/material/Typography";
+
+//Icons
+import SubjectIcon from "@mui/icons-material/Subject";
+import GroupsIcon from "@mui/icons-material/Groups";
+import GavelIcon from "@mui/icons-material/Gavel";
+import MenuIcon from "@mui/icons-material/Menu";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 const DRAWER_WIDTH = 240;
 
@@ -67,7 +69,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 export default function Layout({ children }) {
-  const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
   const handleDrawerCloseOpen = () => {
@@ -86,11 +87,19 @@ export default function Layout({ children }) {
             edge="start"
             sx={{ mr: 2 }}
           >
-            <MenuIcon />
+            {open ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Persistent drawer
-          </Typography>
+          {/* <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{
+              fontWeight: 700,
+              fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
+            }}
+          >
+            Cédula Promotora
+          </Typography> */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -109,30 +118,34 @@ export default function Layout({ children }) {
         <DrawerHeader></DrawerHeader>
         <Divider />
         <List>
-          {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <GroupsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Clientes" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <SubjectIcon />
+              </ListItemIcon>
+              <ListItemText primary="Empréstimos" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <GavelIcon />
+              </ListItemIcon>
+              <ListItemText primary="Cobranças" />
+            </ListItemButton>
+          </ListItem>
         </List>
-        <Divider />
-        <List>
-          {["All mail", "Trash", "Spam"].map((text, index) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
+        {/* <Divider /> */}
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
