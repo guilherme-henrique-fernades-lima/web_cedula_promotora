@@ -1,6 +1,10 @@
-import * as React from "react";
+import React,{useState} from "react";
 import Link from "next/link";
 
+//Third party libraries
+import { useSession, signIn, signOut } from "next-auth/react";
+
+//Mui components
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -24,14 +28,22 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import SavingsIcon from "@mui/icons-material/Savings";
 
-const DRAWER_WIDTH = 240;
 
 export default function Layout({ children }) {
-  const [open, setOpen] = React.useState(false);
+
+  const { data: session, status } = useSession();
+  
+  const [open, setOpen] = useState(false);
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);
   };
+
+  if(session?.user){
+    console.log('USUÁRIO LOGADO')
+  }else{
+    console.log('USUÁRIO NÃO ESTÁ LOGADO')
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -135,6 +147,8 @@ export default function Layout({ children }) {
     </Box>
   );
 }
+
+const DRAWER_WIDTH = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
