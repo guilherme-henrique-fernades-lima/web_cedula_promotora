@@ -1,4 +1,6 @@
 import * as React from "react";
+import Link from "next/link";
+
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -20,53 +22,9 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import GavelIcon from "@mui/icons-material/Gavel";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import SavingsIcon from "@mui/icons-material/Savings";
 
 const DRAWER_WIDTH = 240;
-
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: `-${DRAWER_WIDTH}px`,
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginLeft: 0,
-    }),
-  })
-);
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  transition: theme.transitions.create(["margin", "width"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    width: `calc(100% - ${DRAWER_WIDTH}px)`,
-    marginLeft: `${DRAWER_WIDTH}px`,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-  justifyContent: "flex-end",
-}));
 
 export default function Layout({ children }) {
   const [open, setOpen] = React.useState(false);
@@ -118,32 +76,55 @@ export default function Layout({ children }) {
         <DrawerHeader></DrawerHeader>
         <Divider />
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <GroupsIcon />
-              </ListItemIcon>
-              <ListItemText primary="Clientes" />
-            </ListItemButton>
-          </ListItem>
+          <Link href="/cadastros/cliente">
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <GroupsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<TitleTypography>Clientes</TitleTypography>}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link href="/relatorios/cobrancas">
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <GavelIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<TitleTypography>Cobranças</TitleTypography>}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
+          <Link href="/cadastros/custo-mensal">
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <SavingsIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<TitleTypography>Custo mensal</TitleTypography>}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
 
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <SubjectIcon />
-              </ListItemIcon>
-              <ListItemText primary="Empréstimos" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <GavelIcon />
-              </ListItemIcon>
-              <ListItemText primary="Cobranças" />
-            </ListItemButton>
-          </ListItem>
+          <Link href="/cadastros/emprestimo">
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <SubjectIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<TitleTypography>Empréstimos</TitleTypography>}
+                />
+              </ListItemButton>
+            </ListItem>
+          </Link>
         </List>
         {/* <Divider /> */}
       </Drawer>
@@ -152,5 +133,66 @@ export default function Layout({ children }) {
         {children}
       </Main>
     </Box>
+  );
+}
+
+const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginLeft: `-${DRAWER_WIDTH}px`,
+    ...(open && {
+      transition: theme.transitions.create("margin", {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginLeft: 0,
+    }),
+  })
+);
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  transition: theme.transitions.create(["margin", "width"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${DRAWER_WIDTH}px)`,
+    marginLeft: `${DRAWER_WIDTH}px`,
+    transition: theme.transitions.create(["margin", "width"], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: "flex-end",
+}));
+
+function TitleTypography({ children }) {
+  return (
+    <Typography
+      variant="span"
+      component="span"
+      sx={{
+        fontWeight: 700,
+        fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+        color: "#212121",
+      }}
+    >
+      {children}
+    </Typography>
   );
 }

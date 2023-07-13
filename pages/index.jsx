@@ -1,3 +1,6 @@
+//Custom components
+import ContentWrapper from "../components/templates/ContentWrapper";
+
 export default function Index() {
-  return <h1>Hello world</h1>;
+  return <ContentWrapper title="Relação de cobranças"></ContentWrapper>;
 }
