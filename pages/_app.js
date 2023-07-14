@@ -1,8 +1,7 @@
 import "@/styles/globals.css";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 
 import Layout from "../components/templates/Layout";
-import ProtectPage from "../components/ProtectPage";
 
 export default function App({
   Component,
@@ -10,9 +9,30 @@ export default function App({
 }) {
   return (
     <SessionProvider session={session}>
-      <Layout>
+      {Component.auth ? (
+        <Auth>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </Auth>
+      ) : (
         <Component {...pageProps} />
-      </Layout>
+      )}
+
+      {/* <Layout>
+        <Component {...pageProps} />
+      </Layout> */}
     </SessionProvider>
   );
+}
+
+function Auth({ children }) {
+  // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
+  const { status } = useSession();
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  return children;
 }

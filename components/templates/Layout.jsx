@@ -63,111 +63,107 @@ export default function Layout({ children }) {
     <>
       <CssBaseline />
 
-      {session?.user ? (
-        <Box sx={{ display: "flex" }}>
-          <AppBar position="fixed" open={open} elevation={0}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerCloseOpen}
-                edge="start"
-                sx={{ mr: 2 }}
-              >
-                {open ? <ChevronLeftIcon /> : <MenuIcon />}
-              </IconButton>
-              <Typography
-                variant="h6"
-                noWrap
-                component="h6"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
-                }}
-              >
-                CÉDULA PROMOTORA
-              </Typography>
-            </Toolbar>
-            <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-              <LogoutIcon sx={{ color: "#fff" }} />
+      <Box sx={{ display: "flex" }}>
+        <AppBar position="fixed" open={open} elevation={0}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerCloseOpen}
+              edge="start"
+              sx={{ mr: 2 }}
+            >
+              {open ? <ChevronLeftIcon /> : <MenuIcon />}
             </IconButton>
-          </AppBar>
-          <Drawer
-            sx={{
+            <Typography
+              variant="h6"
+              noWrap
+              component="h6"
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
+              }}
+            >
+              CÉDULA PROMOTORA
+            </Typography>
+          </Toolbar>
+          <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
+            <LogoutIcon sx={{ color: "#fff" }} />
+          </IconButton>
+        </AppBar>
+        <Drawer
+          sx={{
+            width: DRAWER_WIDTH,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
               width: DRAWER_WIDTH,
-              flexShrink: 0,
-              "& .MuiDrawer-paper": {
-                width: DRAWER_WIDTH,
-                boxSizing: "border-box",
-              },
-            }}
-            variant="persistent"
-            anchor="left"
-            open={open}
-          >
-            <DrawerHeader></DrawerHeader>
-            <Divider />
-            <List>
-              <Link href="/cadastros/cliente">
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <GroupsIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<TitleTypography>Clientes</TitleTypography>}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-              <Link href="/relatorios/cobrancas">
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <GavelIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<TitleTypography>Cobranças</TitleTypography>}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-              <Link href="/cadastros/custo-mensal">
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <SavingsIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<TitleTypography>Custo mensal</TitleTypography>}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
+              boxSizing: "border-box",
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader></DrawerHeader>
+          <Divider />
+          <List>
+            <Link href="/cadastros/cliente">
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <GroupsIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<TitleTypography>Clientes</TitleTypography>}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link href="/relatorios/cobrancas">
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <GavelIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<TitleTypography>Cobranças</TitleTypography>}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link href="/cadastros/custo-mensal">
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <SavingsIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<TitleTypography>Custo mensal</TitleTypography>}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
 
-              <Link href="/cadastros/emprestimo">
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <SubjectIcon />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<TitleTypography>Empréstimos</TitleTypography>}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            </List>
-            {/* <Divider /> */}
-          </Drawer>
-          <Main open={open}>
-            <DrawerHeader />
-            {children}
-          </Main>
-        </Box>
-      ) : (
-        <>{children}</>
-      )}
+            <Link href="/cadastros/emprestimo">
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <SubjectIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<TitleTypography>Empréstimos</TitleTypography>}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          </List>
+          {/* <Divider /> */}
+        </Drawer>
+        <Main open={open}>
+          <DrawerHeader />
+          {children}
+        </Main>
+      </Box>
     </>
   );
 }
