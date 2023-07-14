@@ -10,16 +10,18 @@ import moment from "moment";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
-import DatepickerField from "../../components/DatepickerField";
 
 //Mui components
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Autocomplete from "@mui/material/Autocomplete";
 import LoadingButton from "@mui/lab/LoadingButton";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { ptBR } from "date-fns/locale";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
@@ -34,7 +36,7 @@ const clienteCallCenterSchema = yup.object().shape({
     .min(14, "O CPF precisa ter pelo menos 11 digitos"),
   telefoneUm: yup.string().required("Informe um telefone válido"),
   nome: yup.string().required("O nome do cliente é obrigatório"),
-  dataNascimento: yup.date().required("A data de nascimento é obrigatória"),
+  dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
 });
 
 export default function CadastrarCliente() {
@@ -50,6 +52,8 @@ export default function CadastrarCliente() {
     resolver: yupResolver(clienteCallCenterSchema),
   });
 
+  const [loadingButton, setLoadingButton] = useState(false);
+
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
   const [dataNascimento, setDataNascimento] = useState(null);
@@ -57,25 +61,30 @@ export default function CadastrarCliente() {
   const [matricula, setMatricula] = useState("");
   const [telefoneUm, setTelefoneUm] = useState("");
   const [telefoneDois, setTelefoneDois] = useState("");
-  const [telefoneTres, setTelefoneUmTres] = useState("");
+  const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
 
   async function salvarCliente() {
+    setLoadingButton(true);
     console.log("Entrou na função salvarCliente");
 
     const payload = getPayload();
-
     console.log("payload: ", payload);
+
+    setTimeout(() => {
+      setLoadingButton(false);
+      toast.success("Cliente cadastrado com sucesso!");
+    }, 2000);
   }
 
   function getPayload() {
     const payload = {
       cpf: cpf.replace(/\D/g, ""),
-      nome: nome,
+      nome: nome.toUpperCase(),
       dt_nascimento: dataNascimento
         ? moment(dataNascimento).format("YYYY-MM-DD")
         : null,
-      especie: especieInss.especie,
+      especie: especieInss ? especieInss?.especie : null,
       matricula: matricula,
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
@@ -135,7 +144,7 @@ export default function CadastrarCliente() {
               error={Boolean(errors.nome)}
               value={nome}
               onChange={(e) => {
-                setNome(e.target.value.replace(/[^A-Za-z]/g, ""));
+                setNome(e.target.value.replace(/[^A-Za-z\s]/g, ""));
               }}
               size="small"
               label="Nome"
@@ -150,11 +159,38 @@ export default function CadastrarCliente() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <DatepickerField
-              value={dataNascimento}
-              textLabel="Data de nascimento"
-              onChange={setDataNascimento}
-            />
+            <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+              <DesktopDatePicker
+                leftArrowButtonText="Mês anterior"
+                rightArrowButtonText="Próximo mês"
+                label="Data de nascimento"
+                onChange={(newValue) => {
+                  setDataNascimento(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    {...register("dataNascimento")}
+                    error={Boolean(errors.dataNascimento)}
+                  />
+                )}
+                shouldDisableDate={(dateParam) => {
+                  // if (!props.value[1]) {
+                  //     return false;
+                  // } else if (dateParam > props.value[1]) {
+                  //     return true;
+                  // }
+                }}
+                value={dataNascimento}
+                disableFuture
+                disableHighlightToday
+              />
+            </LocalizationProvider>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.dataNascimento?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -242,40 +278,25 @@ export default function CadastrarCliente() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              size="small"
-              label="Telefone 2"
-              placeholder="00 00000-0000"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              inputProps={{
-                maxLength: 11,
-              }}
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              size="small"
-              label="Telefone 3"
-              placeholder="00 00000-0000"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              inputProps={{
-                maxLength: 11,
-              }}
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-            />
+            <InputMask
+              mask="(99) 9 9999-9999"
+              maskChar={null}
+              value={telefoneTres}
+              onChange={(e) => setTelefoneTres(e.target.value)}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="Telefone três"
+                  placeholder="00 00000-0000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -297,11 +318,11 @@ export default function CadastrarCliente() {
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
-              variant="contained"
               type="submit"
+              variant="contained"
               endIcon={<SaveIcon />}
               disableElevation
-              //loading
+              loading={loadingButton}
               // fullWidth
             >
               SALVAR
