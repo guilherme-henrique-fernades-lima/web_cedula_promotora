@@ -19,8 +19,9 @@ h1,
 h2,
 h3,
 h4,
-h5 {
-  font-family: "Lato", sans-serif;
+h5,
+h6 {
+  font-family: "Lato", sans-serif !important;
   font-weight: 400;
 }
 /* 

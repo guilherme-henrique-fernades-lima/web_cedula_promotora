@@ -66,15 +66,31 @@ export default function CadastrarCliente() {
 
   async function salvarCliente() {
     setLoadingButton(true);
-    console.log("Entrou na função salvarCliente");
 
     const payload = getPayload();
     console.log("payload: ", payload);
 
-    setTimeout(() => {
-      setLoadingButton(false);
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_INTEGRATION_URL}/clientes`,
+      {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: `Bearer token`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      const json = await response.json();
+      res.status(response.status).json(json);
       toast.success("Cliente cadastrado com sucesso!");
-    }, 2000);
+      setLoadingButton(false);
+    } else {
+      toast.error("Cliente cadastrado com sucesso!");
+    }
   }
 
   function getPayload() {
@@ -105,7 +121,7 @@ export default function CadastrarCliente() {
         })}
         sx={{ width: "100%" }}
       >
-        <Grid container spacing={1} sx={{ mt: 2 }}>
+        <Grid container spacing={2} sx={{ mt: 2 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("cpf")}

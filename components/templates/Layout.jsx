@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 //Third party libraries
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 
 //Mui components
 import { styled } from "@mui/material/styles";
@@ -33,32 +33,37 @@ import LogoutIcon from "@mui/icons-material/Logout";
 const USER_LOGGED = false;
 
 export default function Layout({ children }) {
-  // const { data: session, status } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
+  const [open, setOpen] = useState(false);
+
   useEffect(() => {
-    // if (!USER_LOGGED) {
+    // if (!session?.user) {
     //   router.push("/auth/login");
     // }
   }, []);
 
-  const [open, setOpen] = useState(false);
+  //Deslogar user
+  //const data = await signOut({redirect: false, callbackUrl: "/"})
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);
   };
 
-  // if (session?.user) {
-  //   console.log("USUÁRIO LOGADO");
-  // } else {
-  //   console.log("USUÁRIO NÃO ESTÁ LOGADO");
+  const handleLogout = async () => {
+    const data = await signOut({ redirect: true, callbackUrl: "/auth/login" });
+  };
+
+  // if (!session?.user) {
+  //   router.push("/auth/login");
   // }
 
   return (
     <>
       <CssBaseline />
 
-      {USER_LOGGED ? (
+      {session?.user ? (
         <Box sx={{ display: "flex" }}>
           <AppBar position="fixed" open={open} elevation={0}>
             <Toolbar>
@@ -71,19 +76,19 @@ export default function Layout({ children }) {
               >
                 {open ? <ChevronLeftIcon /> : <MenuIcon />}
               </IconButton>
-              {/* <Typography
-          variant="h6"
-          noWrap
-          component="div"
-          sx={{
-            fontWeight: 700,
-            fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
-          }}
-        >
-          Cédula Promotora
-        </Typography> */}
+              <Typography
+                variant="h6"
+                noWrap
+                component="h6"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
+                }}
+              >
+                CÉDULA PROMOTORA
+              </Typography>
             </Toolbar>
-            <IconButton onClick={() => {}} sx={{ mr: 2 }}>
+            <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
               <LogoutIcon sx={{ color: "#fff" }} />
             </IconButton>
           </AppBar>

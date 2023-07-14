@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 
 //Third party libraries
 import Lottie from "react-lottie";
-import InputMask from "react-input-mask";
-
-//Context
-// import { getCookiesServerSide } from "@/helpers/handleCookies";
+import { signIn } from "next-auth/react";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -13,8 +10,6 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import InputAdornment from "@mui/material/InputAdornment";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -22,6 +17,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 //Icons
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import LoginIcon from "@mui/icons-material/Login";
 
 //Lottie animation
 import LottieAnimation from "../../public/lotties/authenticate.json";
@@ -52,55 +48,45 @@ function AuthAnimation() {
 }
 
 export default function SingIn() {
-  //const { login, error } = useContext(AuthContext);
+  const [email, setEmail] = useState("admin@admin.com");
+  const [password, setPassword] = useState("admin123");
   const [showPassword, setShowPassword] = useState(false);
-  const [cpf, setCpf] = useState("");
-  const [password, setPassword] = useState("");
-  const [openDialog, setOpenDialog] = useState(false);
+  const [lembrarEmail, setLembrarEmail] = useState(false);
 
-  const [lembrarCpf, setLembrarCpf] = useState(false);
+  const onSubmit = async () => {
+    const result = await signIn("credentials", {
+      username: email,
+      password: password,
+      redirect: true,
+      callbackUrl: "/",
+    });
+  };
 
   useEffect(() => {
-    getCpfLocalStorage();
+    getEmailLocalStorage();
   }, []);
 
-  const getCpfLocalStorage = () => {
-    const cpf = localStorage.getItem("@acaihomedelivery");
+  const getEmailLocalStorage = () => {
+    const email = localStorage.getItem("@app-cedulapromotora");
 
-    if (cpf) {
-      setLembrarCpf(true);
-      setCpf(JSON.parse(cpf));
+    if (email) {
+      setLembrarEmail(true);
+      setEmail(JSON.parse(email));
     }
   };
 
-  function handleSaveCpfLocalStorage() {
-    if (lembrarCpf) {
-      localStorage.removeItem("@acaihomedelivery");
-      setLembrarCpf(false);
+  function handleSaveEmailLocalStorage() {
+    if (lembrarEmail) {
+      localStorage.removeItem("@app-cedulapromotora");
+      setLembrarEmail(false);
     } else {
-      setLembrarCpf(true);
+      setLembrarEmail(true);
     }
   }
 
-  function salvarCpfLocalStorage() {
-    localStorage.setItem("@acaihomedelivery", JSON.stringify(cpf));
+  function salvarEmailLocalStorage() {
+    localStorage.setItem("@app-cedulapromotora", JSON.stringify(email));
   }
-
-  const handleDialog = () => {
-    setOpenDialog(!openDialog);
-  };
-
-  const handleCPFform = (event) => {
-    setCpf(event.target.value);
-  };
-
-  const handlePassword = (event) => {
-    setPassword(event.target.value);
-  };
-
-  const handleLogin = () => {
-    //login(JSON.stringify({ cpf: cpf, password: password }));
-  };
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -116,7 +102,7 @@ export default function SingIn() {
           flexGrow: 1,
           background: "#000046",
           background:
-            "linear-gradient(45deg, rgba(0, 0, 70, 0.9), rgba(28, 181, 224, 0.9)), url(/img/background_login_page.jpg) center center/cover no-repeat",
+            "linear-gradient(45deg, rgba(0, 0, 70, 0.9), rgba(28, 181, 224, 0.8)), url(/img/background_login_page.jpg) center center/cover no-repeat",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -132,49 +118,39 @@ export default function SingIn() {
             maxWidth: 430,
             height: 550,
             backgroundColor: "#fff",
-            borderRadius: "12px",
+            borderRadius: "4px",
             padding: "20px",
-            boxShadow: "rgb(38, 57, 77) 0px 20px 30px -10px",
+            boxShadow: "rgb(0, 0, 0) 0px 20px 30px -10px",
 
             ["@media (max-width:600px)"]: {
               maxWidth: "100%",
-              height: "100%",
-              width: "100%",
+              //height: "100%",
+              width: "95%",
               borderRadius: 0,
               justifyContent: "center",
-              backgroundColor: "transparent",
+              //backgroundColor: "transparent",
             },
           }}
         >
           <AuthAnimation />
 
-          <InputMask
-            // {...register("cpf")}
-            // error={Boolean(errors.cpf)}
-            mask="999.999.999-99"
-            maskChar={null}
-            value={cpf}
-            onChange={handleCPFform}
-          >
-            {(inputProps) => (
-              <TextField
-                {...inputProps}
-                type="text"
-                variant="outlined"
-                size="small"
-                fullWidth
-                label="Insira o CPF"
-                placeholder="000.000.000-000"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                sx={{ width: 280, mt: 1 }}
-              />
-            )}
-          </InputMask>
+          <TextField
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            variant="outlined"
+            size="small"
+            fullWidth
+            label="Insira o e-mail"
+            placeholder="seu-email@email.com"
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
+            sx={{ width: 280, mt: 1 }}
+          />
 
           <TextField
             value={password}
-            onChange={handlePassword}
+            onChange={(e) => setPassword(e.target.value)}
             //error={Boolean(error)}
             placeholder="Senha"
             sx={{
@@ -247,55 +223,28 @@ export default function SingIn() {
                 control={
                   <Checkbox
                     sx={{
-                      color: "#fff",
+                      color: "#5353c9",
                       "&.Mui-checked": {
-                        color: "#fff",
-                      },
-                      ["@media (min-width:601px)"]: {
                         color: "#5353c9",
-                        "&.Mui-checked": {
-                          color: "#5353c9",
-                        },
                       },
                     }}
-                    checked={lembrarCpf}
-                    onChange={handleSaveCpfLocalStorage}
+                    checked={lembrarEmail}
+                    onChange={handleSaveEmailLocalStorage}
                   />
                 }
                 label={
                   <Typography
                     sx={{
                       fontWeight: 700,
-                      fontSize: 10,
-                      color: "#fff",
-                      ["@media (min-width:601px)"]: {
-                        color: "#5353c9",
-                      },
+                      fontSize: 12,
+                      color: "#5353c9",
                     }}
                   >
-                    Lembrar CPF?
+                    Lembrar e-mail?
                   </Typography>
                 }
               />
             </FormGroup>
-
-            {/* <Typography
-              sx={{
-                fontSize: 10,
-                color: "#B83E94",
-                fontWeight: "bold",
-                width: "100%",
-                textAlign: "right",
-                "&:hover": { cursor: "pointer", textDecoration: "underline" },
-
-                ["@media (max-width:600px)"]: {
-                  color: "#fff",
-                },
-              }}
-              onClick={handleDialog}
-            >
-              Esqueci minha senha
-            </Typography> */}
           </Box>
 
           <Button
@@ -303,28 +252,17 @@ export default function SingIn() {
             disableElevation
             sx={{ width: 280, marginTop: "30px" }}
             onClick={() => {
-              if (lembrarCpf) {
-                salvarCpfLocalStorage();
+              if (lembrarEmail) {
+                salvarEmailLocalStorage();
               }
-              handleLogin();
+              onSubmit();
             }}
+            endIcon={<LoginIcon />}
           >
-            ACESSAR
+            LOGIN
           </Button>
         </Box>
       </Box>
-
-      <Dialog
-        open={openDialog}
-        onClose={handleDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        sx={{ margin: "10px" }}
-      >
-        <DialogTitle id="alert-dialog-title">
-          Para alteração de senha, contate a administração.
-        </DialogTitle>
-      </Dialog>
     </>
   );
 }

@@ -15,7 +15,7 @@ export const authOptions = {
         const { username, password } = credentials;
 
         const res = await fetch(
-          "http://127.0.0.1:8005/integracao/auth/login/",
+          "http://127.0.0.1:8005/integration/auth/login/",
           {
             method: "POST",
             headers: {
