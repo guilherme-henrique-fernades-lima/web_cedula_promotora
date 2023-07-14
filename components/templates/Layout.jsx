@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 
 //Third party libraries
@@ -19,6 +19,8 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 //Icons
 import SubjectIcon from "@mui/icons-material/Subject";
@@ -27,23 +29,22 @@ import GavelIcon from "@mui/icons-material/Gavel";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import SavingsIcon from "@mui/icons-material/Savings";
-
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Layout({ children }) {
+  // const { data: session, status } = useSession();
 
-  const { data: session, status } = useSession();
-  
   const [open, setOpen] = useState(false);
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);
   };
 
-  if(session?.user){
-    console.log('USUÁRIO LOGADO')
-  }else{
-    console.log('USUÁRIO NÃO ESTÁ LOGADO')
-  }
+  // if (session?.user) {
+  //   console.log("USUÁRIO LOGADO");
+  // } else {
+  //   console.log("USUÁRIO NÃO ESTÁ LOGADO");
+  // }
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -71,6 +72,9 @@ export default function Layout({ children }) {
             Cédula Promotora
           </Typography> */}
         </Toolbar>
+        <IconButton onClick={() => {}} sx={{ mr: 2 }}>
+          <LogoutIcon sx={{ color: "#fff" }} />
+        </IconButton>
       </AppBar>
       <Drawer
         sx={{
@@ -152,8 +156,15 @@ const DRAWER_WIDTH = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
+    backgroundColor: "#fafafa",
+    minHeight: "100vh",
     flexGrow: 1,
     padding: theme.spacing(3),
+
+    ["@media (max-width:780px)"]: {
+      padding: theme.spacing(1),
+    },
+
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -172,6 +183,10 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  flexDirection: "row",
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
