@@ -17,6 +17,7 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import Autocomplete from "@mui/material/Autocomplete";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -33,6 +34,9 @@ import { ESPECIES_INSS } from "@/helpers/constants";
 //Custom componentes
 import DataTable from "@/components/Datatable";
 import { formatarCPFSemAnonimidade, formatarData } from "@/helpers/utils";
+
+//Icons
+import EditIcon from "@mui/icons-material/Edit";
 
 const clienteCallCenterSchema = yup.object().shape({
   cpf: yup
@@ -53,7 +57,7 @@ export default function CadastrarCliente() {
     formState: { errors },
     setValue,
     clearErrors,
-    resetField,
+    reset,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(clienteCallCenterSchema),
@@ -87,16 +91,12 @@ export default function CadastrarCliente() {
       const json = await response.json();
       setClientes(json);
     }
-
-    console.log(response);
   }
 
   async function salvarCliente() {
     setLoadingButton(true);
-    console.log(session.user);
 
     const payload = getPayload();
-    console.log("payload: ", payload);
 
     const response = await fetch("/api/cadastros/cliente", {
       method: "POST",
@@ -106,10 +106,9 @@ export default function CadastrarCliente() {
       body: JSON.stringify(payload),
     });
 
-    console.log(response);
-
     if (response.ok) {
       toast.success("Cliente cadastrado com sucesso!");
+      clearStatesAndErrors();
       setLoadingButton(false);
     } else {
       toast.error("Erro ao cadastrar cliente.");
@@ -135,7 +134,69 @@ export default function CadastrarCliente() {
     return payload;
   }
 
+  function clearStatesAndErrors() {
+    clearErrors();
+    reset();
+
+    setCpf("");
+    setNome("");
+    setDataNascimento(null);
+    setEspecieInss(null);
+    setMatricula("");
+    setTelefoneUm("");
+    setTelefoneDois("");
+    setTelefoneTres("");
+    setObservacao("");
+  }
+
+  console.log("nome", nome);
+  console.log("cpf", cpf);
+  console.log("especieInss", especieInss);
+  console.log("matricula", matricula);
+  console.log("telefoneUm", telefoneUm);
+  console.log("telefoneDois", telefoneDois);
+  console.log("telefoneTres", telefoneTres);
+  console.log("observacao", observacao);
+
+  function getDataForEdit(data) {
+    console.log("data >>>> ", data);
+    clearErrors();
+
+    setValue("nome", data.nome);
+    setValue("cpf", data.cpf);
+    setValue("telefoneUm", data.telefone1);
+
+    setCpf(data.cpf);
+    setNome(data.nome);
+    //setDataNascimento(data.dataNascimento);
+    setEspecieInss(data.especie ? data.especie : null);
+    setMatricula(data.matricula);
+    setTelefoneUm(data.telefone1 ? data.telefone1 : "");
+    setTelefoneDois(data.telefone2 ? data.telefone2 : "");
+    setTelefoneTres(data.telefone3 ? data.telefone3 : "");
+    setObservacao(data.observacoes);
+  }
+
   const columns = [
+    {
+      field: "id",
+      headerName: "AÇÃO",
+      renderHeader: (params) => <strong>AÇÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        return (
+          <IconButton
+            onClick={() => {
+              getDataForEdit(params.row);
+            }}
+          >
+            <EditIcon />
+          </IconButton>
+        );
+      },
+    },
     {
       field: "cpf",
       headerName: "CPF",
@@ -160,6 +221,11 @@ export default function CadastrarCliente() {
       minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
     },
     {
       field: "especie",
@@ -217,7 +283,7 @@ export default function CadastrarCliente() {
         id: row.id,
         cpf: formatarCPFSemAnonimidade(row.cpf),
         nome: row.nome,
-        dt_nascimento: row.dt_nascimento ? formatarData(row.dt_nascimento) : "",
+        dt_nascimento: row.dt_nascimento,
         especie: row.especie,
         matricula: row.matricula,
         telefone1: row.telefone1,
@@ -293,7 +359,6 @@ export default function CadastrarCliente() {
               {errors.nome?.message}
             </Typography>
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
               <DesktopDatePicker
@@ -321,7 +386,6 @@ export default function CadastrarCliente() {
               {errors.dataNascimento?.message}
             </Typography>
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <Autocomplete
               options={ESPECIES_INSS}
@@ -341,7 +405,6 @@ export default function CadastrarCliente() {
               )}
             />
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               size="small"
@@ -356,7 +419,6 @@ export default function CadastrarCliente() {
               fullWidth
             />
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("telefoneUm")}
@@ -383,7 +445,6 @@ export default function CadastrarCliente() {
               {errors.telefoneUm?.message}
             </Typography>
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               mask="(99) 9 9999-9999"
@@ -405,7 +466,6 @@ export default function CadastrarCliente() {
               )}
             </InputMask>
           </Grid>
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               mask="(99) 9 9999-9999"
@@ -427,7 +487,6 @@ export default function CadastrarCliente() {
               )}
             </InputMask>
           </Grid>
-
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
               multiline
@@ -444,7 +503,6 @@ export default function CadastrarCliente() {
               fullWidth
             />
           </Grid>
-
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
               type="submit"
