@@ -33,7 +33,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 const USER_LOGGED = false;
 
 export default function Layout({ children }) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);

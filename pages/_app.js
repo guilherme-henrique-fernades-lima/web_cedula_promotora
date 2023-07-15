@@ -9,7 +9,7 @@ export default function App({
 }) {
   return (
     <SessionProvider session={session}>
-      {Component.auth ? (
+      {/* {Component.auth ? (
         <Auth>
           <Layout>
             <Component {...pageProps} />
@@ -17,11 +17,11 @@ export default function App({
         </Auth>
       ) : (
         <Component {...pageProps} />
-      )}
+      )} */}
 
-      {/* <Layout>
+      <Layout>
         <Component {...pageProps} />
-      </Layout> */}
+      </Layout>
     </SessionProvider>
   );
 }

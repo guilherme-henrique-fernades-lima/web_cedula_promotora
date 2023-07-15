@@ -7,6 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
+import { useSession } from "next-auth/react";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -29,6 +30,9 @@ import SaveIcon from "@mui/icons-material/Save";
 //Constants
 import { ESPECIES_INSS } from "@/helpers/constants";
 
+//Custom componentes
+import DataTable from "@/components/Datatable";
+
 const clienteCallCenterSchema = yup.object().shape({
   cpf: yup
     .string()
@@ -40,6 +44,8 @@ const clienteCallCenterSchema = yup.object().shape({
 });
 
 export default function CadastrarCliente() {
+  const { data: session } = useSession();
+
   const {
     register,
     handleSubmit,
@@ -65,7 +71,7 @@ export default function CadastrarCliente() {
   const [observacao, setObservacao] = useState("");
 
   async function salvarCliente() {
-    setLoadingButton(true);
+    //setLoadingButton(true);
 
     const payload = getPayload();
     console.log("payload: ", payload);
@@ -77,7 +83,7 @@ export default function CadastrarCliente() {
         headers: {
           "X-Requested-With": "XMLHttpRequest",
           "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer token`,
+          Authorization: `Bearer ${session?.user?.token}`,
         },
         body: JSON.stringify(payload),
       }
@@ -110,6 +116,32 @@ export default function CadastrarCliente() {
 
     return payload;
   }
+
+  const columns = [
+    {
+      field: "id",
+      headerName: "AÇÃO",
+      renderHeader: (params) => <strong>AÇÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+  ];
+  var rows = [{ id: 1, id: 2 }];
+  // try {
+  //   var rows = bancosArray?.map((row, index) => {
+  //     return {
+  //       id: index,
+  //       pk_ecom_banco: row.pk_ecom_banco,
+  //       cd_banco: row.cd_banco,
+  //       no_banco: row.no_banco,
+  //       no_fantasia: row.no_fantasia,
+  //     };
+  //   });
+  // } catch (err) {
+  //   console.log(err);
+  //   var rows = [];
+  // }
 
   return (
     <ContentWrapper title="Cadastrar cliente">
@@ -192,13 +224,6 @@ export default function CadastrarCliente() {
                     error={Boolean(errors.dataNascimento)}
                   />
                 )}
-                shouldDisableDate={(dateParam) => {
-                  // if (!props.value[1]) {
-                  //     return false;
-                  // } else if (dateParam > props.value[1]) {
-                  //     return true;
-                  // }
-                }}
                 value={dataNascimento}
                 disableFuture
                 disableHighlightToday
@@ -345,6 +370,8 @@ export default function CadastrarCliente() {
             </LoadingButton>
           </Grid>
         </Grid>
+
+        <DataTable rows={rows} columns={columns} />
       </Box>
     </ContentWrapper>
   );
