@@ -174,7 +174,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
     backgroundColor: "#fafafa",
     minHeight: "100vh",
-    flexGrow: 1,
+    width: "100%",
     padding: theme.spacing(3),
 
     ["@media (max-width:780px)"]: {

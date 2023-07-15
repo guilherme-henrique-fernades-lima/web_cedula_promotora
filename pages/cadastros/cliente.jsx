@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
@@ -32,6 +32,7 @@ import { ESPECIES_INSS } from "@/helpers/constants";
 
 //Custom componentes
 import DataTable from "@/components/Datatable";
+import { formatarCPFSemAnonimidade, formatarData } from "@/helpers/utils";
 
 const clienteCallCenterSchema = yup.object().shape({
   cpf: yup
@@ -40,7 +41,7 @@ const clienteCallCenterSchema = yup.object().shape({
     .min(14, "O CPF precisa ter pelo menos 11 digitos"),
   telefoneUm: yup.string().required("Informe um telefone válido"),
   nome: yup.string().required("O nome do cliente é obrigatório"),
-  dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
+  //dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
 });
 
 export default function CadastrarCliente() {
@@ -58,8 +59,8 @@ export default function CadastrarCliente() {
     resolver: yupResolver(clienteCallCenterSchema),
   });
 
+  const [clientes, setClientes] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
-
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
   const [dataNascimento, setDataNascimento] = useState(null);
@@ -70,32 +71,49 @@ export default function CadastrarCliente() {
   const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
 
+  useEffect(() => {
+    getClientes();
+  }, [session?.user]);
+
+  async function getClientes() {
+    const response = await fetch("/api/cadastros/cliente", {
+      method: "GET",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      setClientes(json);
+    }
+
+    console.log(response);
+  }
+
   async function salvarCliente() {
-    //setLoadingButton(true);
+    setLoadingButton(true);
+    console.log(session.user);
 
     const payload = getPayload();
     console.log("payload: ", payload);
 
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_INTEGRATION_URL}/clientes`,
-      {
-        method: "POST",
-        headers: {
-          "X-Requested-With": "XMLHttpRequest",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${session?.user?.token}`,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const response = await fetch("/api/cadastros/cliente", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log(response);
 
     if (response.ok) {
-      const json = await response.json();
-      res.status(response.status).json(json);
       toast.success("Cliente cadastrado com sucesso!");
       setLoadingButton(false);
     } else {
-      toast.error("Cliente cadastrado com sucesso!");
+      toast.error("Erro ao cadastrar cliente.");
+      setLoadingButton(false);
     }
   }
 
@@ -107,11 +125,11 @@ export default function CadastrarCliente() {
         ? moment(dataNascimento).format("YYYY-MM-DD")
         : null,
       especie: especieInss ? especieInss?.especie : null,
-      matricula: matricula,
+      matricula: matricula.toUpperCase(),
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
       telefone3: telefoneTres.replace(/\D/g, ""),
-      observacoes: observacao,
+      observacoes: observacao.toUpperCase(),
     };
 
     return payload;
@@ -119,29 +137,99 @@ export default function CadastrarCliente() {
 
   const columns = [
     {
-      field: "id",
-      headerName: "AÇÃO",
-      renderHeader: (params) => <strong>AÇÃO</strong>,
+      field: "cpf",
+      headerName: "CPF",
+      renderHeader: (params) => <strong>CPF</strong>,
       minWidth: 150,
       align: "center",
       headerAlign: "center",
     },
+    {
+      field: "nome",
+      headerName: "NOME",
+      renderHeader: (params) => <strong>NOME</strong>,
+      flex: 1,
+      minWidth: 350,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "dt_nascimento",
+      headerName: "DATA NASCIMENTO",
+      renderHeader: (params) => <strong>DATA NASCIMENTO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "especie",
+      headerName: "ESPÉCIE",
+      renderHeader: (params) => <strong>ESPÉCIE</strong>,
+      minWidth: 450,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "matricula",
+      headerName: "MATRÍCULA",
+      renderHeader: (params) => <strong>MATRÍCULA</strong>,
+      minWidth: 250,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "telefone1",
+      headerName: "TELEFONE UM",
+      renderHeader: (params) => <strong>TELEFONE UM</strong>,
+      minWidth: 250,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "telefone2",
+      headerName: "TELEFONE DOIS",
+      renderHeader: (params) => <strong>TELEFONE DOIS</strong>,
+      minWidth: 250,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "telefone3",
+      headerName: "TELEFONE TRÊS",
+      renderHeader: (params) => <strong>TELEFONE TRÊS</strong>,
+      minWidth: 250,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "observacoes",
+      headerName: "OBSERVAÇÃO",
+      renderHeader: (params) => <strong>OBSERVAÇÃO</strong>,
+      minWidth: 450,
+      align: "center",
+      headerAlign: "center",
+    },
   ];
-  var rows = [{ id: 1, id: 2 }];
-  // try {
-  //   var rows = bancosArray?.map((row, index) => {
-  //     return {
-  //       id: index,
-  //       pk_ecom_banco: row.pk_ecom_banco,
-  //       cd_banco: row.cd_banco,
-  //       no_banco: row.no_banco,
-  //       no_fantasia: row.no_fantasia,
-  //     };
-  //   });
-  // } catch (err) {
-  //   console.log(err);
-  //   var rows = [];
-  // }
+
+  try {
+    var rows = clientes?.map((row) => {
+      return {
+        id: row.id,
+        cpf: formatarCPFSemAnonimidade(row.cpf),
+        nome: row.nome,
+        dt_nascimento: row.dt_nascimento ? formatarData(row.dt_nascimento) : "",
+        especie: row.especie,
+        matricula: row.matricula,
+        telefone1: row.telefone1,
+        telefone2: row.telefone2,
+        telefone3: row.telefone3,
+        observacoes: row.observacoes,
+      };
+    });
+  } catch (err) {
+    console.log(err);
+    var rows = [];
+  }
 
   return (
     <ContentWrapper title="Cadastrar cliente">
@@ -370,7 +458,8 @@ export default function CadastrarCliente() {
             </LoadingButton>
           </Grid>
         </Grid>
-
+      </Box>
+      <Box sx={{ width: "100%" }}>
         <DataTable rows={rows} columns={columns} />
       </Box>
     </ContentWrapper>
