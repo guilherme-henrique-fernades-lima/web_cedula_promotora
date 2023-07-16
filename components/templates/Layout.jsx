@@ -144,7 +144,7 @@ export default function Layout({ children }) {
                         <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
                       </ListItemIcon>
                       <ListItemText
-                        primary={<TitleTypography>Cobranças</TitleTypography>}
+                        primary={<TitleTypography>Cliente</TitleTypography>}
                       />
                     </ListItemButton>
                   </ListItem>
