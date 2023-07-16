@@ -27,24 +27,28 @@ export function formatarCPFSemAnonimidade(cpf) {
 }
 
 export function formatarTelefone(telefone) {
-  // Remover todos os caracteres não numéricos do número de telefone
+  // Removendo caracteres não numéricos do telefone
   const numeroLimpo = telefone.replace(/\D/g, "");
 
-  // Verificar se o número de telefone possui o formato correto (11 dígitos)
-  if (numeroLimpo.length !== 11) {
-    throw new Error(
-      "Número de telefone inválido. Certifique-se de que o número contenha 11 dígitos."
-    );
+  if (!telefone) {
+    return "";
   }
 
-  // Formatar o número de telefone no formato desejado
-  const codigoArea = numeroLimpo.slice(0, 2);
-  const digito9 = numeroLimpo.slice(2, 3);
-  const digitosRestantes = numeroLimpo.slice(3);
-  const telefoneFormatado = `(${codigoArea}) ${digito9} ${digitosRestantes.slice(
-    0,
-    4
-  )}-${digitosRestantes.slice(4)}`;
-
-  return telefoneFormatado;
+  // Verificando se o número tem 11 dígitos (incluindo o DDD)
+  if (numeroLimpo.length === 11) {
+    // Formato com DDD, 9 e 4 primeiros dígitos após o DDD
+    return `${numeroLimpo.slice(0, 2)} ${numeroLimpo.slice(
+      2,
+      3
+    )} ${numeroLimpo.slice(3, 7)}-${numeroLimpo.slice(7)}`;
+  } else if (numeroLimpo.length === 10) {
+    // Formato com DDD e 4 primeiros dígitos após o DDD
+    return `${numeroLimpo.slice(0, 2)} ${numeroLimpo.slice(
+      2,
+      6
+    )}-${numeroLimpo.slice(6)}`;
+  } else {
+    // Caso não corresponda a nenhum padrão conhecido, retornar o número original
+    return telefone;
+  }
 }

@@ -222,7 +222,13 @@ export default function CadastrarCliente() {
     setCpf(data.cpf);
     setNome(data.nome);
     setDataNascimento(data.dataNascimento);
-    setEspecieInss(data.especie);
+    setEspecieInss(
+      data.especie
+        ? {
+            especie: data.especie,
+          }
+        : null
+    );
     setMatricula(data.matricula);
     setTelefoneUm(data.telefone1 ? data.telefone1 : "");
     setTelefoneDois(data.telefone2 ? data.telefone2 : "");
@@ -339,7 +345,7 @@ export default function CadastrarCliente() {
               getOptionLabel={(option) => option?.especie}
               value={especieInss}
               onChange={(event, newValue) => {
-                setEspecieInss(newValue?.especie);
+                setEspecieInss(newValue);
               }}
               renderInput={(params) => (
                 <TextField

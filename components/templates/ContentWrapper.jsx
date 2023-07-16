@@ -15,7 +15,7 @@ export default function ContentWrapper(props) {
         marginBottom: 1,
         display: "flex",
         alignItems: "flex-start",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         flexDirection: "column",
       }}
       elevation={0}

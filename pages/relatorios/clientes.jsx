@@ -15,7 +15,11 @@ import IconButton from "@mui/material/IconButton";
 
 //Custom componentes
 import DataTable from "@/components/Datatable";
-import { formatarCPFSemAnonimidade, formatarData } from "@/helpers/utils";
+import {
+  formatarCPFSemAnonimidade,
+  formatarData,
+  formatarTelefone,
+} from "@/helpers/utils";
 
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
@@ -120,6 +124,7 @@ export default function CadastrarCliente() {
       minWidth: 250,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => formatarTelefone(params.value),
     },
     {
       field: "telefone2",
@@ -128,6 +133,7 @@ export default function CadastrarCliente() {
       minWidth: 250,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => formatarTelefone(params.value),
     },
     {
       field: "telefone3",
@@ -136,6 +142,7 @@ export default function CadastrarCliente() {
       minWidth: 250,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => formatarTelefone(params.value),
     },
     {
       field: "observacoes",
