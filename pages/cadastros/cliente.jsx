@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 
+//Next.js
+import { useRouter } from "next/router";
+
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
@@ -24,19 +27,14 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
 //Constants
 import { ESPECIES_INSS } from "@/helpers/constants";
-
-//Custom componentes
-import DataTable from "@/components/Datatable";
-import { formatarCPFSemAnonimidade, formatarData } from "@/helpers/utils";
-
-//Icons
-import EditIcon from "@mui/icons-material/Edit";
 
 const clienteCallCenterSchema = yup.object().shape({
   cpf: yup
@@ -50,6 +48,8 @@ const clienteCallCenterSchema = yup.object().shape({
 
 export default function CadastrarCliente() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const [openBackdrop, setOpenBackdrop] = useState(false);
 
   const {
     register,
@@ -75,6 +75,18 @@ export default function CadastrarCliente() {
   const [telefoneDois, setTelefoneDois] = useState("");
   const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
+
+  console.log("especieInss >>> ", especieInss);
+
+  useEffect(() => {
+    if (router.query?.cpf) {
+      getClientePorCPF(router.query?.cpf);
+    }
+  }, [router.query?.cpf]);
+
+  const handleBackdrop = () => {
+    setOpenBackdrop(!openBackdrop);
+  };
 
   useEffect(() => {
     getClientes();
@@ -120,7 +132,7 @@ export default function CadastrarCliente() {
   async function editarDadosCliente() {
     setLoadingButton(true);
 
-    const payload = getPayloadEditarDados();
+    const payload = getPayload();
     console.log("payload >>> ", payload);
 
     const response = await fetch(
@@ -134,8 +146,6 @@ export default function CadastrarCliente() {
       }
     );
 
-    console.log(response);
-
     if (response.ok) {
       toast.success("Dados atualizados com sucesso!");
       clearStatesAndErrors();
@@ -146,25 +156,26 @@ export default function CadastrarCliente() {
     }
   }
 
-  function getPayload() {
-    const payload = {
-      cpf: cpf.replace(/\D/g, ""),
-      nome: nome.toUpperCase(),
-      dt_nascimento: dataNascimento
-        ? moment(dataNascimento).format("YYYY-MM-DD")
-        : null,
-      especie: especieInss ? especieInss?.especie : null,
-      matricula: matricula.toUpperCase(),
-      telefone1: telefoneUm.replace(/\D/g, ""),
-      telefone2: telefoneDois.replace(/\D/g, ""),
-      telefone3: telefoneTres.replace(/\D/g, ""),
-      observacoes: observacao.toUpperCase(),
-    };
+  async function getClientePorCPF(cpfCliente) {
+    setOpenBackdrop(true);
+    const response = await fetch(
+      `/api/cadastros/retrieveCliente/?cpf=${cpfCliente.replace(/\D/g, "")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
-    return payload;
+    if (response.ok) {
+      const json = await response.json();
+      getDataForEdit(json);
+    }
+    setOpenBackdrop(false);
   }
 
-  function getPayloadEditarDados() {
+  function getPayload() {
     const payload = {
       id: id,
       cpf: cpf.replace(/\D/g, ""),
@@ -200,7 +211,7 @@ export default function CadastrarCliente() {
   }
 
   function getDataForEdit(data) {
-    console.log("data >>>> ", data);
+    console.log("data", data);
     clearErrors();
 
     setValue("nome", data.nome);
@@ -210,8 +221,8 @@ export default function CadastrarCliente() {
     setId(data.id);
     setCpf(data.cpf);
     setNome(data.nome);
-    //setDataNascimento(data.dataNascimento);
-    setEspecieInss(data.especie ? data.especie : null);
+    setDataNascimento(data.dataNascimento);
+    setEspecieInss(data.especie);
     setMatricula(data.matricula);
     setTelefoneUm(data.telefone1 ? data.telefone1 : "");
     setTelefoneDois(data.telefone2 ? data.telefone2 : "");
@@ -219,133 +230,22 @@ export default function CadastrarCliente() {
     setObservacao(data.observacoes);
   }
 
-  const columns = [
-    {
-      field: "id",
-      headerName: "AÇÃO",
-      renderHeader: (params) => <strong>AÇÃO</strong>,
-      minWidth: 150,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        return (
-          <IconButton
-            onClick={() => {
-              getDataForEdit(params.row);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-        );
-      },
-    },
-    {
-      field: "cpf",
-      headerName: "CPF",
-      renderHeader: (params) => <strong>CPF</strong>,
-      minWidth: 150,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "nome",
-      headerName: "NOME",
-      renderHeader: (params) => <strong>NOME</strong>,
-      flex: 1,
-      minWidth: 350,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "dt_nascimento",
-      headerName: "DATA NASCIMENTO",
-      renderHeader: (params) => <strong>DATA NASCIMENTO</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarData(params.value);
-        }
-      },
-    },
-    {
-      field: "especie",
-      headerName: "ESPÉCIE",
-      renderHeader: (params) => <strong>ESPÉCIE</strong>,
-      minWidth: 450,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "matricula",
-      headerName: "MATRÍCULA",
-      renderHeader: (params) => <strong>MATRÍCULA</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "telefone1",
-      headerName: "TELEFONE UM",
-      renderHeader: (params) => <strong>TELEFONE UM</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "telefone2",
-      headerName: "TELEFONE DOIS",
-      renderHeader: (params) => <strong>TELEFONE DOIS</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "telefone3",
-      headerName: "TELEFONE TRÊS",
-      renderHeader: (params) => <strong>TELEFONE TRÊS</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "observacoes",
-      headerName: "OBSERVAÇÃO",
-      renderHeader: (params) => <strong>OBSERVAÇÃO</strong>,
-      minWidth: 450,
-      align: "center",
-      headerAlign: "center",
-    },
-  ];
-
-  try {
-    var rows = clientes?.map((row) => {
-      return {
-        id: row.id,
-        cpf: formatarCPFSemAnonimidade(row.cpf),
-        nome: row.nome,
-        dt_nascimento: row.dt_nascimento,
-        especie: row.especie,
-        matricula: row.matricula,
-        telefone1: row.telefone1,
-        telefone2: row.telefone2,
-        telefone3: row.telefone3,
-        observacoes: row.observacoes,
-      };
-    });
-  } catch (err) {
-    console.log(err);
-    var rows = [];
-  }
-
   return (
     <ContentWrapper title="Cadastrar cliente">
       <Toaster position="bottom-center" reverseOrder={true} />
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBackdrop}
+        onClick={handleBackdrop}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <Box
         component="form"
         onSubmit={handleSubmit(() => {
-          // salvarCliente();
+          //salvarCliente();
           editarDadosCliente();
         })}
         sx={{ width: "100%" }}
@@ -358,7 +258,9 @@ export default function CadastrarCliente() {
               mask="999.999.999-99"
               maskChar={null}
               value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
+              onChange={(e) => {
+                setCpf(e.target.value);
+              }}
             >
               {(inputProps) => (
                 <TextField
@@ -437,7 +339,7 @@ export default function CadastrarCliente() {
               getOptionLabel={(option) => option?.especie}
               value={especieInss}
               onChange={(event, newValue) => {
-                setEspecieInss(newValue);
+                setEspecieInss(newValue?.especie);
               }}
               renderInput={(params) => (
                 <TextField
@@ -560,9 +462,6 @@ export default function CadastrarCliente() {
             </LoadingButton>
           </Grid>
         </Grid>
-      </Box>
-      <Box sx={{ width: "100%" }}>
-        <DataTable rows={rows} columns={columns} />
       </Box>
     </ContentWrapper>
   );

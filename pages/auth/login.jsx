@@ -152,6 +152,7 @@ export default function SingIn() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             //error={Boolean(error)}
+            label="Senha"
             placeholder="Senha"
             sx={{
               marginTop: "20px",

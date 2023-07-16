@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DataGrid, ptBR } from "@mui/x-data-grid";
+import { DataGrid, ptBR, GridToolbar } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 
 export default function DataTable(props) {
@@ -22,12 +22,17 @@ export default function DataTable(props) {
         pageSize={pageSize}
         rowsPerPageOptions={[5, 10, 25, 50, 100]}
         onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-        componentsProps={{
-          pagination: {
-            labelRowsPerPage: "Linhas por página",
+        disableRowSelectionOnClick
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+            quickFilterProps: { debounceMs: 500 },
           },
         }}
-        disableRowSelectionOnClick
+        disableColumnSelector
+        disableDensitySelector
+        disableColumnFilter
       />
     </Box>
   );

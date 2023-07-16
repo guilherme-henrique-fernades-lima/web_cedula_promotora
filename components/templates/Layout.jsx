@@ -20,6 +20,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
+import Collapse from "@mui/material/Collapse";
 
 //Icons
 import SubjectIcon from "@mui/icons-material/Subject";
@@ -29,14 +30,18 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import SavingsIcon from "@mui/icons-material/Savings";
 import LogoutIcon from "@mui/icons-material/Logout";
-
-const USER_LOGGED = false;
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
+  const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
+  const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
 
   useEffect(() => {
     // if (!session?.user) {
@@ -63,107 +68,183 @@ export default function Layout({ children }) {
     <>
       <CssBaseline />
 
-      <Box sx={{ display: "flex" }}>
-        <AppBar position="fixed" open={open} elevation={0}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerCloseOpen}
-              edge="start"
-              sx={{ mr: 2 }}
-            >
-              {open ? <ChevronLeftIcon /> : <MenuIcon />}
+      {session?.user ? (
+        <Box sx={{ display: "flex" }}>
+          <AppBar position="fixed" open={open} elevation={0}>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerCloseOpen}
+                edge="start"
+                sx={{ mr: 2 }}
+              >
+                {open ? <ChevronLeftIcon /> : <MenuIcon />}
+              </IconButton>
+              <Typography
+                variant="h6"
+                noWrap
+                component="h6"
+                sx={{
+                  fontWeight: 700,
+                  fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
+                }}
+              >
+                CÉDULA PROMOTORA
+              </Typography>
+            </Toolbar>
+            <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
+              <LogoutIcon sx={{ color: "#fff" }} />
             </IconButton>
-            <Typography
-              variant="h6"
-              noWrap
-              component="h6"
-              sx={{
-                fontWeight: 700,
-                fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
-              }}
-            >
-              CÉDULA PROMOTORA
-            </Typography>
-          </Toolbar>
-          <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-            <LogoutIcon sx={{ color: "#fff" }} />
-          </IconButton>
-        </AppBar>
-        <Drawer
-          sx={{
-            width: DRAWER_WIDTH,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
+          </AppBar>
+          <Drawer
+            sx={{
               width: DRAWER_WIDTH,
-              boxSizing: "border-box",
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader></DrawerHeader>
-          <Divider />
-          <List>
-            <Link href="/cadastros/cliente">
-              <ListItem disablePadding>
+              flexShrink: 0,
+              "& .MuiDrawer-paper": {
+                width: DRAWER_WIDTH,
+                boxSizing: "border-box",
+              },
+            }}
+            variant="persistent"
+            anchor="left"
+            open={open}
+          >
+            <DrawerHeader></DrawerHeader>
+            <Divider />
+            <List>
+              <ListItem
+                disablePadding
+                onClick={() => setOpenDropdownCadastros(!openDropdownCadastros)}
+              >
                 <ListItemButton>
                   <ListItemIcon>
-                    <GroupsIcon />
+                    <AddCircleOutlineIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<TitleTypography>Clientes</TitleTypography>}
+                    primary={<TitleTypography>Cadastros</TitleTypography>}
+                  />
+                  <ExpandLess
+                    sx={{
+                      fontSize: "20px",
+                      transition: "all 0.3s ease",
+                      transform: `${
+                        openDropdownCadastros ? "rotate(0)" : "rotate(180deg)"
+                      }`,
+                    }}
                   />
                 </ListItemButton>
               </ListItem>
-            </Link>
-            <Link href="/relatorios/cobrancas">
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <GavelIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<TitleTypography>Cobranças</TitleTypography>}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-            <Link href="/cadastros/custo-mensal">
-              <ListItem disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <SavingsIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<TitleTypography>Custo mensal</TitleTypography>}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </Link>
 
-            <Link href="/cadastros/emprestimo">
-              <ListItem disablePadding>
+              <Collapse in={openDropdownCadastros} timeout="auto" unmountOnExit>
+                <Link href="/cadastros/cliente">
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemIcon sx={{ pl: 3 }}>
+                        <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={<TitleTypography>Cobranças</TitleTypography>}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Link>
+              </Collapse>
+
+              <ListItem
+                disablePadding
+                onClick={() =>
+                  setOpenDropdownRelatorios(!openDropdownRelatorios)
+                }
+              >
                 <ListItemButton>
                   <ListItemIcon>
                     <SubjectIcon />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<TitleTypography>Empréstimos</TitleTypography>}
+                    primary={<TitleTypography>Relatórios</TitleTypography>}
+                  />
+                  <ExpandLess
+                    sx={{
+                      fontSize: "20px",
+                      transition: "all 0.3s ease",
+                      transform: `${
+                        openDropdownRelatorios ? "rotate(0)" : "rotate(180deg)"
+                      }`,
+                    }}
                   />
                 </ListItemButton>
               </ListItem>
-            </Link>
-          </List>
-          {/* <Divider /> */}
-        </Drawer>
-        <Main open={open}>
-          <DrawerHeader />
-          {children}
-        </Main>
-      </Box>
+              <Collapse
+                in={openDropdownRelatorios}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="div" disablePadding>
+                  <Link href="/relatorios/clientes">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Clientes</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/relatorios/cobrancas">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Cobranças</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/relatorios/contratos">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Contratos</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/relatorios/despesas">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Despesas</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                </List>
+              </Collapse>
+            </List>
+            {/* <Divider /> */}
+          </Drawer>
+          <Main open={open}>
+            <DrawerHeader />
+            {children}
+          </Main>
+        </Box>
+      ) : (
+        <>{children}</>
+      )}
     </>
   );
 }
