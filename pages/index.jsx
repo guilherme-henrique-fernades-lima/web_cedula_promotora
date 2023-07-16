@@ -2,5 +2,5 @@
 import ContentWrapper from "../components/templates/ContentWrapper";
 
 export default function Index() {
-  return <ContentWrapper title="Relação de cobranças"></ContentWrapper>;
+  return <ContentWrapper title="Tela de bem vindas"></ContentWrapper>;
 }

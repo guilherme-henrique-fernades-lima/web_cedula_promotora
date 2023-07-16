@@ -52,3 +52,12 @@ export function formatarTelefone(telefone) {
     return telefone;
   }
 }
+
+export function converterDataParaJS(dataNoFormatoYYYYMMDD) {
+  const partesDaData = dataNoFormatoYYYYMMDD.split("-");
+  const ano = parseInt(partesDaData[0]);
+  const mes = parseInt(partesDaData[1]) - 1;
+  const dia = parseInt(partesDaData[2]);
+
+  return new Date(ano, mes, dia);
+}

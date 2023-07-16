@@ -20,7 +20,6 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import Autocomplete from "@mui/material/Autocomplete";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -36,6 +35,12 @@ import SaveIcon from "@mui/icons-material/Save";
 //Constants
 import { ESPECIES_INSS } from "@/helpers/constants";
 
+//Formatters
+import {
+  formatarCPFSemAnonimidade,
+  converterDataParaJS,
+} from "@/helpers/utils";
+
 const clienteCallCenterSchema = yup.object().shape({
   cpf: yup
     .string()
@@ -43,7 +48,7 @@ const clienteCallCenterSchema = yup.object().shape({
     .min(14, "O CPF precisa ter pelo menos 11 digitos"),
   telefoneUm: yup.string().required("Informe um telefone válido"),
   nome: yup.string().required("O nome do cliente é obrigatório"),
-  //dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
+  dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
 });
 
 export default function CadastrarCliente() {
@@ -63,7 +68,6 @@ export default function CadastrarCliente() {
     resolver: yupResolver(clienteCallCenterSchema),
   });
 
-  const [clientes, setClientes] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
   const [cpf, setCpf] = useState("");
@@ -76,8 +80,6 @@ export default function CadastrarCliente() {
   const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
 
-  console.log("especieInss >>> ", especieInss);
-
   useEffect(() => {
     if (router.query?.cpf) {
       getClientePorCPF(router.query?.cpf);
@@ -87,24 +89,6 @@ export default function CadastrarCliente() {
   const handleBackdrop = () => {
     setOpenBackdrop(!openBackdrop);
   };
-
-  useEffect(() => {
-    getClientes();
-  }, [session?.user]);
-
-  async function getClientes() {
-    const response = await fetch("/api/cadastros/cliente", {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
-
-    if (response.ok) {
-      const json = await response.json();
-      setClientes(json);
-    }
-  }
 
   async function salvarCliente() {
     setLoadingButton(true);
@@ -150,6 +134,10 @@ export default function CadastrarCliente() {
       toast.success("Dados atualizados com sucesso!");
       clearStatesAndErrors();
       setLoadingButton(false);
+
+      setTimeout(() => {
+        router.push("/relatorios/clientes");
+      }, 500);
     } else {
       toast.error("Erro ao atualizar dados!");
       setLoadingButton(false);
@@ -210,18 +198,19 @@ export default function CadastrarCliente() {
     setObservacao("");
   }
 
+  console.log(new Date(dataNascimento));
+
   function getDataForEdit(data) {
-    console.log("data", data);
     clearErrors();
 
     setValue("nome", data.nome);
-    setValue("cpf", data.cpf);
+    setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
     setValue("telefoneUm", data.telefone1);
 
     setId(data.id);
-    setCpf(data.cpf);
+    setCpf(formatarCPFSemAnonimidade(data.cpf));
     setNome(data.nome);
-    setDataNascimento(data.dataNascimento);
+    setDataNascimento(converterDataParaJS(data.dt_nascimento));
     setEspecieInss(
       data.especie
         ? {
@@ -251,8 +240,11 @@ export default function CadastrarCliente() {
       <Box
         component="form"
         onSubmit={handleSubmit(() => {
-          //salvarCliente();
-          editarDadosCliente();
+          if (router.query?.cpf) {
+            editarDadosCliente();
+          } else {
+            salvarCliente();
+          }
         })}
         sx={{ width: "100%" }}
       >
