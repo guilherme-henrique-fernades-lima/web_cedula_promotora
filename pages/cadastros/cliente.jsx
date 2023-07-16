@@ -65,6 +65,7 @@ export default function CadastrarCliente() {
 
   const [clientes, setClientes] = useState([]);
   const [loadingButton, setLoadingButton] = useState(false);
+  const [id, setId] = useState("");
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
   const [dataNascimento, setDataNascimento] = useState(null);
@@ -116,8 +117,56 @@ export default function CadastrarCliente() {
     }
   }
 
+  async function editarDadosCliente() {
+    setLoadingButton(true);
+
+    const payload = getPayloadEditarDados();
+    console.log("payload >>> ", payload);
+
+    const response = await fetch(
+      `/api/cadastros/cliente/?cpf=${cpf.replace(/\D/g, "")}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    console.log(response);
+
+    if (response.ok) {
+      toast.success("Dados atualizados com sucesso!");
+      clearStatesAndErrors();
+      setLoadingButton(false);
+    } else {
+      toast.error("Erro ao atualizar dados!");
+      setLoadingButton(false);
+    }
+  }
+
   function getPayload() {
     const payload = {
+      cpf: cpf.replace(/\D/g, ""),
+      nome: nome.toUpperCase(),
+      dt_nascimento: dataNascimento
+        ? moment(dataNascimento).format("YYYY-MM-DD")
+        : null,
+      especie: especieInss ? especieInss?.especie : null,
+      matricula: matricula.toUpperCase(),
+      telefone1: telefoneUm.replace(/\D/g, ""),
+      telefone2: telefoneDois.replace(/\D/g, ""),
+      telefone3: telefoneTres.replace(/\D/g, ""),
+      observacoes: observacao.toUpperCase(),
+    };
+
+    return payload;
+  }
+
+  function getPayloadEditarDados() {
+    const payload = {
+      id: id,
       cpf: cpf.replace(/\D/g, ""),
       nome: nome.toUpperCase(),
       dt_nascimento: dataNascimento
@@ -138,6 +187,7 @@ export default function CadastrarCliente() {
     clearErrors();
     reset();
 
+    setId("");
     setCpf("");
     setNome("");
     setDataNascimento(null);
@@ -149,15 +199,6 @@ export default function CadastrarCliente() {
     setObservacao("");
   }
 
-  console.log("nome", nome);
-  console.log("cpf", cpf);
-  console.log("especieInss", especieInss);
-  console.log("matricula", matricula);
-  console.log("telefoneUm", telefoneUm);
-  console.log("telefoneDois", telefoneDois);
-  console.log("telefoneTres", telefoneTres);
-  console.log("observacao", observacao);
-
   function getDataForEdit(data) {
     console.log("data >>>> ", data);
     clearErrors();
@@ -166,6 +207,7 @@ export default function CadastrarCliente() {
     setValue("cpf", data.cpf);
     setValue("telefoneUm", data.telefone1);
 
+    setId(data.id);
     setCpf(data.cpf);
     setNome(data.nome);
     //setDataNascimento(data.dataNascimento);
@@ -303,7 +345,8 @@ export default function CadastrarCliente() {
       <Box
         component="form"
         onSubmit={handleSubmit(() => {
-          salvarCliente();
+          // salvarCliente();
+          editarDadosCliente();
         })}
         sx={{ width: "100%" }}
       >
@@ -375,6 +418,7 @@ export default function CadastrarCliente() {
                     size="small"
                     {...register("dataNascimento")}
                     error={Boolean(errors.dataNascimento)}
+                    autoComplete="off"
                   />
                 )}
                 value={dataNascimento}
