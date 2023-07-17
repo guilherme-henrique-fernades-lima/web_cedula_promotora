@@ -137,7 +137,7 @@ export default function Layout({ children }) {
               </ListItem>
 
               <Collapse in={openDropdownCadastros} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding>
+                <List component="nav" disablePadding>
                   <Link href="/cadastros/cliente">
                     <ListItem disablePadding>
                       <ListItemButton>
@@ -195,7 +195,7 @@ export default function Layout({ children }) {
                 timeout="auto"
                 unmountOnExit
               >
-                <List component="div" disablePadding>
+                <List component="nav" disablePadding>
                   <Link href="/relatorios/clientes">
                     <ListItem disablePadding>
                       <ListItemButton>

@@ -40,32 +40,57 @@ import {
 } from "@/helpers/constants";
 
 //Formatters
-import {
-  formatarCPFSemAnonimidade,
-  converterDataParaJS,
-} from "@/helpers/utils";
-
-function getPayload() {
-  const data = {
-    id: "",
-    dt_vencimento: "",
-    descricao: "",
-    valor: "",
-    situacao: "",
-    tp_despesa: "",
-    natureza_despesa: "",
-  };
-
-  return data;
-}
+import { converterDataParaJS } from "@/helpers/utils";
 
 export default function CadastrarDespesa() {
   const [openBackdrop, setOpenBackdrop] = useState(false);
-  const [dataVencimento, setDataVencimento] = useState(null);
+
+  const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
+  const [descricaoDespesa, setDescricaoDespesa] = useState("");
+  const [valorDespesa, setValorDespesa] = useState("");
+  const [tipoDespesa, setTipoDespesa] = useState("");
+  const [naturezaDespesa, setNaturezaDespesa] = useState("");
+  const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
 
   const handleBackdrop = () => {
     setOpenBackdrop(!openBackdrop);
   };
+
+  function getPayload() {
+    const data = {
+      dt_vencimento: dataVencimentoDespesa,
+      descricao: descricaoDespesa,
+      valor: valorDespesa,
+      situacao: situacaoPagamentoDespesa,
+      tp_despesa: tipoDespesa,
+      natureza_despesa: naturezaDespesa,
+    };
+
+    return data;
+  }
+
+  async function salvarDespesa() {
+    //setLoadingButton(true);
+    const payload = getPayload();
+    console.log("payload >> ", payload);
+
+    const response = await fetch("/api/cadastros/despesa", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Despesa cadastrada com sucesso!");
+      clearStatesAndErrors();
+      //setLoadingButton(false);
+    } else {
+      toast.error("Erro ao cadastrar despesa.");
+      //setLoadingButton(false);
+    }
+  }
 
   return (
     <ContentWrapper title="Cadastrar despesa">
@@ -78,7 +103,13 @@ export default function CadastrarDespesa() {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      <Box component="form" sx={{ width: "100%" }}>
+      <Box
+        component="form"
+        sx={{ width: "100%" }}
+        onSubmit={handleSubmit(() => {
+          salvarDespesa();
+        })}
+      >
         <Grid container spacing={2} sx={{ mt: 2 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
@@ -86,9 +117,9 @@ export default function CadastrarDespesa() {
                 leftArrowButtonText="Mês anterior"
                 rightArrowButtonText="Próximo mês"
                 label="Data de vencimento"
-                value={dataVencimento}
+                value={dataVencimentoDespesa}
                 onChange={(newValue) => {
-                  setDataVencimento(newValue);
+                  setDataVencimentoDespesa(newValue);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -107,10 +138,10 @@ export default function CadastrarDespesa() {
             <TextField
               // {...register("nome")}
               // error={Boolean(errors.nome)}
-              // value={nome}
-              // onChange={(e) => {
-              //   setNome(e.target.value.replace(/[^A-Za-z\s]/g, ""));
-              // }}
+              value={descricaoDespesa}
+              onChange={(e) => {
+                setDescricaoDespesa(e.target.value);
+              }}
               size="small"
               label="Descrição da despesa"
               placeholder="Descreva a despesa"
@@ -124,10 +155,10 @@ export default function CadastrarDespesa() {
             <TextField
               // {...register("nome")}
               // error={Boolean(errors.nome)}
-              // value={nome}
-              // onChange={(e) => {
-              //   setNome(e.target.value.replace(/[^A-Za-z\s]/g, ""));
-              // }}
+              value={valorDespesa}
+              onChange={(e) => {
+                setValorDespesa(e.target.value);
+              }}
               size="small"
               label="Valor da despesa"
               placeholder="R$ 0,00"
@@ -144,10 +175,10 @@ export default function CadastrarDespesa() {
               fullWidth
               label="Situação"
               size="small"
-              // value={siglaLoja || ""}
-              // onChange={(e) => {
-              // 	setSiglaLoja(e.target.value);
-              // }}
+              value={situacaoPagamentoDespesa}
+              onChange={(e) => {
+                setSituacaoPagamentoDespesa(e.target.value);
+              }}
             >
               {SITUACAO_PAGAMENTO.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -164,10 +195,10 @@ export default function CadastrarDespesa() {
               fullWidth
               label="Natureza da despesa"
               size="small"
-              // value={siglaLoja || ""}
-              // onChange={(e) => {
-              // 	setSiglaLoja(e.target.value);
-              // }}
+              value={naturezaDespesa}
+              onChange={(e) => {
+                setNaturezaDespesa(e.target.value);
+              }}
             >
               {NATUREZA_DESPESA.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -184,10 +215,10 @@ export default function CadastrarDespesa() {
               fullWidth
               label="Tipo de despesa"
               size="small"
-              // value={siglaLoja || ""}
-              // onChange={(e) => {
-              // 	setSiglaLoja(e.target.value);
-              // }}
+              value={tipoDespesa}
+              onChange={(e) => {
+                setTipoDespesa(e.target.value);
+              }}
             >
               {TIPO_DESPESA.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
