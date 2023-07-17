@@ -137,18 +137,33 @@ export default function Layout({ children }) {
               </ListItem>
 
               <Collapse in={openDropdownCadastros} timeout="auto" unmountOnExit>
-                <Link href="/cadastros/cliente">
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon sx={{ pl: 3 }}>
-                        <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={<TitleTypography>Cliente</TitleTypography>}
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                </Link>
+                <List component="div" disablePadding>
+                  <Link href="/cadastros/cliente">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Cliente</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/cadastros/despesa">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Despesa</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                </List>
               </Collapse>
 
               <ListItem
@@ -253,7 +268,7 @@ const DRAWER_WIDTH = 240;
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
-    backgroundColor: "#fafafa",
+    backgroundColor: "#e8e8e8",
     minHeight: "100vh",
     width: "100%",
     padding: theme.spacing(3),

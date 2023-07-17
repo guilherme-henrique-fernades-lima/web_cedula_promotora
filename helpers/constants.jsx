@@ -475,3 +475,18 @@ export const ESPECIES_INSS = [
     especie: "99 - Afastamento Até 15 Dias Acidente Trabalhador",
   },
 ];
+
+export const TIPO_DESPESA = [
+  { value: "fixa", label: "FIXA" },
+  { value: "variavel", label: "VARIÁVEL" },
+];
+
+export const NATUREZA_DESPESA = [
+  { value: "refeicao", label: "REFEIÇÃO" },
+  { value: "aluguel", label: "ALUGUEL" },
+];
+
+export const SITUACAO_PAGAMENTO = [
+  { value: "pago", label: "PAGO" },
+  { value: "pendente", label: "PENDENTE" },
+];

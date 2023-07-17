@@ -117,7 +117,6 @@ export default function CadastrarCliente() {
     setLoadingButton(true);
 
     const payload = getPayload();
-    console.log("payload >>> ", payload);
 
     const response = await fetch(
       `/api/cadastros/cliente/?cpf=${cpf.replace(/\D/g, "")}`,
@@ -197,8 +196,6 @@ export default function CadastrarCliente() {
     setTelefoneTres("");
     setObservacao("");
   }
-
-  console.log(new Date(dataNascimento));
 
   function getDataForEdit(data) {
     clearErrors();
