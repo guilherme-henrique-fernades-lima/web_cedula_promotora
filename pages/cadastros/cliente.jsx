@@ -245,7 +245,7 @@ export default function CadastrarCliente() {
         })}
         sx={{ width: "100%" }}
       >
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("cpf")}

@@ -482,8 +482,11 @@ export const TIPO_DESPESA = [
 ];
 
 export const NATUREZA_DESPESA = [
-  { value: "refeicao", label: "REFEIÇÃO" },
   { value: "aluguel", label: "ALUGUEL" },
+  { value: "fgts", label: "FGTS" },
+  { value: "refeicao", label: "REFEIÇÃO" },
+  { value: "salario", label: "SALÁRIO" },
+  { value: "outro", label: "OUTRO" },
 ];
 
 export const SITUACAO_PAGAMENTO = [

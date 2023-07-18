@@ -42,15 +42,39 @@ import {
 //Formatters
 import { converterDataParaJS } from "@/helpers/utils";
 
-export default function CadastrarDespesa() {
-  const [openBackdrop, setOpenBackdrop] = useState(false);
+const desepesaSchema = yup.object().shape({
+  descricaoDespesa: yup.string().required("Descreva a despesa"),
+  valorDespesa: yup.string().required("Insira o valor desta despesa"),
+  situacaoPagamentoDespesa: yup
+    .string()
+    .required("Selecione uma situação de pagamento para esta despesa"),
+  tipoDespesa: yup.string().required("Selecione o tipo desta despesa"),
+  naturezaDespesa: yup.string().required("Selecione a natureza desta despesa"),
+});
 
+export default function CadastrarDespesa() {
+  const { data: session } = useSession();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    clearErrors,
+    reset,
+  } = useForm({
+    mode: "onChange",
+    resolver: yupResolver(desepesaSchema),
+  });
+
+  const [openBackdrop, setOpenBackdrop] = useState(false);
+  const [loadingButton, setLoadingButton] = useState(false);
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
   const [descricaoDespesa, setDescricaoDespesa] = useState("");
   const [valorDespesa, setValorDespesa] = useState("");
-  const [tipoDespesa, setTipoDespesa] = useState("");
-  const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
+  const [naturezaDespesa, setNaturezaDespesa] = useState("");
+  const [tipoDespesa, setTipoDespesa] = useState("");
 
   const handleBackdrop = () => {
     setOpenBackdrop(!openBackdrop);
@@ -58,9 +82,11 @@ export default function CadastrarDespesa() {
 
   function getPayload() {
     const data = {
-      dt_vencimento: dataVencimentoDespesa,
-      descricao: descricaoDespesa,
-      valor: valorDespesa,
+      dt_vencimento: dataVencimentoDespesa
+        ? moment(dataVencimentoDespesa).format("YYYY-MM-DD")
+        : null,
+      descricao: descricaoDespesa.toUpperCase(),
+      valor: parseFloat(valorDespesa),
       situacao: situacaoPagamentoDespesa,
       tp_despesa: tipoDespesa,
       natureza_despesa: naturezaDespesa,
@@ -70,7 +96,7 @@ export default function CadastrarDespesa() {
   }
 
   async function salvarDespesa() {
-    //setLoadingButton(true);
+    setLoadingButton(true);
     const payload = getPayload();
     console.log("payload >> ", payload);
 
@@ -85,11 +111,22 @@ export default function CadastrarDespesa() {
     if (response.ok) {
       toast.success("Despesa cadastrada com sucesso!");
       clearStatesAndErrors();
-      //setLoadingButton(false);
     } else {
       toast.error("Erro ao cadastrar despesa.");
-      //setLoadingButton(false);
     }
+
+    setLoadingButton(false);
+  }
+
+  function clearStatesAndErrors() {
+    clearErrors();
+    reset();
+    setDataVencimentoDespesa(null);
+    setDescricaoDespesa("");
+    setValorDespesa("");
+    setTipoDespesa("");
+    setNaturezaDespesa("");
+    setSituacaoPagamentoDespesa("");
   }
 
   return (
@@ -110,7 +147,7 @@ export default function CadastrarDespesa() {
           salvarDespesa();
         })}
       >
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+        <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
               <DesktopDatePicker
@@ -136,25 +173,28 @@ export default function CadastrarDespesa() {
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              // {...register("nome")}
-              // error={Boolean(errors.nome)}
+              {...register("descricaoDespesa")}
+              error={Boolean(errors.descricaoDespesa)}
               value={descricaoDespesa}
               onChange={(e) => {
                 setDescricaoDespesa(e.target.value);
               }}
               size="small"
               label="Descrição da despesa"
-              placeholder="Descreva a despesa"
+              placeholder="Insira descrição"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
             />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.descricaoDespesa?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              // {...register("nome")}
-              // error={Boolean(errors.nome)}
+              {...register("valorDespesa")}
+              error={Boolean(errors.valorDespesa)}
               value={valorDespesa}
               onChange={(e) => {
                 setValorDespesa(e.target.value);
@@ -166,12 +206,16 @@ export default function CadastrarDespesa() {
               autoComplete="off"
               fullWidth
             />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.valorDespesa?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("situacaoPagamentoDespesa")}
+              error={Boolean(errors.situacaoPagamentoDespesa)}
               select
-              required
               fullWidth
               label="Situação"
               size="small"
@@ -186,12 +230,16 @@ export default function CadastrarDespesa() {
                 </MenuItem>
               ))}
             </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.situacaoPagamentoDespesa?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("naturezaDespesa")}
+              error={Boolean(errors.naturezaDespesa)}
               select
-              required
               fullWidth
               label="Natureza da despesa"
               size="small"
@@ -206,12 +254,16 @@ export default function CadastrarDespesa() {
                 </MenuItem>
               ))}
             </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.naturezaDespesa?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("tipoDespesa")}
+              error={Boolean(errors.tipoDespesa)}
               select
-              required
               fullWidth
               label="Tipo de despesa"
               size="small"
@@ -226,6 +278,9 @@ export default function CadastrarDespesa() {
                 </MenuItem>
               ))}
             </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.tipoDespesa?.message}
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
@@ -233,7 +288,7 @@ export default function CadastrarDespesa() {
               variant="contained"
               endIcon={<SaveIcon />}
               disableElevation
-              loading={false}
+              loading={loadingButton}
               // fullWidth
             >
               SALVAR
