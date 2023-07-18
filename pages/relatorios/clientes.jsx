@@ -33,7 +33,7 @@ export default function CadastrarCliente() {
   }, [session?.user]);
 
   async function getClientes() {
-    const response = await fetch("/api/cadastros/cliente", {
+    const response = await fetch("/api/relatorios/clientes", {
       method: "GET",
       headers: {
         Authorization: session?.user?.token,

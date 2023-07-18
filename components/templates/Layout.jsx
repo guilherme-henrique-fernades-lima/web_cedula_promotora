@@ -44,13 +44,10 @@ export default function Layout({ children }) {
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
 
   useEffect(() => {
-    // if (!session?.user) {
-    //   router.push("/auth/login");
-    // }
-  }, []);
-
-  //Deslogar user
-  //const data = await signOut({redirect: false, callbackUrl: "/"})
+    if (!session?.user) {
+      router.push("/auth/login");
+    }
+  }, [session?.user]);
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);
@@ -59,10 +56,6 @@ export default function Layout({ children }) {
   const handleLogout = async () => {
     const data = await signOut({ redirect: true, callbackUrl: "/auth/login" });
   };
-
-  // if (!session?.user) {
-  //   router.push("/auth/login");
-  // }
 
   return (
     <>
@@ -146,6 +139,32 @@ export default function Layout({ children }) {
                         </ListItemIcon>
                         <ListItemText
                           primary={<TitleTypography>Cliente</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/cadastros/cobranca">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Cobrança</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/cadastros/contrato">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Contrato</TitleTypography>}
                         />
                       </ListItemButton>
                     </ListItem>
