@@ -52,6 +52,9 @@ const desepesaSchema = yup.object().shape({
   naturezaDespesa: yup.string().required("Selecione a natureza desta despesa"),
 });
 
+//Schema validation
+import { despesaSchema } from "@/schemas/despesaSchema";
+
 export default function CadastrarDespesa() {
   const { data: session } = useSession();
 

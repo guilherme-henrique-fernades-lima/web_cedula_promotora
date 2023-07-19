@@ -43,11 +43,11 @@ export default function Layout({ children }) {
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
 
-  useEffect(() => {
-    if (!session?.user) {
-      router.push("/auth/login");
-    }
-  }, [session?.user]);
+  // useEffect(() => {
+  //   if (!session?.user) {
+  //     router.push("/auth/login");
+  //   }
+  // }, [session?.user]);
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);

@@ -41,15 +41,8 @@ import {
   converterDataParaJS,
 } from "@/helpers/utils";
 
-const clienteCallCenterSchema = yup.object().shape({
-  cpf: yup
-    .string()
-    .required("Informe um CPF válido")
-    .min(14, "O CPF precisa ter pelo menos 11 digitos"),
-  telefoneUm: yup.string().required("Informe um telefone válido"),
-  nome: yup.string().required("O nome do cliente é obrigatório"),
-  dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
-});
+//Schema validation
+import { clienteCallCenterSchema } from "@/schemas/clienteCallCenterSchema";
 
 export default function CadastrarCliente() {
   const { data: session } = useSession();
@@ -245,7 +238,7 @@ export default function CadastrarCliente() {
         })}
         sx={{ width: "100%" }}
       >
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={1} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("cpf")}

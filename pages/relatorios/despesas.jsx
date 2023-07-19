@@ -5,6 +5,12 @@ import Link from "next/link";
 
 //Third party libraries
 import { useSession } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import moment from "moment";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -12,17 +18,129 @@ import ContentWrapper from "../../components/templates/ContentWrapper";
 //Mui components
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
+import Fade from "@mui/material/Fade";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+
+import Typography from "@mui/material/Typography";
+import LoadingButton from "@mui/lab/LoadingButton";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { ptBR } from "date-fns/locale";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import MenuItem from "@mui/material/MenuItem";
 
 //Custom componentes
 import DataTable from "@/components/Datatable";
-import { formatarData, formatarValorBRL } from "@/helpers/utils";
+import {
+  formatarData,
+  formatarValorBRL,
+  converterDataParaJS,
+} from "@/helpers/utils";
+
+//Constants
+import {
+  SITUACAO_PAGAMENTO,
+  NATUREZA_DESPESA,
+  TIPO_DESPESA,
+} from "@/helpers/constants";
 
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
+import SaveIcon from "@mui/icons-material/Save";
+import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+
+//Schema validation
+import { despesaSchema } from "@/schemas/despesaSchema";
 
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
+  const [showEditForm, setShowEditForm] = useState(false);
+
+  const [loadingButton, setLoadingButton] = useState(false);
+  const [id, setId] = useState("");
+  const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
+  const [descricaoDespesa, setDescricaoDespesa] = useState("");
+  const [valorDespesa, setValorDespesa] = useState("");
+  const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
+  const [naturezaDespesa, setNaturezaDespesa] = useState("");
+  const [tipoDespesa, setTipoDespesa] = useState("");
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    clearErrors,
+    reset,
+  } = useForm({
+    mode: "onChange",
+    resolver: yupResolver(despesaSchema),
+  });
+
+  async function editarDadosDespesa() {
+    setLoadingButton(true);
+    const response = await fetch("/api/relatorios/despesas", {
+      method: "PUT",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      toast.success("Despesa atualizada com sucesso");
+    } else {
+      toast.error("Error ao atualizar despesa");
+    }
+
+    setLoadingButton(false);
+  }
+
+  function getPayload() {
+    const payload = {
+      id: id,
+      cpf: cpf.replace(/\D/g, ""),
+      nome: nome.toUpperCase(),
+      dt_nascimento: dataNascimento
+        ? moment(dataNascimento).format("YYYY-MM-DD")
+        : null,
+      especie: especieInss ? especieInss?.especie : null,
+      matricula: matricula.toUpperCase(),
+      telefone1: telefoneUm.replace(/\D/g, ""),
+      telefone2: telefoneDois.replace(/\D/g, ""),
+      telefone3: telefoneTres.replace(/\D/g, ""),
+      observacoes: observacao.toUpperCase(),
+    };
+
+    return payload;
+  }
+
+  function clearStatesAndErrors() {
+    clearErrors();
+    reset();
+
+    setDataVencimentoDespesa("");
+    setDescricaoDespesa("");
+    setValorDespesa("");
+    setSituacaoPagamentoDespesa("");
+    setNaturezaDespesa("");
+    setTipoDespesa("");
+
+    // setId("");
+    // setCpf("");
+    // setNome("");
+    // setDataNascimento(null);
+    // setEspecieInss(null);
+    // setMatricula("");
+    // setTelefoneUm("");
+    // setTelefoneDois("");
+    // setTelefoneTres("");
+    // setObservacao("");
+  }
 
   useEffect(() => {
     getDespesas();
@@ -43,6 +161,25 @@ export default function RelatorioDespesas() {
     }
   }
 
+  function getDataForEdit(data) {
+    console.log(data);
+    clearErrors();
+
+    setValue("descricaoDespesa", data.nome);
+    setValue("valorDespesa", data.cpf);
+    setValue("situacaoPagamentoDespesa", data.telefone1);
+    setValue("tipoDespesa", data.nome);
+    setValue("naturezaDespesa", data.nome);
+
+    setId(data.id);
+    setDescricaoDespesa(data.descricao);
+    setDataVencimentoDespesa(converterDataParaJS(data.dt_vencimento));
+    setValorDespesa(data.valor);
+    setSituacaoPagamentoDespesa(data.situacao);
+    setNaturezaDespesa(data.natureza_despesa);
+    setTipoDespesa(data.tp_despesa);
+  }
+
   const columns = [
     {
       field: "id",
@@ -53,18 +190,14 @@ export default function RelatorioDespesas() {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <Link
-            href={{
-              pathname: "/cadastros/despesa",
-              query: {
-                id: params.row.id,
-              },
+          <IconButton
+            onClick={() => {
+              setShowEditForm(!showEditForm);
+              getDataForEdit(params.row);
             }}
           >
-            <IconButton>
-              <EditIcon />
-            </IconButton>
-          </Link>
+            <EditIcon />
+          </IconButton>
         );
       },
     },
@@ -72,25 +205,36 @@ export default function RelatorioDespesas() {
       field: "dt_vencimento",
       headerName: "DT. VENCIMENTO",
       renderHeader: (params) => <strong>DT. VENCIMENTO</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
     },
     {
       field: "descricao",
       headerName: "DESCRIÇÃO",
       renderHeader: (params) => <strong>DESCRIÇÃO</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
+      flex: 1,
     },
     {
       field: "valor",
       headerName: "VALOR",
       renderHeader: (params) => <strong>VALOR</strong>,
-      minWidth: 150,
+      minWidth: 140,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarValorBRL(params.value);
+        }
+      },
     },
     {
       field: "situacao",
@@ -99,22 +243,25 @@ export default function RelatorioDespesas() {
       minWidth: 150,
       align: "center",
       headerAlign: "center",
+      flex: 1,
     },
     {
       field: "tp_despesa",
       headerName: "TIPO DE DESPESA",
       renderHeader: (params) => <strong>TIPO DE DESPESA</strong>,
-      minWidth: 150,
+      minWidth: 220,
       align: "center",
       headerAlign: "center",
+      flex: 1,
     },
     {
       field: "natureza_despesa",
       headerName: "NATUREZA DA DESPESA",
       renderHeader: (params) => <strong>NATUREZA DA DESPESA</strong>,
-      minWidth: 150,
+      minWidth: 220,
       align: "center",
       headerAlign: "center",
+      flex: 1,
     },
   ];
 
@@ -122,11 +269,9 @@ export default function RelatorioDespesas() {
     var rows = despesas?.map((row) => {
       return {
         id: row.id,
-        dt_vencimento: row.dt_vencimento
-          ? formatarData(row.dt_vencimento)
-          : null,
+        dt_vencimento: row.dt_vencimento,
         descricao: row.descricao,
-        valor: formatarValorBRL(row.valor),
+        valor: row.valor,
         situacao: row.situacao,
         tp_despesa: row.tp_despesa,
         natureza_despesa: row.natureza_despesa,
@@ -139,9 +284,195 @@ export default function RelatorioDespesas() {
 
   return (
     <ContentWrapper title="Relação de despesas">
-      <Box sx={{ width: "100%" }}>
-        <DataTable rows={rows} columns={columns} />
-      </Box>
+      {showEditForm && (
+        <Fade in={showEditForm}>
+          <Button
+            disableElevation
+            variant="outlined"
+            onClick={() => {
+              setShowEditForm(!showEditForm);
+              clearErrors();
+            }}
+            sx={{ mt: 2 }}
+            startIcon={<ArrowBackIosRoundedIcon />}
+          >
+            VOLTAR
+          </Button>
+        </Fade>
+      )}
+
+      <Fade in={showEditForm}>
+        <Box
+          sx={{
+            display: showEditForm ? "flex" : "none",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            flexDirection: "column",
+            width: "100%",
+            mt: 4,
+          }}
+          component="form"
+          onSubmit={handleSubmit(() => {
+            editarDadosDespesa();
+          })}
+        >
+          <Toaster position="bottom-center" reverseOrder={true} />
+
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+                <DesktopDatePicker
+                  leftArrowButtonText="Mês anterior"
+                  rightArrowButtonText="Próximo mês"
+                  label="Data de vencimento"
+                  value={dataVencimentoDespesa}
+                  onChange={(newValue) => {
+                    setDataVencimentoDespesa(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      size="small"
+                      autoComplete="off"
+                    />
+                  )}
+                  disableFuture
+                  disableHighlightToday
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("descricaoDespesa")}
+                error={Boolean(errors.descricaoDespesa)}
+                value={descricaoDespesa}
+                onChange={(e) => {
+                  setDescricaoDespesa(e.target.value);
+                }}
+                size="small"
+                label="Descrição da despesa"
+                placeholder="Insira descrição"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.descricaoDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("valorDespesa")}
+                error={Boolean(errors.valorDespesa)}
+                value={valorDespesa}
+                onChange={(e) => {
+                  setValorDespesa(e.target.value);
+                }}
+                size="small"
+                label="Valor da despesa"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.valorDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("situacaoPagamentoDespesa")}
+                error={Boolean(errors.situacaoPagamentoDespesa)}
+                select
+                fullWidth
+                label="Situação"
+                size="small"
+                value={situacaoPagamentoDespesa}
+                onChange={(e) => {
+                  setSituacaoPagamentoDespesa(e.target.value);
+                }}
+              >
+                {SITUACAO_PAGAMENTO.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.situacaoPagamentoDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("naturezaDespesa")}
+                error={Boolean(errors.naturezaDespesa)}
+                select
+                fullWidth
+                label="Natureza da despesa"
+                size="small"
+                value={naturezaDespesa}
+                onChange={(e) => {
+                  setNaturezaDespesa(e.target.value);
+                }}
+              >
+                {NATUREZA_DESPESA.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.naturezaDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("tipoDespesa")}
+                error={Boolean(errors.tipoDespesa)}
+                select
+                fullWidth
+                label="Tipo de despesa"
+                size="small"
+                value={tipoDespesa}
+                onChange={(e) => {
+                  setTipoDespesa(e.target.value);
+                }}
+              >
+                {TIPO_DESPESA.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.tipoDespesa?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                endIcon={<SaveIcon />}
+                disableElevation
+                loading={loadingButton}
+              >
+                SALVAR
+              </LoadingButton>
+            </Grid>
+          </Grid>
+        </Box>
+      </Fade>
+
+      <Fade in={!showEditForm}>
+        <Box sx={{ width: "100%", display: !showEditForm ? "block" : "none" }}>
+          <DataTable rows={rows} columns={columns} />
+        </Box>
+      </Fade>
     </ContentWrapper>
   );
 }
