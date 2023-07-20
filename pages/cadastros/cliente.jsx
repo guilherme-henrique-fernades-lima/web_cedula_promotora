@@ -303,11 +303,11 @@ export default function CadastrarCliente() {
                 }}
                 renderInput={(params) => (
                   <TextField
+                    // {...register("dataNascimento")}
+                    // error={Boolean(errors.dataNascimento)}
                     {...params}
                     fullWidth
                     size="small"
-                    {...register("dataNascimento")}
-                    error={Boolean(errors.dataNascimento)}
                     autoComplete="off"
                   />
                 )}
@@ -316,9 +316,9 @@ export default function CadastrarCliente() {
                 disableHighlightToday
               />
             </LocalizationProvider>
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.dataNascimento?.message}
-            </Typography>
+            </Typography> */}
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <Autocomplete

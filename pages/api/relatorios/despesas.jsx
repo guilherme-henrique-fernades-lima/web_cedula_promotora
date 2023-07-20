@@ -1,14 +1,20 @@
 async function getDespesas(req, res) {
   const token = req.headers.authorization;
 
-  const response = await fetch(`${process.env.NEXT_INTEGRATION_URL}/despesas`, {
-    method: "GET",
-    headers: {
-      "X-Requested-With": "XMLHttpRequest",
-      "Content-Type": "application/json;charset=UTF-8",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const dt_inicio = req.query.dt_inicio ?? "";
+  const dt_final = req.query.dt_final ?? "";
+
+  const response = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/despesas/?dt_inicio=${dt_inicio}&dt_final=${dt_final}`,
+    {
+      method: "GET",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
   const json = await response.json();
 

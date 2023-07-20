@@ -24,7 +24,7 @@ export default function ContentWrapper(props) {
         component="h2"
         variant="h2"
         sx={{
-          fontSize: { xs: 14, sm: 14, md: 16, lg: 18, xl: 20 },
+          fontSize: { xs: 14, sm: 16, md: 16, lg: 18, xl: 20 },
           fontWeight: 700,
           color: "#212121",
         }}

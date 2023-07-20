@@ -56,10 +56,15 @@ import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
 
+var DATA_HOJE = new Date();
+
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
   const [showEditForm, setShowEditForm] = useState(false);
+
+  const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
+  const [dataFim, setDataFim] = useState(new Date());
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
@@ -82,19 +87,28 @@ export default function RelatorioDespesas() {
     resolver: yupResolver(despesaSchema),
   });
 
+  useEffect(() => {
+    getDespesas();
+  }, [session?.user]);
+
   async function editarDadosDespesa() {
     setLoadingButton(true);
-    const response = await fetch("/api/relatorios/despesas", {
+
+    const payload = getPayload();
+
+    const response = await fetch(`/api/relatorios/despesas/?id=${id}`, {
       method: "PUT",
       headers: {
         Authorization: session?.user?.token,
       },
+      body: JSON.stringify(payload),
     });
 
     if (response.ok) {
       toast.success("Despesa atualizada com sucesso");
+      getDespesas();
     } else {
-      toast.error("Error ao atualizar despesa");
+      toast.error("Erro ao atualizar despesa");
     }
 
     setLoadingButton(false);
@@ -103,17 +117,14 @@ export default function RelatorioDespesas() {
   function getPayload() {
     const payload = {
       id: id,
-      cpf: cpf.replace(/\D/g, ""),
-      nome: nome.toUpperCase(),
-      dt_nascimento: dataNascimento
-        ? moment(dataNascimento).format("YYYY-MM-DD")
+      descricao: descricaoDespesa,
+      dt_vencimento: dataVencimentoDespesa
+        ? moment(dataVencimentoDespesa).format("YYYY-MM-DD")
         : null,
-      especie: especieInss ? especieInss?.especie : null,
-      matricula: matricula.toUpperCase(),
-      telefone1: telefoneUm.replace(/\D/g, ""),
-      telefone2: telefoneDois.replace(/\D/g, ""),
-      telefone3: telefoneTres.replace(/\D/g, ""),
-      observacoes: observacao.toUpperCase(),
+      valor: parseFloat(valorDespesa),
+      situacao: situacaoPagamentoDespesa,
+      natureza_despesa: naturezaDespesa,
+      tp_despesa: tipoDespesa,
     };
 
     return payload;
@@ -122,54 +133,42 @@ export default function RelatorioDespesas() {
   function clearStatesAndErrors() {
     clearErrors();
     reset();
-
     setDataVencimentoDespesa("");
     setDescricaoDespesa("");
     setValorDespesa("");
     setSituacaoPagamentoDespesa("");
     setNaturezaDespesa("");
     setTipoDespesa("");
-
-    // setId("");
-    // setCpf("");
-    // setNome("");
-    // setDataNascimento(null);
-    // setEspecieInss(null);
-    // setMatricula("");
-    // setTelefoneUm("");
-    // setTelefoneDois("");
-    // setTelefoneTres("");
-    // setObservacao("");
   }
 
-  useEffect(() => {
-    getDespesas();
-  }, [session?.user]);
-
   async function getDespesas() {
-    const response = await fetch("/api/relatorios/despesas", {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
+    const response = await fetch(
+      `/api/relatorios/despesas/?dt_inicio=${moment(dataInicio).format(
+        "YYYY-MM-DD"
+      )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
     if (response.ok) {
       const json = await response.json();
-
       setDespesas(json);
     }
   }
 
   function getDataForEdit(data) {
-    console.log(data);
+    console.log("data >>>> ", data);
     clearErrors();
 
-    setValue("descricaoDespesa", data.nome);
-    setValue("valorDespesa", data.cpf);
-    setValue("situacaoPagamentoDespesa", data.telefone1);
-    setValue("tipoDespesa", data.nome);
-    setValue("naturezaDespesa", data.nome);
+    setValue("descricaoDespesa", data.descricao);
+    setValue("valorDespesa", data.valor);
+    setValue("situacaoPagamentoDespesa", data.situacao);
+    setValue("tipoDespesa", data.tp_despesa);
+    setValue("naturezaDespesa", data.natureza_despesa);
 
     setId(data.id);
     setDescricaoDespesa(data.descricao);
@@ -232,7 +231,7 @@ export default function RelatorioDespesas() {
       headerAlign: "center",
       renderCell: (params) => {
         if (params.value) {
-          return formatarValorBRL(params.value);
+          return formatarValorBRL(parseFloat(params.value));
         }
       },
     },
@@ -291,7 +290,8 @@ export default function RelatorioDespesas() {
             variant="outlined"
             onClick={() => {
               setShowEditForm(!showEditForm);
-              clearErrors();
+              clearStatesAndErrors();
+              setLoadingButton(false);
             }}
             sx={{ mt: 2 }}
             startIcon={<ArrowBackIosRoundedIcon />}
@@ -470,6 +470,70 @@ export default function RelatorioDespesas() {
 
       <Fade in={!showEditForm}>
         <Box sx={{ width: "100%", display: !showEditForm ? "block" : "none" }}>
+          <Grid container spacing={1} sx={{ mt: 1, mb: 2 }}>
+            <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+                <DesktopDatePicker
+                  leftArrowButtonText="Mês anterior"
+                  rightArrowButtonText="Próximo mês"
+                  label="Início"
+                  onChange={(newValue) => {
+                    setDataInicio(newValue);
+                  }}
+                  value={dataInicio}
+                  renderInput={(params) => (
+                    <TextField {...params} fullWidth size="small" />
+                  )}
+                  shouldDisableDate={(dateParam) => {
+                    // if (dateParam < dataFim) {
+                    //   return false;
+                    // } else if (dateParam > dataFim) {
+                    //   return true;
+                    // }
+                  }}
+                  disableFuture
+                  disableHighlightToday
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+                <DesktopDatePicker
+                  leftArrowButtonText="Mês anterior"
+                  rightArrowButtonText="Próximo mês"
+                  label="Fim"
+                  onChange={(newValue) => {
+                    setDataFim(newValue);
+                  }}
+                  value={dataFim}
+                  renderInput={(params) => (
+                    <TextField {...params} fullWidth size="small" />
+                  )}
+                  shouldDisableDate={(dateParam) => {
+                    // if (dateParam > dataInicio) {
+                    //   return false;
+                    // } else if (dateParam < dataInicio) {
+                    //   return true;
+                    // }
+                  }}
+                  disableFuture
+                  disableHighlightToday
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={2} lg={2} xl={1}>
+              <Button
+                variant="contained"
+                disableElevation
+                fullWidth
+                onClick={getDespesas}
+              >
+                PESQUISAR
+              </Button>
+            </Grid>
+          </Grid>
           <DataTable rows={rows} columns={columns} />
         </Box>
       </Fade>
