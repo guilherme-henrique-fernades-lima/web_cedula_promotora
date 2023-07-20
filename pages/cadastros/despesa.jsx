@@ -42,16 +42,6 @@ import {
 //Formatters
 import { converterDataParaJS } from "@/helpers/utils";
 
-const desepesaSchema = yup.object().shape({
-  descricaoDespesa: yup.string().required("Descreva a despesa"),
-  valorDespesa: yup.string().required("Insira o valor desta despesa"),
-  situacaoPagamentoDespesa: yup
-    .string()
-    .required("Selecione uma situação de pagamento para esta despesa"),
-  tipoDespesa: yup.string().required("Selecione o tipo desta despesa"),
-  naturezaDespesa: yup.string().required("Selecione a natureza desta despesa"),
-});
-
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
 
@@ -67,7 +57,7 @@ export default function CadastrarDespesa() {
     reset,
   } = useForm({
     mode: "onChange",
-    resolver: yupResolver(desepesaSchema),
+    resolver: yupResolver(despesaSchema),
   });
 
   const [openBackdrop, setOpenBackdrop] = useState(false);

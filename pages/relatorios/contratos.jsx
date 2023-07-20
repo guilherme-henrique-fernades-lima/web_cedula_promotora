@@ -38,7 +38,7 @@ export default function RelatorioContratos() {
 
     if (response.ok) {
       const json = await response.json();
-      setDespesas(json);
+      setContratos(json);
     }
   }
 
@@ -66,6 +66,134 @@ export default function RelatorioContratos() {
           </Link>
         );
       },
+    },
+    {
+      field: "promotora",
+      headerName: "PROMOTORA",
+      renderHeader: (params) => <strong>PROMOTORA</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "dt_digitacao",
+      headerName: "DATA DIGITAÇÃO",
+      renderHeader: (params) => <strong>DATA DIGITAÇÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nr_contrato",
+      headerName: "NR. CONTRATO",
+      renderHeader: (params) => <strong>NR. CONTRATO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "no_cliente",
+      headerName: "NOME CLIENTE",
+      renderHeader: (params) => <strong>NOME CLIENTE</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "cpf",
+      headerName: "CPF CLIENTE",
+      renderHeader: (params) => <strong>CPF CLIENTE</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "convenio",
+      headerName: "CONVÊNIO",
+      renderHeader: (params) => <strong>CONVÊNIO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "operacao",
+      headerName: "OPERAÇÃO",
+      renderHeader: (params) => <strong>OPERAÇÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "banco",
+      headerName: "BANCO",
+      renderHeader: (params) => <strong>BANCO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "vl_contrato",
+      headerName: "VLR. CONTRATO",
+      renderHeader: (params) => <strong>VLR. CONTRATO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "qt_parcelas",
+      headerName: "QTD. PARCELAS",
+      renderHeader: (params) => <strong>QTD. PARCELAS</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "vl_parcela",
+      headerName: "VLR. PARCELA",
+      renderHeader: (params) => <strong>VLR. PARCELA</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "dt_pag_cliente",
+      headerName: "DT. PAG. CLIENTE",
+      renderHeader: (params) => <strong>DT. PAG. CLIENTE</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "dt_pag_comissao",
+      headerName: "DT. PAG. COMISSÃO",
+      renderHeader: (params) => <strong>DT. PAG. COMISSÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "vl_comissao",
+      headerName: "VLR. COMISSÃO",
+      renderHeader: (params) => <strong>VLR. COMISSÃO</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "porcentagem",
+      headerName: "(%) PORCENTAGEM",
+      renderHeader: (params) => <strong>(%) PORCENTAGEM</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "corretor",
+      headerName: "CORRETOR",
+      renderHeader: (params) => <strong>CORRETOR</strong>,
+      minWidth: 150,
+      align: "center",
+      headerAlign: "center",
     },
   ];
 

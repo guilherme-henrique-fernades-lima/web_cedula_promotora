@@ -33,30 +33,16 @@ import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 
 //Constants
-import {
-  SITUACAO_PAGAMENTO,
-  NATUREZA_DESPESA,
-  TIPO_DESPESA,
-} from "@/helpers/constants";
+import { TP_PROMOTORA } from "@/helpers/constants";
 
 //Formatters
 import { converterDataParaJS } from "@/helpers/utils";
-
-const desepesaSchema = yup.object().shape({
-  descricaoDespesa: yup.string().required("Descreva a despesa"),
-  valorDespesa: yup.string().required("Insira o valor desta despesa"),
-  situacaoPagamentoDespesa: yup
-    .string()
-    .required("Selecione uma situação de pagamento para esta despesa"),
-  tipoDespesa: yup.string().required("Selecione o tipo desta despesa"),
-  naturezaDespesa: yup.string().required("Selecione a natureza desta despesa"),
-});
 
 //Schema validation
 import { contratoSchema } from "@/schemas/despesaSchema";
 
 export default function CadastrarContrato() {
-  const [contrato, setContrato] = useState("");
+  const { data: session } = useSession();
 
   const {
     register,
@@ -70,52 +56,134 @@ export default function CadastrarContrato() {
     resolver: yupResolver(contratoSchema),
   });
 
-  // id = models.BigAutoField(primary_key=True)
-  // promotora = models.CharField(max_length=255, null=True, blank=True)
-  // dt_digitacao = models.DateField(null=True, blank=True)
-  // nr_contrato = models.CharField(max_length=255, null=True, blank=True)
-  // no_cliente = models.CharField(max_length=255, null=True, blank=True)
-  // cpf = models.CharField(max_length=255, null=True, blank=True)
-  // convenio = models.CharField(max_length=255, null=True, blank=True)
-  // operacao = models.CharField(max_length=255, null=True, blank=True)
-  // banco = models.CharField(max_length=255, null=True, blank=True)
-  // vl_contrato = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-  // qt_parcelas = models.CharField(max_length=255, null=True, blank=True)
-  // vl_parcela = models.CharField(max_length=255, null=True, blank=True)
-  // dt_pag_cliente = models.DateField(null=True, blank=True)
-  // dt_pag_comissao = models.CharField(max_length=255, null=True, blank=True)
-  // vl_comissao = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-  // porcentagem = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-  // corretor = models.CharField(max_length=255, null=True, blank=True)
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  const [id, setId] = useState("");
+  const [promotora, setPromotora] = useState("");
+  const [dt_digitacao, setDtDigitacao] = useState(null);
+  const [nr_contrato, setNrContrato] = useState("");
+  const [no_cliente, setNoCliente] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [convenio, setConvenio] = useState("");
+  const [operacao, setOperacao] = useState("");
+  const [banco, setBanco] = useState("");
+  const [vl_contrato, setVlContrato] = useState("");
+  const [qt_parcelas, setQtParcelas] = useState("");
+  const [vl_parcela, setVlParcela] = useState("");
+  const [dt_pag_cliente, setDtPagCliente] = useState("");
+  const [dt_pag_comissao, setDtPagComissao] = useState("");
+  const [vl_comissao, setVlComissao] = useState("");
+  const [porcentagem, setPorcentagem] = useState("");
+  const [corretor, setCorretor] = useState("");
+
+  function getPayload() {
+    const data = {
+      id: id,
+      promotora: promotora,
+      dt_digitacao: dt_digitacao,
+      nr_contrato: nr_contrato,
+      no_cliente: no_cliente,
+      cpf: cpf,
+      convenio: convenio,
+      operacao: operacao,
+      banco: banco,
+      vl_contrato: vl_contrato,
+      qt_parcelas: qt_parcelas,
+      vl_parcela: vl_parcela,
+      dt_pag_cliente: dt_pag_cliente,
+      dt_pag_comissao: dt_pag_comissao,
+      vl_comissao: vl_comissao,
+      porcentagem: porcentagem,
+      corretor: corretor,
+    };
+
+    return data;
+  }
+
+  async function salvarContrato() {
+    //setLoadingButton(true);
+    const payload = getPayload();
+    console.log(payload);
+
+    const response = await fetch("/api/cadastros/contrato", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Contrato cadastrado com sucesso!");
+      clearStatesAndErrors();
+    } else {
+      toast.error("Erro ao cadastrar o contrato.");
+    }
+
+    //setLoadingButton(false);
+  }
+
+  function clearStatesAndErrors() {
+    clearErrors();
+    reset();
+
+    setId("");
+    setPromotora("");
+    setDtDigitacao("");
+    setNrContrato("");
+    setNoCliente("");
+    setCpf("");
+    setConvenio("");
+    setOperacao("");
+    setBanco("");
+    setVlContrato("");
+    setQtParcelas("");
+    setVlParcela("");
+    setDtPagCliente("");
+    setDtPagComissao("");
+    setVlComissao("");
+    setPorcentagem("");
+    setCorretor("");
+  }
 
   return (
     <ContentWrapper title="Cadastrar contrato">
+      <Toaster position="bottom-center" reverseOrder={true} />
+
       <Box
         component="form"
         sx={{ width: "100%" }}
-        // onSubmit={handleSubmit(() => {
-        //   salvarDespesa();
-        // })}
+        onSubmit={handleSubmit(() => {
+          salvarContrato();
+        })}
       >
         <Grid container spacing={2} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("contrato")}
-              error={Boolean(errors.contrato)}
-              value={contrato}
-              onChange={(e) => {
-                setContrato(e.target.value);
-              }}
               size="small"
-              label="Número do contrato"
-              placeholder="Insira o número do contrato"
+              label="(%) Porcentagem"
+              value={porcentagem}
+              onChange={(e) => {
+                setPorcentagem(e.target.value);
+              }}
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
+              disabled
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.contrato?.message}
-            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              endIcon={<SaveIcon />}
+              disableElevation
+              loading={loadingButton}
+              // fullWidth
+            >
+              SALVAR
+            </LoadingButton>
           </Grid>
         </Grid>
       </Box>

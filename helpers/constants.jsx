@@ -493,3 +493,23 @@ export const SITUACAO_PAGAMENTO = [
   { value: "pago", label: "PAGO" },
   { value: "pendente", label: "PENDENTE" },
 ];
+
+export const TP_PROMOTORA = [
+  { value: "EFETIVA", label: "EFETIVA" },
+  { value: "IMEDIATA", label: "IMEDIATA" },
+];
+
+export const TP_CONVENIO = [
+  { value: "ESTADO", label: "ESTADO" },
+  { value: "FGTS", label: "FGTS" },
+  { value: "INSS", label: "INSS" },
+  { value: "FEDERAL", label: "FEDERAL" },
+];
+
+export const TP_OPERACAO = [
+  { value: "NOVO", label: "NOVO" },
+  { value: "SAQUE COMPL. CARTAO", label: "SAQUE COMPL. CARTÃO" },
+  { value: "REFIN", label: "REFIN" },
+  { value: "CARTAO BENEFICIO", label: "CARTÃO BENEFÍCIO" },
+  { value: "CARTAO", label: "CARTÃO" },
+];
