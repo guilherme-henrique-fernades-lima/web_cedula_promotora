@@ -1,9 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import NextAuth from "next-auth";
 
 export const authOptions = {
-  // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -66,4 +64,5 @@ export const authOptions = {
 
   secret: process.env.NEXTAUTH_SECRET,
 };
+
 export default NextAuth(authOptions);
