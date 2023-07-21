@@ -38,10 +38,6 @@ export const authOptions = {
         }
       },
     }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-    }),
   ],
 
   callbacks: {
@@ -68,6 +64,6 @@ export const authOptions = {
     signIn: "/auth/login",
   },
 
-  secret: "adiaodasdjasdjlkdjljdlkjdlkajdasdlsa",
+  secret: process.env.NEXTAUTH_SECRET,
 };
 export default NextAuth(authOptions);

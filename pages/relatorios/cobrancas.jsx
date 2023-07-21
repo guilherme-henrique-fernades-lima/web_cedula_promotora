@@ -22,6 +22,18 @@ import EditIcon from "@mui/icons-material/Edit";
 
 export default function RelatorioCobrancas() {
   const { data: session } = useSession();
+
+  const { status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      console.log("Not logged in!");
+    },
+  });
+
+  if (status === "loading") {
+    return "Not authenticated";
+  }
+
   const [cobrancas, setCobrancas] = useState([]);
 
   useEffect(() => {

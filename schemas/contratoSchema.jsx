@@ -12,7 +12,7 @@ export const contratoSchema = yup.object().shape({
   operacao: yup.string().required("Selecione uma operação"),
   banco: yup.string().required("Insira o nome do banco"),
   vl_contrato: yup.string().required("Insira o valor do contrato"),
-  qt_parcelas: yup.string().required("Insira a quantidade de parcelas"),
+  //qt_parcelas: yup.string().required("Insira a quantidade de parcelas"),
   vl_parcela: yup.string().required("Insira o valor da parcela"),
   vl_comissao: yup.string().required("Insira o valor da comissão"),
   porcentagem: yup.string().required("Insira a porcentagem"),

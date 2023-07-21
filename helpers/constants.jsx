@@ -494,16 +494,18 @@ export const SITUACAO_PAGAMENTO = [
   { value: "pendente", label: "PENDENTE" },
 ];
 
-export const TP_PROMOTORA = [
-  { value: "EFETIVA", label: "EFETIVA" },
-  { value: "IMEDIATA", label: "IMEDIATA" },
-];
-
 export const TP_CONVENIO = [
   { value: "ESTADO", label: "ESTADO" },
   { value: "FGTS", label: "FGTS" },
   { value: "INSS", label: "INSS" },
   { value: "FEDERAL", label: "FEDERAL" },
+  { value: "ESTADO PIAUÍ", label: "ESTADO PIAUÍ" },
+  { value: "ESTADO MARANHÃO", label: "ESTADO MARANHÃO" },
+  { value: "FORÇAS ARMADAS", label: "FORÇAS ARMADAS" },
+  { value: "MARINHA", label: "MARINHA" },
+  { value: "AERONÁUTICA", label: "AERONÁUTICA" },
+  { value: "PREFEITURA", label: "PREFEITURA" },
+  { value: "BPC-LOAS", label: "BPC-LOAS" },
 ];
 
 export const TP_OPERACAO = [

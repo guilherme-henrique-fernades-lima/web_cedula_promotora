@@ -25,15 +25,13 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
 //Constants
-import { TP_PROMOTORA, TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
+import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
 
 //Formatters
 import { converterDataParaJS } from "@/helpers/utils";
@@ -191,13 +189,8 @@ export default function CadastrarContrato() {
               onChange={(e) => {
                 setPromotora(e.target.value);
               }}
-            >
-              {TP_PROMOTORA.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            />
+
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.promotora?.message}
             </Typography>
@@ -403,8 +396,8 @@ export default function CadastrarContrato() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("qt_parcelas")}
-              error={Boolean(errors.qt_parcelas)}
+              // {...register("qt_parcelas")}
+              // error={Boolean(errors.qt_parcelas)}
               value={qt_parcelas}
               onChange={(e) => {
                 setQtParcelas(e.target.value);
@@ -422,9 +415,9 @@ export default function CadastrarContrato() {
               }
               inputProps={{ maxLength: 5 }}
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.qt_parcelas?.message}
-            </Typography>
+            </Typography> */}
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
