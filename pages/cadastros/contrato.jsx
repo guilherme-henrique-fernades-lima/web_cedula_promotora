@@ -33,13 +33,13 @@ import MenuItem from "@mui/material/MenuItem";
 import SaveIcon from "@mui/icons-material/Save";
 
 //Constants
-import { TP_PROMOTORA } from "@/helpers/constants";
+import { TP_PROMOTORA, TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
 
 //Formatters
 import { converterDataParaJS } from "@/helpers/utils";
 
 //Schema validation
-import { contratoSchema } from "@/schemas/despesaSchema";
+import { contratoSchema } from "@/schemas/contratoSchema";
 
 export default function CadastrarContrato() {
   const { data: session } = useSession();
@@ -70,8 +70,8 @@ export default function CadastrarContrato() {
   const [vl_contrato, setVlContrato] = useState("");
   const [qt_parcelas, setQtParcelas] = useState("");
   const [vl_parcela, setVlParcela] = useState("");
-  const [dt_pag_cliente, setDtPagCliente] = useState("");
-  const [dt_pag_comissao, setDtPagComissao] = useState("");
+  const [dt_pag_cliente, setDtPagCliente] = useState(null);
+  const [dt_pag_comissao, setDtPagComissao] = useState(null);
   const [vl_comissao, setVlComissao] = useState("");
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
@@ -105,20 +105,20 @@ export default function CadastrarContrato() {
     const payload = getPayload();
     console.log(payload);
 
-    const response = await fetch("/api/cadastros/contrato", {
-      method: "POST",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-      body: JSON.stringify(payload),
-    });
+    // const response = await fetch("/api/cadastros/contrato", {
+    //   method: "POST",
+    //   headers: {
+    //     Authorization: session?.user?.token,
+    //   },
+    //   body: JSON.stringify(payload),
+    // });
 
-    if (response.ok) {
-      toast.success("Contrato cadastrado com sucesso!");
-      clearStatesAndErrors();
-    } else {
-      toast.error("Erro ao cadastrar o contrato.");
-    }
+    // if (response.ok) {
+    //   toast.success("Contrato cadastrado com sucesso!");
+    //   clearStatesAndErrors();
+    // } else {
+    //   toast.error("Erro ao cadastrar o contrato.");
+    // }
 
     //setLoadingButton(false);
   }
@@ -157,20 +157,400 @@ export default function CadastrarContrato() {
           salvarContrato();
         })}
       >
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={1} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("promotora")}
+              error={Boolean(errors.promotora)}
+              select
+              fullWidth
+              label="Tipo de despesa"
               size="small"
-              label="(%) Porcentagem"
+              value={promotora}
+              onChange={(e) => {
+                setPromotora(e.target.value);
+              }}
+            >
+              {TP_PROMOTORA.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.promotora?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+              <DesktopDatePicker
+                leftArrowButtonText="Mês anterior"
+                rightArrowButtonText="Próximo mês"
+                label="Data de digitação"
+                value={dt_digitacao}
+                onChange={(newValue) => {
+                  setDtDigitacao(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    autoComplete="off"
+                  />
+                )}
+                disableFuture
+                disableHighlightToday
+              />
+            </LocalizationProvider>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("contrato")}
+              error={Boolean(errors.contrato)}
+              value={nr_contrato}
+              onChange={(e) => {
+                setNrContrato(e.target.value);
+              }}
+              size="small"
+              label="Número do contrato"
+              placeholder="Insira o contrato"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 50 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.contrato?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("no_cliente")}
+              error={Boolean(errors.no_cliente)}
+              value={no_cliente}
+              onChange={(e) => {
+                setNoCliente(e.target.value);
+              }}
+              size="small"
+              label="Nome do cliente"
+              placeholder="Insira o nome completo do cliente"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, ""))
+              }
+              inputProps={{ maxLength: 255 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.no_cliente?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <InputMask
+              {...register("cpf")}
+              error={Boolean(errors.cpf)}
+              mask="999.999.999-99"
+              maskChar={null}
+              value={cpf}
+              onChange={(e) => {
+                setCpf(e.target.value);
+              }}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="CPF"
+                  placeholder="000.000.000-000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.cpf?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("convenio")}
+              error={Boolean(errors.convenio)}
+              select
+              fullWidth
+              label="Convênio"
+              size="small"
+              value={convenio}
+              onChange={(e) => {
+                setConvenio(e.target.value);
+              }}
+            >
+              {TP_CONVENIO.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.convenio?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("operacao")}
+              error={Boolean(errors.operacao)}
+              select
+              fullWidth
+              label="Operação"
+              size="small"
+              value={operacao}
+              onChange={(e) => {
+                setOperacao(e.target.value);
+              }}
+            >
+              {TP_OPERACAO.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.operacao?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("banco")}
+              error={Boolean(errors.banco)}
+              value={banco}
+              onChange={(e) => {
+                setBanco(e.target.value);
+              }}
+              size="small"
+              label="Banco"
+              placeholder="Insira o nome do banco"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 255 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.banco?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("vl_contrato")}
+              error={Boolean(errors.vl_contrato)}
+              value={vl_contrato}
+              onChange={(e) => {
+                setVlContrato(e.target.value);
+              }}
+              size="small"
+              label="Valor do contrato"
+              placeholder="R$ 0,00"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 10 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.vl_contrato?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("qt_parcelas")}
+              error={Boolean(errors.qt_parcelas)}
+              value={qt_parcelas}
+              onChange={(e) => {
+                setQtParcelas(e.target.value);
+              }}
+              size="small"
+              label="Quantidade de parcelas"
+              placeholder="Insira a quantidade de parcelas"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 5 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qt_parcelas?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("vl_parcela")}
+              error={Boolean(errors.vl_parcela)}
+              value={vl_parcela}
+              onChange={(e) => {
+                setVlParcela(e.target.value);
+              }}
+              size="small"
+              label="Valor da parcela"
+              placeholder="R$ 0,00"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 10 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.vl_parcela?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+              <DesktopDatePicker
+                leftArrowButtonText="Mês anterior"
+                rightArrowButtonText="Próximo mês"
+                label="Data de pagamento ao cliente"
+                value={dt_pag_cliente}
+                onChange={(newValue) => {
+                  setDtPagCliente(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    autoComplete="off"
+                  />
+                )}
+                disableFuture
+                disableHighlightToday
+              />
+            </LocalizationProvider>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+              <DesktopDatePicker
+                leftArrowButtonText="Mês anterior"
+                rightArrowButtonText="Próximo mês"
+                label="Data de pagamento comissão"
+                value={dt_pag_comissao}
+                onChange={(newValue) => {
+                  setDtPagComissao(newValue);
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    size="small"
+                    autoComplete="off"
+                  />
+                )}
+                disableFuture
+                disableHighlightToday
+              />
+            </LocalizationProvider>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("vl_comissao")}
+              error={Boolean(errors.vl_comissao)}
+              value={vl_comissao}
+              onChange={(e) => {
+                setVlComissao(e.target.value);
+              }}
+              size="small"
+              label="Valor da comissão"
+              placeholder="R$ 0,00"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 10 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.vl_comissao?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("porcentagem")}
+              error={Boolean(errors.porcentagem)}
               value={porcentagem}
               onChange={(e) => {
                 setPorcentagem(e.target.value);
               }}
+              size="small"
+              label="(%) Porcentagem"
+              placeholder="% de juros"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              disabled
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 3 }}
             />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.porcentagem?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("corretor")}
+              error={Boolean(errors.corretor)}
+              value={corretor}
+              onChange={(e) => {
+                setCorretor(e.target.value);
+              }}
+              size="small"
+              label="Correto"
+              placeholder="Insira o corretor"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 50 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.corretor?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
