@@ -76,13 +76,33 @@ export default function CadastrarContrato() {
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
 
+  const MOCK_DATA = {
+    //id: id,
+    promotora: "EFETIVA",
+    dt_digitacao: "2023-07-21",
+    nr_contrato: "111111111",
+    no_cliente: "GLAYSON SILVA VISGUEIRA",
+    cpf: "05251596308",
+    convenio: "FGTS",
+    operacao: "REFIN",
+    banco: "BANCO DO BRASIL",
+    vl_contrato: 200,
+    qt_parcelas: "6",
+    vl_parcela: 200,
+    dt_pag_cliente: "2023-07-21",
+    dt_pag_comissao: "2023-07-21",
+    vl_comissao: 200,
+    porcentagem: 2,
+    corretor: "teste",
+  };
+
   function getPayload() {
     const data = {
-      id: id,
+      //id: id,
       promotora: promotora,
       dt_digitacao: dt_digitacao,
       nr_contrato: nr_contrato,
-      no_cliente: no_cliente,
+      no_cliente: no_cliente.toUpperCase(),
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
@@ -102,23 +122,24 @@ export default function CadastrarContrato() {
 
   async function salvarContrato() {
     //setLoadingButton(true);
-    const payload = getPayload();
+    //const payload = getPayload();
+    const payload = MOCK_DATA;
     console.log(payload);
 
-    // const response = await fetch("/api/cadastros/contrato", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: session?.user?.token,
-    //   },
-    //   body: JSON.stringify(payload),
-    // });
+    const response = await fetch("/api/cadastros/contrato", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
 
-    // if (response.ok) {
-    //   toast.success("Contrato cadastrado com sucesso!");
-    //   clearStatesAndErrors();
-    // } else {
-    //   toast.error("Erro ao cadastrar o contrato.");
-    // }
+    if (response.ok) {
+      toast.success("Contrato cadastrado com sucesso!");
+      clearStatesAndErrors();
+    } else {
+      toast.error("Erro ao cadastrar o contrato.");
+    }
 
     //setLoadingButton(false);
   }
@@ -555,11 +576,12 @@ export default function CadastrarContrato() {
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
-              type="submit"
+              //type="submit"
               variant="contained"
               endIcon={<SaveIcon />}
               disableElevation
               loading={loadingButton}
+              onClick={salvarContrato}
               // fullWidth
             >
               SALVAR

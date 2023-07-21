@@ -15,7 +15,7 @@ export const authOptions = {
         const { username, password } = credentials;
 
         const res = await fetch(
-          "http://127.0.0.1:8005/integration/auth/login/",
+          `${process.env.NEXT_INTEGRATION_URL}/auth/login/`,
           {
             method: "POST",
             headers: {
@@ -65,7 +65,7 @@ export const authOptions = {
   },
 
   pages: {
-    signIn: "/login",
+    signIn: "/auth/login",
   },
 
   secret: "adiaodasdjasdjlkdjljdlkjdlkajdasdlsa",
