@@ -60,7 +60,6 @@ export default function CadastrarDespesa() {
     resolver: yupResolver(despesaSchema),
   });
 
-  const [openBackdrop, setOpenBackdrop] = useState(false);
   const [loadingButton, setLoadingButton] = useState(false);
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
   const [descricaoDespesa, setDescricaoDespesa] = useState("");
@@ -68,10 +67,6 @@ export default function CadastrarDespesa() {
   const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
-
-  const handleBackdrop = () => {
-    setOpenBackdrop(!openBackdrop);
-  };
 
   function getPayload() {
     const data = {
@@ -124,13 +119,6 @@ export default function CadastrarDespesa() {
   return (
     <ContentWrapper title="Cadastrar despesa">
       <Toaster position="bottom-center" reverseOrder={true} />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-        onClick={handleBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
 
       <Box
         component="form"

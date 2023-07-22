@@ -153,7 +153,6 @@ export default function RelatorioDespesas() {
   }
 
   function getDataForEdit(data) {
-    console.log("data >>>> ", data);
     clearErrors();
 
     setValue("descricaoDespesa", data.descricao);

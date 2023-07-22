@@ -1,0 +1,31 @@
+async function getEmprestimos(req, res) {
+  const token = req.headers.authorization;
+
+  // const dt_inicio = req.query.dt_inicio ?? "";
+  // const dt_final = req.query.dt_final ?? "";
+  // `${process.env.NEXT_INTEGRATION_URL}/despesas/?dt_inicio=${dt_inicio}&dt_final=${dt_final}`,
+
+  const response = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/`,
+    {
+      method: "GET",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const json = await response.json();
+
+  return res.status(response.status).json(json);
+}
+
+export default async function handler(req, res) {
+  if (req.method == "GET") {
+    getEmprestimos(req, res);
+  } else {
+    res.status(405).send();
+  }
+}

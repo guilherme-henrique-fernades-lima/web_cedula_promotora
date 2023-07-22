@@ -144,19 +144,6 @@ export default function Layout({ children }) {
                     </ListItem>
                   </Link>
 
-                  <Link href="/cadastros/cobranca">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Cobrança</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
                   <Link href="/cadastros/contrato">
                     <ListItem disablePadding>
                       <ListItemButton>
@@ -178,6 +165,21 @@ export default function Layout({ children }) {
                         </ListItemIcon>
                         <ListItemText
                           primary={<TitleTypography>Despesa</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/cadastros/emprestimo">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <TitleTypography>Empréstimo</TitleTypography>
+                          }
                         />
                       </ListItemButton>
                     </ListItem>
@@ -228,19 +230,6 @@ export default function Layout({ children }) {
                     </ListItem>
                   </Link>
 
-                  <Link href="/relatorios/cobrancas">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Cobranças</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
                   <Link href="/relatorios/contratos">
                     <ListItem disablePadding>
                       <ListItemButton>
@@ -262,6 +251,21 @@ export default function Layout({ children }) {
                         </ListItemIcon>
                         <ListItemText
                           primary={<TitleTypography>Despesas</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
+                  <Link href="/relatorios/emprestimos">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <TitleTypography>Empréstimos</TitleTypography>
+                          }
                         />
                       </ListItemButton>
                     </ListItem>
