@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 
-//Next.js imports
-import Link from "next/link";
-
 //Third party libraries
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
@@ -12,9 +9,6 @@ import { useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
 
-//Custom components
-import ContentWrapper from "../../components/templates/ContentWrapper";
-
 //Mui components
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -22,18 +16,16 @@ import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-
 import Typography from "@mui/material/Typography";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 
 //Custom componentes
+import ContentWrapper from "../../components/templates/ContentWrapper";
 import DataTable from "@/components/Datatable";
 import {
   formatarData,
@@ -283,6 +275,8 @@ export default function RelatorioDespesas() {
 
   return (
     <ContentWrapper title="Relação de despesas">
+      <Toaster position="bottom-center" reverseOrder={true} />
+
       {showEditForm && (
         <Fade in={showEditForm}>
           <Button
@@ -316,8 +310,6 @@ export default function RelatorioDespesas() {
             editarDadosDespesa();
           })}
         >
-          <Toaster position="bottom-center" reverseOrder={true} />
-
           <Grid container spacing={1}>
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>

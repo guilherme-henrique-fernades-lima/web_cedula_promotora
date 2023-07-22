@@ -74,43 +74,49 @@ export default function CadastrarContrato() {
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
 
-  const MOCK_DATA = {
-    //id: id,
-    promotora: "EFETIVA",
-    dt_digitacao: "2023-07-21",
-    nr_contrato: "111111111",
-    no_cliente: "GLAYSON SILVA VISGUEIRA",
-    cpf: "05251596308",
-    convenio: "FGTS",
-    operacao: "REFIN",
-    banco: "BANCO DO BRASIL",
-    vl_contrato: 200,
-    qt_parcelas: "6",
-    vl_parcela: 200,
-    dt_pag_cliente: "2023-07-21",
-    dt_pag_comissao: "2023-07-21",
-    vl_comissao: 200,
-    porcentagem: 2,
-    corretor: "teste",
-  };
+  // const MOCK_DATA = {
+  //   id: id,
+  //   promotora: "EFETIVA",
+  //   dt_digitacao: "2023-07-21",
+  //   nr_contrato: "111111111",
+  //   no_cliente: "GLAYSON SILVA VISGUEIRA",
+  //   cpf: "05251596308",
+  //   convenio: "FGTS",
+  //   operacao: "REFIN",
+  //   banco: "BANCO DO BRASIL",
+  //   vl_contrato: 200,
+  //   qt_parcelas: "6",
+  //   vl_parcela: 200,
+  //   dt_pag_cliente: "2023-07-21",
+  //   dt_pag_comissao: "2023-07-21",
+  //   vl_comissao: 200,
+  //   porcentagem: 2,
+  //   corretor: "teste",
+  // };
 
   function getPayload() {
     const data = {
       //id: id,
       promotora: promotora,
-      dt_digitacao: dt_digitacao,
+      dt_digitacao: dt_digitacao
+        ? moment(dt_digitacao).format("YYYY-MM-DD")
+        : null,
       nr_contrato: nr_contrato,
       no_cliente: no_cliente.toUpperCase(),
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
       banco: banco,
-      vl_contrato: vl_contrato,
+      vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
-      vl_parcela: vl_parcela,
-      dt_pag_cliente: dt_pag_cliente,
-      dt_pag_comissao: dt_pag_comissao,
-      vl_comissao: vl_comissao,
+      vl_parcela: parseFloat(vl_parcela),
+      dt_pag_cliente: dt_pag_cliente
+        ? moment(dt_pag_cliente).format("YYYY-MM-DD")
+        : null,
+      dt_pag_comissao: dt_pag_comissao
+        ? moment(dt_pag_comissao).format("YYYY-MM-DD")
+        : null,
+      vl_comissao: parseFloat(vl_comissao),
       porcentagem: porcentagem,
       corretor: corretor,
     };
@@ -119,9 +125,9 @@ export default function CadastrarContrato() {
   }
 
   async function salvarContrato() {
-    //setLoadingButton(true);
-    //const payload = getPayload();
-    const payload = MOCK_DATA;
+    setLoadingButton(true);
+    const payload = getPayload();
+    // const payload = MOCK_DATA;
     console.log(payload);
 
     const response = await fetch("/api/cadastros/contrato", {
@@ -132,6 +138,8 @@ export default function CadastrarContrato() {
       body: JSON.stringify(payload),
     });
 
+    console.log(response);
+
     if (response.ok) {
       toast.success("Contrato cadastrado com sucesso!");
       clearStatesAndErrors();
@@ -139,7 +147,7 @@ export default function CadastrarContrato() {
       toast.error("Erro ao cadastrar o contrato.");
     }
 
-    //setLoadingButton(false);
+    setLoadingButton(false);
   }
 
   function clearStatesAndErrors() {
@@ -181,11 +189,11 @@ export default function CadastrarContrato() {
             <TextField
               {...register("promotora")}
               error={Boolean(errors.promotora)}
-              select
               fullWidth
               label="Tipo de despesa"
               size="small"
               value={promotora}
+              autoComplete="off"
               onChange={(e) => {
                 setPromotora(e.target.value);
               }}
@@ -569,12 +577,12 @@ export default function CadastrarContrato() {
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
-              //type="submit"
+              type="submit"
               variant="contained"
               endIcon={<SaveIcon />}
               disableElevation
               loading={loadingButton}
-              onClick={salvarContrato}
+              //onClick={salvarContrato}
               // fullWidth
             >
               SALVAR
