@@ -93,12 +93,17 @@ export default function RelatorioContratos() {
   }, [session?.user]);
 
   async function getContratos() {
-    const response = await fetch("/api/relatorios/contratos", {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
+    const response = await fetch(
+      `/api/relatorios/contratos/?dt_inicio=${moment(dataInicio).format(
+        "YYYY-MM-DD"
+      )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
     if (response.ok) {
       const json = await response.json();
@@ -110,7 +115,6 @@ export default function RelatorioContratos() {
     setLoadingButton(true);
 
     const payload = getPayload();
-    console.log(payload);
 
     const response = await fetch(`/api/relatorios/contratos/?id=${id}`, {
       method: "PUT",
@@ -133,7 +137,7 @@ export default function RelatorioContratos() {
   function getPayload() {
     const data = {
       id: id,
-      promotora: promotora,
+      promotora: promotora.toUpperCase(),
       dt_digitacao: dt_digitacao
         ? moment(dt_digitacao).format("YYYY-MM-DD")
         : null,
@@ -142,7 +146,7 @@ export default function RelatorioContratos() {
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
-      banco: banco,
+      banco: banco.toUpperCase(),
       vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
@@ -243,7 +247,7 @@ export default function RelatorioContratos() {
       field: "promotora",
       headerName: "PROMOTORA",
       renderHeader: (params) => <strong>PROMOTORA</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
     },
@@ -251,15 +255,20 @@ export default function RelatorioContratos() {
       field: "dt_digitacao",
       headerName: "DATA DIGITAÇÃO",
       renderHeader: (params) => <strong>DATA DIGITAÇÃO</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
     },
     {
       field: "nr_contrato",
       headerName: "NR. CONTRATO",
       renderHeader: (params) => <strong>NR. CONTRATO</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
     },
@@ -267,7 +276,7 @@ export default function RelatorioContratos() {
       field: "no_cliente",
       headerName: "NOME CLIENTE",
       renderHeader: (params) => <strong>NOME CLIENTE</strong>,
-      minWidth: 150,
+      minWidth: 300,
       align: "center",
       headerAlign: "center",
     },
@@ -275,15 +284,20 @@ export default function RelatorioContratos() {
       field: "cpf",
       headerName: "CPF CLIENTE",
       renderHeader: (params) => <strong>CPF CLIENTE</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarCPFSemAnonimidade(params.value);
+        }
+      },
     },
     {
       field: "convenio",
       headerName: "CONVÊNIO",
       renderHeader: (params) => <strong>CONVÊNIO</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
     },
@@ -291,7 +305,7 @@ export default function RelatorioContratos() {
       field: "operacao",
       headerName: "OPERAÇÃO",
       renderHeader: (params) => <strong>OPERAÇÃO</strong>,
-      minWidth: 150,
+      minWidth: 170,
       align: "center",
       headerAlign: "center",
     },
@@ -299,7 +313,7 @@ export default function RelatorioContratos() {
       field: "banco",
       headerName: "BANCO",
       renderHeader: (params) => <strong>BANCO</strong>,
-      minWidth: 150,
+      minWidth: 220,
       align: "center",
       headerAlign: "center",
     },
@@ -307,15 +321,20 @@ export default function RelatorioContratos() {
       field: "vl_contrato",
       headerName: "VLR. CONTRATO",
       renderHeader: (params) => <strong>VLR. CONTRATO</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarValorBRL(parseFloat(params.value));
+        }
+      },
     },
     {
       field: "qt_parcelas",
       headerName: "QTD. PARCELAS",
       renderHeader: (params) => <strong>QTD. PARCELAS</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },
@@ -323,39 +342,59 @@ export default function RelatorioContratos() {
       field: "vl_parcela",
       headerName: "VLR. PARCELA",
       renderHeader: (params) => <strong>VLR. PARCELA</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarValorBRL(parseFloat(params.value));
+        }
+      },
     },
     {
       field: "dt_pag_cliente",
       headerName: "DT. PAG. CLIENTE",
       renderHeader: (params) => <strong>DT. PAG. CLIENTE</strong>,
-      minWidth: 150,
+      minWidth: 230,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
     },
     {
       field: "dt_pag_comissao",
       headerName: "DT. PAG. COMISSÃO",
       renderHeader: (params) => <strong>DT. PAG. COMISSÃO</strong>,
-      minWidth: 150,
+      minWidth: 230,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
     },
     {
       field: "vl_comissao",
       headerName: "VLR. COMISSÃO",
       renderHeader: (params) => <strong>VLR. COMISSÃO</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarValorBRL(parseFloat(params.value));
+        }
+      },
     },
     {
       field: "porcentagem",
       headerName: "(%) PORCENTAGEM",
       renderHeader: (params) => <strong>(%) PORCENTAGEM</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },
@@ -363,7 +402,7 @@ export default function RelatorioContratos() {
       field: "corretor",
       headerName: "CORRETOR",
       renderHeader: (params) => <strong>CORRETOR</strong>,
-      minWidth: 150,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },

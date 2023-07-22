@@ -97,7 +97,7 @@ export default function CadastrarContrato() {
   function getPayload() {
     const data = {
       //id: id,
-      promotora: promotora,
+      promotora: promotora.toUpperCase(),
       dt_digitacao: dt_digitacao
         ? moment(dt_digitacao).format("YYYY-MM-DD")
         : null,
@@ -106,7 +106,7 @@ export default function CadastrarContrato() {
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
-      banco: banco,
+      banco: banco.toUpperCase(),
       vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
@@ -117,8 +117,8 @@ export default function CadastrarContrato() {
         ? moment(dt_pag_comissao).format("YYYY-MM-DD")
         : null,
       vl_comissao: parseFloat(vl_comissao),
-      porcentagem: porcentagem,
-      corretor: corretor,
+      porcentagem: parseFloat(porcentagem),
+      corretor: corretor.toUpperCase(),
     };
 
     return data;
