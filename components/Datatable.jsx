@@ -15,7 +15,7 @@ function CustomToolbar() {
 }
 
 export default function DataTable(props) {
-  const [pageSize, setPageSize] = useState(50);
+  const [pageSize, setPageSize] = useState(25);
 
   return (
     <DataGrid
@@ -31,7 +31,7 @@ export default function DataTable(props) {
       disableSelectionOnClick={true}
       disableColumnResize={true}
       pageSize={pageSize}
-      rowsPerPageOptions={[5, 10, 25, 50, 100]}
+      pageSizeOptions={[5, 10, 25, 50, 100]}
       onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
       disableRowSelectionOnClick
       slots={{

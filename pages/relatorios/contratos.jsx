@@ -13,6 +13,7 @@ import { useSession } from "next-auth/react";
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import DataTable from "@/components/Datatable";
 import { formatarData, formatarValorBRL } from "@/helpers/utils";
+import Spinner from "@/components/Spinner";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -409,7 +410,7 @@ export default function RelatorioContratos() {
   ];
 
   try {
-    var rows = contratos?.map((row) => {
+    var rows = contratos?.data?.map((row) => {
       return {
         id: row.id,
         promotora: row.promotora,
@@ -944,7 +945,23 @@ export default function RelatorioContratos() {
               </Button>
             </Grid>
           </Grid>
-          <DataTable rows={rows} columns={columns} />
+
+          {contratos?.length == 0 ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+                mb: 5,
+              }}
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <DataTable rows={rows} columns={columns} />
+          )}
         </Box>
       </Fade>
     </ContentWrapper>

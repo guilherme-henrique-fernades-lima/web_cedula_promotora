@@ -55,6 +55,7 @@ export default function CadastrarCobrança() {
     setValue,
     clearErrors,
     reset,
+    resetField,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(emprestimoSchema),
@@ -62,14 +63,39 @@ export default function CadastrarCobrança() {
 
   const [loadingButton, setLoadingButton] = useState(false);
 
-  const [dtEmprestimo, setDtEmprestimo] = useState(null);
+  const [dtEmprestimo, setDtEmprestimo] = useState(new Date());
   const [noCliente, setNoCliente] = useState("");
   const [vlEmprestimo, setVlEmprestimo] = useState("");
+  const [qtParcela, setQtParcela] = useState("");
   const [vlCapital, setVlCapital] = useState("");
   const [vlJuros, setVlJuros] = useState("");
   const [vlTotal, setVlTotal] = useState("");
-  const [qtParcela, setQtParcela] = useState("");
   const [observacao, setObservacao] = useState("");
+
+  useEffect(() => {
+    if (vlEmprestimo && qtParcela) {
+      const vlCapitalValue = parseFloat(vlEmprestimo) / parseInt(qtParcela);
+      setVlCapital(vlCapitalValue.toFixed(2));
+      setValue("vlCapital", vlCapitalValue);
+
+      const vlJurosValue = parseFloat(vlEmprestimo) * 0.2;
+      setVlJuros(vlJurosValue.toFixed(2));
+      setValue("vlJuros", vlJurosValue);
+
+      const vlTotalValue =
+        parseFloat(vlCapitalValue) + parseFloat(vlJurosValue);
+      setVlTotal(vlTotalValue.toFixed(2));
+      setValue("vlTotal", vlTotalValue);
+    } else {
+      setVlCapital("");
+      setVlJuros("");
+      setVlTotal("");
+
+      resetField("vlCapital");
+      resetField("vlJuros");
+      resetField("vlTotal");
+    }
+  }, [vlEmprestimo, qtParcela]);
 
   function getPayload() {
     const data = {
@@ -210,12 +236,39 @@ export default function CadastrarCobrança() {
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("qtParcela")}
+              error={Boolean(errors.qtParcela)}
+              value={qtParcela}
+              onChange={(e) => {
+                setQtParcela(e.target.value);
+              }}
+              size="small"
+              label="Quantidade de parcelas"
+              // placeholder=""
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 2 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
               {...register("vlCapital")}
               error={Boolean(errors.vlCapital)}
+              disabled
               value={vlCapital}
-              onChange={(e) => {
-                setVlCapital(e.target.value);
-              }}
+              // onChange={(e) => {
+
+              // }}
               size="small"
               label="Valor do capital"
               placeholder="R$ 0,00"
@@ -237,6 +290,7 @@ export default function CadastrarCobrança() {
             <TextField
               {...register("vlJuros")}
               error={Boolean(errors.vlJuros)}
+              disabled
               value={vlJuros}
               onChange={(e) => {
                 setVlJuros(e.target.value);
@@ -262,6 +316,7 @@ export default function CadastrarCobrança() {
             <TextField
               {...register("vlTotal")}
               error={Boolean(errors.vlTotal)}
+              disabled
               value={vlTotal}
               onChange={(e) => {
                 setVlTotal(e.target.value);
@@ -283,31 +338,7 @@ export default function CadastrarCobrança() {
               {errors.vlTotal?.message}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("qtParcela")}
-              error={Boolean(errors.qtParcela)}
-              value={qtParcela}
-              onChange={(e) => {
-                setQtParcela(e.target.value);
-              }}
-              size="small"
-              label="Quantidade de parcelas"
-              // placeholder=""
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 2 }}
-            />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.qtParcela?.message}
-            </Typography>
-          </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
               multiline

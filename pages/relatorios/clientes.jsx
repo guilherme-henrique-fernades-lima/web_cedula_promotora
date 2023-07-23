@@ -38,6 +38,7 @@ import {
   formatarCPFSemAnonimidade,
   formatarTelefone,
 } from "@/helpers/utils";
+import Spinner from "@/components/Spinner";
 
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
@@ -609,7 +610,22 @@ export default function CadastrarCliente() {
 
       <Fade in={!showEditForm}>
         <Box sx={{ width: "100%", display: !showEditForm ? "block" : "none" }}>
-          <DataTable rows={rows} columns={columns} />
+          {clientes.length == 0 ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+                mb: 5,
+              }}
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <DataTable rows={rows} columns={columns} />
+          )}
         </Box>
       </Fade>
     </ContentWrapper>

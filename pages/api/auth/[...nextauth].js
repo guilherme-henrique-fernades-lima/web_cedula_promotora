@@ -29,7 +29,7 @@ export const authOptions = {
 
         const user = await res.json();
 
-        if (res.status == 200) {
+        if (res.ok && user) {
           return user;
         } else {
           return null;

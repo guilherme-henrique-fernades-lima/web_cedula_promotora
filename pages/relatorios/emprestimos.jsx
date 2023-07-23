@@ -33,6 +33,10 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -50,6 +54,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import CloseIcon from "@mui/icons-material/Close";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import InputIcon from "@mui/icons-material/Input";
 
 //Schema validation
@@ -71,6 +76,9 @@ export default function RelatorioEmprestimos() {
   const [dataFim, setDataFim] = useState(new Date());
 
   const [loadingButton, setLoadingButton] = useState(false);
+  const [tpBaixaParcela, setTpBaixaParcela] = useState("");
+
+  const [dadosEmprestimoItem, setDadosEmprestimoItem] = useState({});
 
   const [id, setId] = useState("");
   const [dtEmprestimo, setDtEmprestimo] = useState(null);
@@ -99,8 +107,13 @@ export default function RelatorioEmprestimos() {
   }, [session?.user]);
 
   const handleOpenCloseModal = () => setOpenModal(!openModal);
+
   const handleOpenCloseDialog = () => {
     setOpenDialog(!openDialog);
+  };
+
+  const handleRadioChange = (event) => {
+    setTpBaixaParcela(event.target.value);
   };
 
   async function editarDadosEmprestimo() {
@@ -183,12 +196,17 @@ export default function RelatorioEmprestimos() {
   }
 
   async function getEmprestimos() {
-    const response = await fetch(`/api/relatorios/emprestimos`, {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
+    const response = await fetch(
+      `/api/relatorios/emprestimos/?dt_inicio=${moment(dataInicio).format(
+        "YYYY-MM-DD"
+      )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
     if (response.ok) {
       const json = await response.json();
@@ -213,6 +231,36 @@ export default function RelatorioEmprestimos() {
     }
   }
 
+  async function baixarParcelaJuros() {
+    const payload = {
+      id_emprestimo_item: dadosEmprestimoItem?.id,
+      emprestimo: dadosEmprestimoItem?.emprestimo,
+      dt_pagamento: moment(new Date()).format("YYYY-MM-DD"),
+      tp_pagamento: tpBaixaParcela,
+    };
+
+    console.log(payload);
+
+    const response = await fetch(`/api/relatorios/emprestimos-item`, {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log(response);
+
+    if (response.ok) {
+      toast.success("Operação realizada com sucesso!");
+      handleOpenCloseDialog();
+      setDadosEmprestimoItem({});
+      setTpBaixaParcela("");
+    } else {
+      toast.success("Erro na operação, tente novamente.");
+    }
+  }
+
   const columns = [
     {
       field: "id",
@@ -224,7 +272,7 @@ export default function RelatorioEmprestimos() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            <Tooltip title="Editar dados do empréstimo" placement="top">
+            {/* <Tooltip title="Editar dados do empréstimo" placement="top">
               <IconButton
                 onClick={() => {
                   setShowEditForm(!showEditForm);
@@ -233,7 +281,7 @@ export default function RelatorioEmprestimos() {
               >
                 <EditIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
             <Tooltip title="Visualizar parcelas" placement="top">
               <IconButton
                 onClick={() => {
@@ -342,7 +390,7 @@ export default function RelatorioEmprestimos() {
   ];
 
   try {
-    var rows = emprestimos?.map((row) => {
+    var rows = emprestimos?.data?.map((row) => {
       return {
         id: row.id,
         dt_emprestimo: row.dt_emprestimo,
@@ -669,7 +717,23 @@ export default function RelatorioEmprestimos() {
               </Button>
             </Grid>
           </Grid>
-          <DataTable rows={rows} columns={columns} />
+
+          {emprestimos?.length == 0 ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+                mb: 5,
+              }}
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <DataTable rows={rows} columns={columns} />
+          )}
         </Box>
       </Fade>
 
@@ -701,11 +765,11 @@ export default function RelatorioEmprestimos() {
               justifyContent: "flex-start",
               flexDirection: "column",
 
-              maxHeight: 900,
+              maxHeight: 500,
               maxHeight: "80%",
               overflowY: "auto",
               overflowX: "hidden",
-              height: 500,
+              height: "auto",
 
               ["@media (max-width:600px)"]: {
                 height: "100%",
@@ -720,6 +784,7 @@ export default function RelatorioEmprestimos() {
                 clearStatesAndErrors();
                 handleOpenCloseModal();
                 setEmprestimoItem([]);
+                setDadosEmprestimoItem({});
               }}
             >
               <CloseIcon />
@@ -775,14 +840,25 @@ export default function RelatorioEmprestimos() {
                     {emprestimoItem?.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell align="center">
-                          <Tooltip
-                            title="Dar baixa na parcela/juros"
-                            placement="top"
-                          >
-                            <IconButton onClick={handleOpenCloseDialog}>
-                              <InputIcon />
+                          {item.dt_pagamento ? (
+                            <IconButton disabled onClick={() => {}}>
+                              <TaskAltIcon color="success" />
                             </IconButton>
-                          </Tooltip>
+                          ) : (
+                            <Tooltip
+                              title="Dar baixa na parcela/juros"
+                              placement="top"
+                            >
+                              <IconButton
+                                onClick={() => {
+                                  setDadosEmprestimoItem(item);
+                                  handleOpenCloseDialog();
+                                }}
+                              >
+                                <InputIcon />
+                              </IconButton>
+                            </Tooltip>
+                          )}
                         </TableCell>
                         <TableCell align="center">
                           {item.dt_vencimento
@@ -821,11 +897,11 @@ export default function RelatorioEmprestimos() {
               transform: "translate(-50%, -50%)",
               width: "400px",
               bgcolor: "background.paper",
-              // boxShadow: 24,
+              boxShadow: 24,
               borderRadius: "8px",
               padding: "20px 30px",
               display: "flex",
-              alignItems: "flex-end",
+              alignItems: "flex-start",
               justifyContent: "flex-start",
               flexDirection: "column",
 
@@ -833,18 +909,118 @@ export default function RelatorioEmprestimos() {
               maxHeight: "80%",
               overflowY: "auto",
               overflowX: "hidden",
-              height: 300,
-
-              ["@media (max-width:600px)"]: {
-                height: "100%",
-                borderRadius: 0,
-                maxHeight: "100%",
-              },
+              //height: 300,
             }}
           >
-            <IconButton color="error" onClick={() => {}}>
-              <CloseIcon />
-            </IconButton>
+            <Typography
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: 14, sm: 16, md: 16, lg: 18, xl: 18 },
+                mb: 2,
+              }}
+            >
+              O que deseja baixar?
+            </Typography>
+            <FormControl
+              sx={{
+                width: "100%",
+                mb: 2,
+              }}
+              onChange={handleRadioChange}
+            >
+              <RadioGroup>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    width: "100%",
+                    cursor: "pointer",
+                    padding: "10px 20px",
+                    height: 50,
+                    borderRadius: 28,
+
+                    "&:hover": { backgroundColor: "#e6e6e6" },
+                  }}
+                  onClick={(e) => {
+                    setTpBaixaParcela("JUROS");
+                  }}
+                >
+                  <FormControlLabel
+                    value="JUROS"
+                    control={<Radio />}
+                    checked={tpBaixaParcela == "JUROS" ? true : false}
+                    onClick={(e) => {
+                      setTpBaixaParcela("JUROS");
+                    }}
+                    sx={{ marginRight: 0 }}
+                  />
+
+                  <Typography>Juros</Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    width: "100%",
+                    cursor: "pointer",
+                    padding: "10px 20px",
+                    height: 50,
+                    borderRadius: 28,
+
+                    "&:hover": { backgroundColor: "#e6e6e6" },
+                  }}
+                  onClick={(e) => {
+                    setTpBaixaParcela("TOTAL");
+                  }}
+                >
+                  <FormControlLabel
+                    value="TOTAL"
+                    control={<Radio />}
+                    checked={tpBaixaParcela == "TOTAL" ? true : false}
+                    onClick={(e) => {
+                      setTpBaixaParcela("TOTAL");
+                    }}
+                    sx={{ marginRight: 0 }}
+                  />
+
+                  <Typography>Parcela</Typography>
+                </Box>
+              </RadioGroup>
+            </FormControl>
+
+            <Stack
+              direction="row"
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                variant="text"
+                color="error"
+                sx={{ mr: 1 }}
+                onClick={() => {
+                  handleOpenCloseDialog();
+                  setDadosEmprestimoItem({});
+                  setTpBaixaParcela("");
+                }}
+              >
+                CANCELAR
+              </Button>
+              <Button
+                variant="contained"
+                disableElevation
+                color="success"
+                onClick={baixarParcelaJuros}
+                disabled={tpBaixaParcela == "" ? true : false}
+              >
+                CONCLUIR
+              </Button>
+            </Stack>
           </Box>
         </Fade>
       </Modal>

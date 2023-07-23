@@ -32,6 +32,7 @@ import {
   formatarValorBRL,
   converterDataParaJS,
 } from "@/helpers/utils";
+import Spinner from "@/components/Spinner";
 
 //Constants
 import {
@@ -256,7 +257,7 @@ export default function RelatorioDespesas() {
   ];
 
   try {
-    var rows = despesas?.map((row) => {
+    var rows = despesas?.data?.map((row) => {
       return {
         id: row.id,
         dt_vencimento: row.dt_vencimento,
@@ -525,7 +526,23 @@ export default function RelatorioDespesas() {
               </Button>
             </Grid>
           </Grid>
-          <DataTable rows={rows} columns={columns} />
+
+          {despesas?.length == 0 ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+                mb: 5,
+              }}
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <DataTable rows={rows} columns={columns} />
+          )}
         </Box>
       </Fade>
     </ContentWrapper>
