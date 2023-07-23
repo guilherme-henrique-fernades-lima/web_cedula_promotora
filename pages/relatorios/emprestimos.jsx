@@ -21,6 +21,18 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import Tooltip from "@mui/material/Tooltip";
+import Stack from "@mui/material/Stack";
+import Modal from "@mui/material/Modal";
+import Backdrop from "@mui/material/Backdrop";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -30,11 +42,15 @@ import {
   formatarValorBRL,
   converterDataParaJS,
 } from "@/helpers/utils";
+import Spinner from "@/components/Spinner";
 
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import CloseIcon from "@mui/icons-material/Close";
+import InputIcon from "@mui/icons-material/Input";
 
 //Schema validation
 import { emprestimoSchema } from "@/schemas/emprestimoSchema";
@@ -43,7 +59,12 @@ var DATA_HOJE = new Date();
 
 export default function RelatorioEmprestimos() {
   const { data: session } = useSession();
+
+  const [openModal, setOpenModal] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [emprestimos, setEmprestimos] = useState([]);
+  const [emprestimoItem, setEmprestimoItem] = useState([]);
+
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -76,6 +97,11 @@ export default function RelatorioEmprestimos() {
   useEffect(() => {
     getEmprestimos();
   }, [session?.user]);
+
+  const handleOpenCloseModal = () => setOpenModal(!openModal);
+  const handleOpenCloseDialog = () => {
+    setOpenDialog(!openDialog);
+  };
 
   async function editarDadosEmprestimo() {
     setLoadingButton(true);
@@ -123,6 +149,7 @@ export default function RelatorioEmprestimos() {
     clearErrors();
     reset();
 
+    setId("");
     setDtEmprestimo(null);
     setNoCliente("");
     setVlEmprestimo("");
@@ -134,7 +161,6 @@ export default function RelatorioEmprestimos() {
   }
 
   function getDataForEdit(data) {
-    console.log("data >>>> ", data);
     clearErrors();
 
     setValue("noCliente", data.no_cliente);
@@ -170,6 +196,23 @@ export default function RelatorioEmprestimos() {
     }
   }
 
+  async function getEmprestimoItem(idEmprestimo) {
+    const response = await fetch(
+      `/api/relatorios/emprestimos-item/?id=${idEmprestimo}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const json = await response.json();
+      setEmprestimoItem(json);
+    }
+  }
+
   const columns = [
     {
       field: "id",
@@ -180,14 +223,29 @@ export default function RelatorioEmprestimos() {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() => {
-              setShowEditForm(!showEditForm);
-              getDataForEdit(params.row);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <Stack direction="row">
+            <Tooltip title="Editar dados do empréstimo" placement="top">
+              <IconButton
+                onClick={() => {
+                  setShowEditForm(!showEditForm);
+                  getDataForEdit(params.row);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Visualizar parcelas" placement="top">
+              <IconButton
+                onClick={() => {
+                  getEmprestimoItem(params.value);
+                  handleOpenCloseModal();
+                }}
+                sx={{ ml: 1 }}
+              >
+                <CurrencyExchangeIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
         );
       },
     },
@@ -614,6 +672,182 @@ export default function RelatorioEmprestimos() {
           <DataTable rows={rows} columns={columns} />
         </Box>
       </Fade>
+
+      <Modal
+        open={openModal}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={openModal}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "100%",
+              maxWidth: 800,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              borderRadius: "8px",
+              padding: "20px 30px",
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "flex-start",
+              flexDirection: "column",
+
+              maxHeight: 900,
+              maxHeight: "80%",
+              overflowY: "auto",
+              overflowX: "hidden",
+              height: 500,
+
+              ["@media (max-width:600px)"]: {
+                height: "100%",
+                borderRadius: 0,
+                maxHeight: "100%",
+              },
+            }}
+          >
+            <IconButton
+              color="error"
+              onClick={() => {
+                clearStatesAndErrors();
+                handleOpenCloseModal();
+                setEmprestimoItem([]);
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+
+            {emprestimoItem.length === 0 ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <Spinner />
+              </Box>
+            ) : (
+              <TableContainer sx={{ width: "100%", mt: 2 }}>
+                <Table
+                  size="small"
+                  sx={{
+                    width: "100%",
+                    borderRadius: "8px",
+                    // "& .tableCellClasses.root": {
+                    //   borderBottom: "none",
+                    // },
+                  }}
+                >
+                  <TableHead
+                    sx={{
+                      height: 50,
+                      borderBottom: "1px solid #ccc",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <TableRow sx={{ "& td": { border: 0 } }}>
+                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                        AÇÃO
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                        DT. VENCIMENTO
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                        PARCELA
+                      </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                        DT. PAGAMENTO
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {emprestimoItem?.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell align="center">
+                          <Tooltip
+                            title="Dar baixa na parcela/juros"
+                            placement="top"
+                          >
+                            <IconButton onClick={handleOpenCloseDialog}>
+                              <InputIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell align="center">
+                          {item.dt_vencimento
+                            ? formatarData(item.dt_vencimento)
+                            : "---"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {item.nr_parcela}/{emprestimoItem.length}
+                        </TableCell>
+                        <TableCell align="center">
+                          {item.dt_pagamento
+                            ? formatarData(item.dt_pagamento)
+                            : "---"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+        </Fade>
+      </Modal>
+
+      <Modal
+        open={openDialog}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+      >
+        <Fade in={openDialog}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "400px",
+              bgcolor: "background.paper",
+              // boxShadow: 24,
+              borderRadius: "8px",
+              padding: "20px 30px",
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "flex-start",
+              flexDirection: "column",
+
+              maxHeight: 900,
+              maxHeight: "80%",
+              overflowY: "auto",
+              overflowX: "hidden",
+              height: 300,
+
+              ["@media (max-width:600px)"]: {
+                height: "100%",
+                borderRadius: 0,
+                maxHeight: "100%",
+              },
+            }}
+          >
+            <IconButton color="error" onClick={() => {}}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </Fade>
+      </Modal>
     </ContentWrapper>
   );
 }

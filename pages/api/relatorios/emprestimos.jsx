@@ -27,8 +27,6 @@ async function editarEmprestimo(req, res) {
   const data = req.body;
   const id = req.query.id ?? "";
 
-  console.log("Entrou no editar");
-
   const result = await fetch(
     `${process.env.NEXT_INTEGRATION_URL}/emprestimos/${id}/`,
     {
