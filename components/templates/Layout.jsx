@@ -24,13 +24,9 @@ import Collapse from "@mui/material/Collapse";
 
 //Icons
 import SubjectIcon from "@mui/icons-material/Subject";
-import GroupsIcon from "@mui/icons-material/Groups";
-import GavelIcon from "@mui/icons-material/Gavel";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import SavingsIcon from "@mui/icons-material/Savings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -42,6 +38,8 @@ export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
+
+  const [activeOption, setActiveOption] = useState("");
 
   // useEffect(() => {
   //   if (!session?.user) {
@@ -108,7 +106,16 @@ export default function Layout({ children }) {
             <List>
               <ListItem
                 disablePadding
-                onClick={() => setOpenDropdownCadastros(!openDropdownCadastros)}
+                onClick={() => {
+                  setOpenDropdownCadastros(!openDropdownCadastros);
+                  setOpenDropdownRelatorios(false);
+                  setActiveOption("cadastros");
+                }}
+                sx={{
+                  transition: "all 0.3s ease",
+                  backgroundColor:
+                    activeOption == "cadastros" ? "#e6e6e6" : "transparent",
+                }}
               >
                 <ListItemButton>
                   <ListItemIcon>
@@ -189,9 +196,15 @@ export default function Layout({ children }) {
 
               <ListItem
                 disablePadding
-                onClick={() =>
-                  setOpenDropdownRelatorios(!openDropdownRelatorios)
-                }
+                onClick={() => {
+                  setOpenDropdownRelatorios(!openDropdownRelatorios);
+                  setOpenDropdownCadastros(false);
+                  setActiveOption("relatorios");
+                }}
+                sx={{
+                  backgroundColor:
+                    activeOption == "relatorios" ? "#e6e6e6" : "transparent",
+                }}
               >
                 <ListItemButton>
                   <ListItemIcon>

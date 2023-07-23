@@ -7,5 +7,4 @@ export const emprestimoSchema = yup.object().shape({
   vlJuros: yup.string().required("Insira o valor do juros"),
   vlTotal: yup.string().required("Insira o valor total"),
   qtParcela: yup.string().required("Insira a quantidade de parcelas"),
-  observacao: yup.string().required("Insira uma observação"),
 });

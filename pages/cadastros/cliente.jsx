@@ -46,8 +46,6 @@ import { clienteCallCenterSchema } from "@/schemas/clienteCallCenterSchema";
 
 export default function CadastrarCliente() {
   const { data: session } = useSession();
-  const router = useRouter();
-  const [openBackdrop, setOpenBackdrop] = useState(false);
 
   const {
     register,
@@ -62,6 +60,7 @@ export default function CadastrarCliente() {
   });
 
   const [loadingButton, setLoadingButton] = useState(false);
+
   const [id, setId] = useState("");
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
@@ -72,16 +71,6 @@ export default function CadastrarCliente() {
   const [telefoneDois, setTelefoneDois] = useState("");
   const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
-
-  useEffect(() => {
-    if (router.query?.cpf) {
-      getClientePorCPF(router.query?.cpf);
-    }
-  }, [router.query?.cpf]);
-
-  const handleBackdrop = () => {
-    setOpenBackdrop(!openBackdrop);
-  };
 
   async function salvarCliente() {
     setLoadingButton(true);
@@ -104,55 +93,6 @@ export default function CadastrarCliente() {
       toast.error("Erro ao cadastrar cliente.");
       setLoadingButton(false);
     }
-  }
-
-  async function editarDadosCliente() {
-    setLoadingButton(true);
-
-    const payload = getPayload();
-
-    const response = await fetch(
-      `/api/cadastros/cliente/?cpf=${cpf.replace(/\D/g, "")}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    if (response.ok) {
-      toast.success("Dados atualizados com sucesso!");
-      clearStatesAndErrors();
-      setLoadingButton(false);
-
-      setTimeout(() => {
-        router.push("/relatorios/clientes");
-      }, 500);
-    } else {
-      toast.error("Erro ao atualizar dados!");
-      setLoadingButton(false);
-    }
-  }
-
-  async function getClientePorCPF(cpfCliente) {
-    setOpenBackdrop(true);
-    const response = await fetch(
-      `/api/cadastros/retrieveCliente/?cpf=${cpfCliente.replace(/\D/g, "")}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const json = await response.json();
-      getDataForEdit(json);
-    }
-    setOpenBackdrop(false);
   }
 
   function getPayload() {
@@ -190,51 +130,14 @@ export default function CadastrarCliente() {
     setObservacao("");
   }
 
-  function getDataForEdit(data) {
-    clearErrors();
-
-    setValue("nome", data.nome);
-    setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
-    setValue("telefoneUm", data.telefone1);
-
-    setId(data.id);
-    setCpf(formatarCPFSemAnonimidade(data.cpf));
-    setNome(data.nome);
-    setDataNascimento(converterDataParaJS(data.dt_nascimento));
-    setEspecieInss(
-      data.especie
-        ? {
-            especie: data.especie,
-          }
-        : null
-    );
-    setMatricula(data.matricula);
-    setTelefoneUm(data.telefone1 ? data.telefone1 : "");
-    setTelefoneDois(data.telefone2 ? data.telefone2 : "");
-    setTelefoneTres(data.telefone3 ? data.telefone3 : "");
-    setObservacao(data.observacoes);
-  }
-
   return (
     <ContentWrapper title="Cadastrar cliente">
       <Toaster position="bottom-center" reverseOrder={true} />
 
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={openBackdrop}
-        onClick={handleBackdrop}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-
       <Box
         component="form"
         onSubmit={handleSubmit(() => {
-          if (router.query?.cpf) {
-            editarDadosCliente();
-          } else {
-            salvarCliente();
-          }
+          salvarCliente();
         })}
         sx={{ width: "100%" }}
       >
@@ -260,11 +163,6 @@ export default function CadastrarCliente() {
                   placeholder="000.000.000-000"
                   InputLabelProps={{ shrink: true }}
                   autoComplete="off"
-                  // onInput={(e) =>
-                  //   (e.target.value = e.target.value
-                  //     .replace(/[^0-9.]/g, "")
-                  //     .replace(/(\..*?)\..*/g, "$1"))
-                  // }
                 />
               )}
             </InputMask>

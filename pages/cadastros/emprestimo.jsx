@@ -81,7 +81,7 @@ export default function CadastrarCobrança() {
       vl_capital: parseFloat(vlCapital),
       vl_juros: parseFloat(vlJuros),
       vl_total: parseFloat(vlTotal),
-      qt_parcela: qtParcela,
+      qt_parcela: parseInt(qtParcela),
       observacao: observacao,
     };
 
@@ -310,8 +310,6 @@ export default function CadastrarCobrança() {
           </Grid>
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
-              {...register("observacao")}
-              error={Boolean(errors.observacao)}
               multiline
               rows={3}
               value={observacao}
@@ -325,9 +323,6 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.observacao?.message}
-            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

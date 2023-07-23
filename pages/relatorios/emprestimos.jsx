@@ -6,7 +6,6 @@ import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import InputMask from "react-input-mask";
 import moment from "moment";
 
 //Mui components
@@ -22,7 +21,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import MenuItem from "@mui/material/MenuItem";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -33,20 +31,13 @@ import {
   converterDataParaJS,
 } from "@/helpers/utils";
 
-//Constants
-import {
-  SITUACAO_PAGAMENTO,
-  NATUREZA_DESPESA,
-  TIPO_DESPESA,
-} from "@/helpers/constants";
-
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 
 //Schema validation
-import { despesaSchema } from "@/schemas/despesaSchema";
+import { emprestimoSchema } from "@/schemas/emprestimoSchema";
 
 var DATA_HOJE = new Date();
 
@@ -79,7 +70,7 @@ export default function RelatorioEmprestimos() {
     reset,
   } = useForm({
     mode: "onChange",
-    resolver: yupResolver(despesaSchema),
+    resolver: yupResolver(emprestimoSchema),
   });
 
   useEffect(() => {
@@ -90,6 +81,7 @@ export default function RelatorioEmprestimos() {
     setLoadingButton(true);
 
     const payload = getPayload();
+    console.log(payload);
 
     const response = await fetch(`/api/relatorios/emprestimos/?id=${id}`, {
       method: "PUT",
@@ -120,7 +112,7 @@ export default function RelatorioEmprestimos() {
       vl_capital: parseFloat(vlCapital),
       vl_juros: parseFloat(vlJuros),
       vl_total: parseFloat(vlTotal),
-      qt_parcela: qtParcela,
+      qt_parcela: parseInt(qtParcela),
       observacao: observacao,
     };
 
@@ -348,21 +340,203 @@ export default function RelatorioEmprestimos() {
           })}
         >
           <Grid container spacing={1}>
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-              xl={12}
-              sx={{ backgroundColor: "red" }}
-            >
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+                <DesktopDatePicker
+                  leftArrowButtonText="Mês anterior"
+                  rightArrowButtonText="Próximo mês"
+                  label="Data do empréstimo"
+                  value={dtEmprestimo}
+                  onChange={(newValue) => {
+                    setDtEmprestimo(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      size="small"
+                      autoComplete="off"
+                    />
+                  )}
+                  disableFuture
+                  disableHighlightToday
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("noCliente")}
+                error={Boolean(errors.noCliente)}
+                value={noCliente}
+                onChange={(e) => {
+                  setNoCliente(e.target.value);
+                }}
+                size="small"
+                label="Nome do cliente"
+                placeholder="Insira o nome"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, ""))
+                }
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.noCliente?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("vlEmprestimo")}
+                error={Boolean(errors.vlEmprestimo)}
+                value={vlEmprestimo}
+                onChange={(e) => {
+                  setVlEmprestimo(e.target.value);
+                }}
+                size="small"
+                label="Valor do empréstimo"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value
+                    .replace(/[^0-9.]/g, "")
+                    .replace(/(\..*?)\..*/g, "$1"))
+                }
+                inputProps={{ maxLength: 10 }}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.vlEmprestimo?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("vlCapital")}
+                error={Boolean(errors.vlCapital)}
+                value={vlCapital}
+                onChange={(e) => {
+                  setVlCapital(e.target.value);
+                }}
+                size="small"
+                label="Valor do capital"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value
+                    .replace(/[^0-9.]/g, "")
+                    .replace(/(\..*?)\..*/g, "$1"))
+                }
+                inputProps={{ maxLength: 10 }}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.vlCapital?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("vlJuros")}
+                error={Boolean(errors.vlJuros)}
+                value={vlJuros}
+                onChange={(e) => {
+                  setVlJuros(e.target.value);
+                }}
+                size="small"
+                label="Valor do juros"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value
+                    .replace(/[^0-9.]/g, "")
+                    .replace(/(\..*?)\..*/g, "$1"))
+                }
+                inputProps={{ maxLength: 10 }}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.vlJuros?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("vlTotal")}
+                error={Boolean(errors.vlTotal)}
+                value={vlTotal}
+                onChange={(e) => {
+                  setVlTotal(e.target.value);
+                }}
+                size="small"
+                label="Valor total"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value
+                    .replace(/[^0-9.]/g, "")
+                    .replace(/(\..*?)\..*/g, "$1"))
+                }
+                inputProps={{ maxLength: 10 }}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.vlTotal?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("qtParcela")}
+                error={Boolean(errors.qtParcela)}
+                value={qtParcela}
+                onChange={(e) => {
+                  setQtParcela(e.target.value);
+                }}
+                size="small"
+                label="Quantidade de parcelas"
+                // placeholder=""
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                onInput={(e) =>
+                  (e.target.value = e.target.value
+                    .replace(/[^0-9.]/g, "")
+                    .replace(/(\..*?)\..*/g, "$1"))
+                }
+                inputProps={{ maxLength: 2 }}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.qtParcela?.message}
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+              <TextField
+                multiline
+                rows={3}
+                value={observacao}
+                onChange={(e) => {
+                  setObservacao(e.target.value);
+                }}
+                size="small"
+                label="Observação"
+                placeholder="Insira a observação"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <LoadingButton
                 type="submit"
                 variant="contained"
                 endIcon={<SaveIcon />}
                 disableElevation
                 loading={loadingButton}
+                // fullWidth
               >
                 SALVAR
               </LoadingButton>

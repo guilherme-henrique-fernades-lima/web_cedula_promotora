@@ -4,7 +4,7 @@ async function salvarEmprestimo(req, res) {
   const data = req.body;
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/`,
+    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/save/`,
     {
       method: "POST",
       headers: {
