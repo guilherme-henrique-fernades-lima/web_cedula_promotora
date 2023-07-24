@@ -711,7 +711,7 @@ export default function RelatorioEmprestimos() {
                 variant="contained"
                 disableElevation
                 fullWidth
-                //onClick={getEmprestimos}
+                onClick={getEmprestimos}
               >
                 PESQUISAR
               </Button>

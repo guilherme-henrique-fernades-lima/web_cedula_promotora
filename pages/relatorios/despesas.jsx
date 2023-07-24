@@ -45,6 +45,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
@@ -541,7 +542,29 @@ export default function RelatorioDespesas() {
               <Spinner />
             </Box>
           ) : (
-            <DataTable rows={rows} columns={columns} />
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-start",
+                  // width: 240,
+                  height: 70,
+                  borderRadius: "14px",
+                  // background:
+                  //   "linear-gradient(135deg, #b1ea4d 0%,#459522 100%)",
+                }}
+              >
+                <MonetizationOnIcon sx={{ fontSize: 38, color: "#000" }} />
+                <Typography sx={{ fontWeight: 700, color: "#000", ml: 1 }}>
+                  Valor total no período:
+                  {despesas?.indicadores?.total
+                    ? formatarValorBRL(despesas?.indicadores?.total)
+                    : 0}
+                </Typography>
+              </Box>
+              <DataTable rows={rows} columns={columns} />
+            </>
           )}
         </Box>
       </Fade>
