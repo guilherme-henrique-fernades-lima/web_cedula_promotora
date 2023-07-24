@@ -33,19 +33,11 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const [open, setOpen] = useState(false);
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
-
   const [activeOption, setActiveOption] = useState("");
-
-  // useEffect(() => {
-  //   if (!session?.user) {
-  //     router.push("/auth/login");
-  //   }
-  // }, [session?.user]);
 
   const handleDrawerCloseOpen = () => {
     setOpen(!open);

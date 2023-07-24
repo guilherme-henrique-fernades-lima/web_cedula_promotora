@@ -60,6 +60,7 @@ export default function RelatorioDespesas() {
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
 
+  const [loadingDataFetch, setLoadingDataFetch] = useState(true);
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
@@ -136,6 +137,7 @@ export default function RelatorioDespesas() {
   }
 
   async function getDespesas() {
+    setLoadingDataFetch(true);
     const response = await fetch(
       `/api/relatorios/despesas/?dt_inicio=${moment(dataInicio).format(
         "YYYY-MM-DD"
@@ -148,10 +150,10 @@ export default function RelatorioDespesas() {
       }
     );
 
-    if (response.ok) {
-      const json = await response.json();
-      setDespesas(json);
-    }
+    const json = await response.json();
+    setDespesas(json);
+
+    setLoadingDataFetch(false);
   }
 
   function getDataForEdit(data) {
@@ -262,11 +264,15 @@ export default function RelatorioDespesas() {
       return {
         id: row.id,
         dt_vencimento: row.dt_vencimento,
-        descricao: row.descricao,
+        descricao: row.descricao ? row.descricao.toUpperCase() : row.descricao,
         valor: row.valor,
-        situacao: row.situacao,
-        tp_despesa: row.tp_despesa,
-        natureza_despesa: row.natureza_despesa,
+        situacao: row.situacao ? row.situacao.toUpperCase() : row.situacao,
+        tp_despesa: row.tp_despesa
+          ? row.tp_despesa.toUpperCase()
+          : row.tp_despesa,
+        natureza_despesa: row.natureza_despesa
+          ? row.natureza_despesa.toUpperCase()
+          : row.natureza_despesa,
       };
     });
   } catch (err) {
@@ -528,7 +534,45 @@ export default function RelatorioDespesas() {
             </Grid>
           </Grid>
 
-          {despesas?.length == 0 ? (
+          {loadingDataFetch ? (
+            <Box
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: 5,
+                mb: 5,
+              }}
+            >
+              <Spinner />
+            </Box>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total de despesas:
+                  {(despesas?.data?.length && despesas?.data?.length) || 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Valor total:
+                  {despesas?.indicadores?.total
+                    ? formatarValorBRL(despesas?.indicadores?.total)
+                    : 0}
+                </Typography>
+              </Box>
+              <DataTable rows={rows} columns={columns} />
+            </>
+          )}
+
+          {/* {despesas?.length == 0 ? (
             <Box
               sx={{
                 width: "100%",
@@ -555,17 +599,30 @@ export default function RelatorioDespesas() {
                   //   "linear-gradient(135deg, #b1ea4d 0%,#459522 100%)",
                 }}
               >
-                <MonetizationOnIcon sx={{ fontSize: 38, color: "#000" }} />
-                <Typography sx={{ fontWeight: 700, color: "#000", ml: 1 }}>
-                  Valor total no período:
-                  {despesas?.indicadores?.total
-                    ? formatarValorBRL(despesas?.indicadores?.total)
-                    : 0}
-                </Typography>
+                <MonetizationOnIcon sx={{ fontSize: 38, color: "#0f0f0f" }} />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    justifyContent: "flex-start",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 700, color: "#0f0f0f", ml: 1 }}>
+                    Total de despesas: {despesas?.data?.length || 0}
+                  </Typography>
+                  <Typography sx={{ fontWeight: 700, color: "#0f0f0f", ml: 1 }}>
+                    Valor total:
+                    {despesas?.indicadores?.total
+                      ? formatarValorBRL(despesas?.indicadores?.total)
+                      : 0}
+                  </Typography>
+                </Box>
               </Box>
               <DataTable rows={rows} columns={columns} />
             </>
-          )}
+          )} */}
         </Box>
       </Fade>
     </ContentWrapper>

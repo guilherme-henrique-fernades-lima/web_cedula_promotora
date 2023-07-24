@@ -43,6 +43,7 @@ import {
 import { contratoSchema } from "@/schemas/contratoSchema";
 
 //Icons
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
@@ -58,6 +59,7 @@ export default function RelatorioContratos() {
   const [dataFim, setDataFim] = useState(new Date());
 
   const [loadingButton, setLoadingButton] = useState(false);
+  const [loadingDataFetch, setLoadingDataFetch] = useState(true);
 
   const [id, setId] = useState("");
   const [promotora, setPromotora] = useState("");
@@ -94,6 +96,7 @@ export default function RelatorioContratos() {
   }, [session?.user]);
 
   async function getContratos() {
+    setLoadingDataFetch(true);
     const response = await fetch(
       `/api/relatorios/contratos/?dt_inicio=${moment(dataInicio).format(
         "YYYY-MM-DD"
@@ -106,10 +109,10 @@ export default function RelatorioContratos() {
       }
     );
 
-    if (response.ok) {
-      const json = await response.json();
-      setContratos(json);
-    }
+    const json = await response.json();
+    setContratos(json);
+
+    setLoadingDataFetch(false);
   }
 
   async function editarDadosContrato() {
@@ -946,7 +949,7 @@ export default function RelatorioContratos() {
             </Grid>
           </Grid>
 
-          {contratos?.length == 0 ? (
+          {loadingDataFetch ? (
             <Box
               sx={{
                 width: "100%",
@@ -960,7 +963,37 @@ export default function RelatorioContratos() {
               <Spinner />
             </Box>
           ) : (
-            <DataTable rows={rows} columns={columns} />
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total contratos: {""}
+                  {contratos?.indicadores?.vl_contrato
+                    ? formatarValorBRL(contratos?.indicadores?.vl_comissao)
+                    : 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total parcelas: {""}
+                  {contratos?.indicadores?.vl_parcela
+                    ? formatarValorBRL(contratos?.indicadores?.vl_parcela)
+                    : 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total comissão: {""}
+                  {contratos?.indicadores?.vl_comissao
+                    ? formatarValorBRL(contratos?.indicadores?.vl_comissao)
+                    : 0}
+                </Typography>
+              </Box>
+
+              <DataTable rows={rows} columns={columns} />
+            </>
           )}
         </Box>
       </Fade>

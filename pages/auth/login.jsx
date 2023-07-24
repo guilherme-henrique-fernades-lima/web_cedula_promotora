@@ -48,8 +48,8 @@ function AuthAnimation() {
 }
 
 export default function SingIn() {
-  const [email, setEmail] = useState("admin@admin.com");
-  const [password, setPassword] = useState("admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [lembrarEmail, setLembrarEmail] = useState(false);
 
@@ -58,7 +58,7 @@ export default function SingIn() {
       username: email,
       password: password,
       redirect: true,
-      callbackUrl: "/",
+      callbackUrl: "/relatorios/emprestimos",
     });
   };
 

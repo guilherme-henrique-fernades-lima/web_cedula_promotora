@@ -71,13 +71,13 @@ export default function RelatorioEmprestimos() {
   const [emprestimoItem, setEmprestimoItem] = useState([]);
 
   const [showEditForm, setShowEditForm] = useState(false);
+  const [loadingDataFetch, setLoadingDataFetch] = useState(true);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [tpBaixaParcela, setTpBaixaParcela] = useState("");
-
   const [dadosEmprestimoItem, setDadosEmprestimoItem] = useState({});
 
   const [id, setId] = useState("");
@@ -196,6 +196,7 @@ export default function RelatorioEmprestimos() {
   }
 
   async function getEmprestimos() {
+    setLoadingDataFetch(true);
     const response = await fetch(
       `/api/relatorios/emprestimos/?dt_inicio=${moment(dataInicio).format(
         "YYYY-MM-DD"
@@ -208,10 +209,10 @@ export default function RelatorioEmprestimos() {
       }
     );
 
-    if (response.ok) {
-      const json = await response.json();
-      setEmprestimos(json);
-    }
+    const json = await response.json();
+    setEmprestimos(json);
+
+    setLoadingDataFetch(false);
   }
 
   async function getEmprestimoItem(idEmprestimo) {
@@ -718,7 +719,7 @@ export default function RelatorioEmprestimos() {
             </Grid>
           </Grid>
 
-          {emprestimos?.length == 0 ? (
+          {loadingDataFetch ? (
             <Box
               sx={{
                 width: "100%",
@@ -732,7 +733,43 @@ export default function RelatorioEmprestimos() {
               <Spinner />
             </Box>
           ) : (
-            <DataTable rows={rows} columns={columns} />
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "flex-start",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total empréstimos: {""}
+                  {emprestimos?.indicadores?.vl_emprestimo
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_emprestimo)
+                    : 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total capital: {""}
+                  {emprestimos?.indicadores?.vl_capital
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_capital)
+                    : 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total juros: {""}
+                  {emprestimos?.indicadores?.vl_juros
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_juros)
+                    : 0}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Total: {""}
+                  {emprestimos?.indicadores?.vl_total
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_total)
+                    : 0}
+                </Typography>
+              </Box>
+
+              <DataTable rows={rows} columns={columns} />
+            </>
           )}
         </Box>
       </Fade>
