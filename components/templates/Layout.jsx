@@ -275,6 +275,21 @@ export default function Layout({ children }) {
                       </ListItemButton>
                     </ListItem>
                   </Link>
+
+                  <Link href="/relatorios/vencimentos">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={
+                            <TitleTypography>Vencimentos</TitleTypography>
+                          }
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
                 </List>
               </Collapse>
             </List>
