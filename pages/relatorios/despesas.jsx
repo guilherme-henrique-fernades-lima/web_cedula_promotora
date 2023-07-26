@@ -6,8 +6,8 @@ import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import InputMask from "react-input-mask";
 import moment from "moment";
+import { NumericFormat } from "react-number-format";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -31,6 +31,8 @@ import {
   formatarData,
   formatarValorBRL,
   converterDataParaJS,
+  renderNaturezaDespesa,
+  renderTipoDespesa,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
@@ -157,6 +159,7 @@ export default function RelatorioDespesas() {
   }
 
   function getDataForEdit(data) {
+    console.log(data);
     clearErrors();
 
     setValue("descricaoDespesa", data.descricao);
@@ -247,6 +250,11 @@ export default function RelatorioDespesas() {
       align: "center",
       headerAlign: "center",
       flex: 1,
+      renderCell: (params) => {
+        if (params.value) {
+          return renderTipoDespesa(params.value);
+        }
+      },
     },
     {
       field: "natureza_despesa",
@@ -256,6 +264,11 @@ export default function RelatorioDespesas() {
       align: "center",
       headerAlign: "center",
       flex: 1,
+      renderCell: (params) => {
+        if (params.value) {
+          return renderNaturezaDespesa(params.value);
+        }
+      },
     },
   ];
 
@@ -266,12 +279,10 @@ export default function RelatorioDespesas() {
         dt_vencimento: row.dt_vencimento,
         descricao: row.descricao ? row.descricao.toUpperCase() : row.descricao,
         valor: row.valor,
-        situacao: row.situacao ? row.situacao.toUpperCase() : row.situacao,
-        tp_despesa: row.tp_despesa
-          ? row.tp_despesa.toUpperCase()
-          : row.tp_despesa,
+        situacao: row.situacao,
+        tp_despesa: row.tp_despesa,
         natureza_despesa: row.natureza_despesa
-          ? row.natureza_despesa.toUpperCase()
+          ? row.natureza_despesa
           : row.natureza_despesa,
       };
     });

@@ -192,7 +192,7 @@ export default function CadastrarDespesa() {
                   }}
                   error={Boolean(errors.valorDespesa)}
                   size="small"
-                  label="Valor do despesa"
+                  label="Valor da despesa"
                   placeholder="R$ 0,00"
                   InputLabelProps={{ shrink: true }}
                   autoComplete="off"

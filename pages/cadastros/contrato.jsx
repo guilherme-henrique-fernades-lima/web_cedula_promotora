@@ -90,7 +90,7 @@ export default function CadastrarContrato(props) {
       convenio: convenio,
       operacao: operacao,
       banco: banco.toUpperCase(),
-      vl_contrato: vl_contrato,
+      vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
       dt_pag_cliente: dt_pag_cliente
@@ -110,7 +110,7 @@ export default function CadastrarContrato(props) {
   async function salvarContrato() {
     setLoadingButton(true);
     const payload = getPayload();
-    console.log("vl_contrato: ", vl_contrato);
+
     console.log(payload);
 
     const response = await fetch("/api/cadastros/contrato", {
@@ -161,7 +161,7 @@ export default function CadastrarContrato(props) {
 
     setId("");
     setPromotora("");
-    setDtDigitacao("");
+    setDtDigitacao(null);
     setNrContrato("");
     setNoCliente("");
     setCpf("");
@@ -171,8 +171,8 @@ export default function CadastrarContrato(props) {
     setVlContrato("");
     setQtParcelas("");
     setVlParcela("");
-    setDtPagCliente("");
-    setDtPagComissao("");
+    setDtPagCliente(null);
+    setDtPagComissao(null);
     setVlComissao("");
     setPorcentagem("");
     setCorretor("");

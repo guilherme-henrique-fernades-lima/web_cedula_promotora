@@ -878,9 +878,9 @@ export default function RelatorioEmprestimos() {
                       <TableCell align="center" sx={{ fontWeight: 700 }}>
                         DT. VENCIMENTO
                       </TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                      {/* <TableCell align="center" sx={{ fontWeight: 700 }}>
                         PARCELA
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell align="center" sx={{ fontWeight: 700 }}>
                         DT. PAGAMENTO
                       </TableCell>
@@ -919,14 +919,14 @@ export default function RelatorioEmprestimos() {
                             ? formatarData(item.dt_vencimento)
                             : "---"}
                         </TableCell>
-                        <TableCell align="center">
+                        {/* <TableCell align="center">
                           {item.nr_parcela}/
                           {
                             emprestimoItem?.filter(
                               (item) => item.tp_pagamento != "JUROS"
                             ).length
                           }
-                        </TableCell>
+                        </TableCell> */}
                         <TableCell align="center">
                           {item.dt_pagamento
                             ? formatarData(item.dt_pagamento)

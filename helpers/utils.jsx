@@ -73,3 +73,39 @@ export function renderTipoPagamentoEmprestimo(value) {
     return "";
   }
 }
+
+export function renderNaturezaDespesa(value) {
+  if (value === "aluguel") {
+    return "ALUGUEL";
+  } else if (value === "aux_familia") {
+    return "AUXÍLIO FAMÍLIA";
+  } else if (value === "corretor") {
+    return "CORRETOR(A)";
+  } else if (value === "fgts") {
+    return "FGTS";
+  } else if (value === "inss") {
+    return "INSS";
+  } else if (value === "iptu") {
+    return "INSS";
+  } else if (value === "refeicao") {
+    return "REFEIÇÃO";
+  } else if (value === "salario") {
+    return "SALÁRIO";
+  } else if (value === "vale_transporte") {
+    return "VALE TRANSPORTE";
+  } else if (value === "outro") {
+    return "OUTRO";
+  } else {
+    return "";
+  }
+}
+
+export function renderTipoDespesa(value) {
+  if (value === "fixa") {
+    return "FIXA";
+  } else if (value === "variavel") {
+    return "VARIÁVEL";
+  } else {
+    return "";
+  }
+}
