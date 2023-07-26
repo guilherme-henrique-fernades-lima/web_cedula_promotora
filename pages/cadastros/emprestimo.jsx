@@ -32,15 +32,8 @@ import MenuItem from "@mui/material/MenuItem";
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
-//Constants
-import {
-  SITUACAO_PAGAMENTO,
-  NATUREZA_DESPESA,
-  TIPO_DESPESA,
-} from "@/helpers/constants";
-
 //Formatters
-import { converterDataParaJS } from "@/helpers/utils";
+import { converterDataParaJS, formatarValorBRL } from "@/helpers/utils";
 
 //Schema validation
 import { emprestimoSchema } from "@/schemas/emprestimoSchema";
@@ -69,6 +62,8 @@ export default function CadastrarCobrança() {
   const [qtParcela, setQtParcela] = useState("");
   const [vlCapital, setVlCapital] = useState("");
   const [vlJuros, setVlJuros] = useState("");
+  const [vlJurosUm, setVlJurosUm] = useState("");
+  const [vlJurosDois, setVlJurosDois] = useState("");
   const [vlTotal, setVlTotal] = useState("");
   const [observacao, setObservacao] = useState("");
 
@@ -76,24 +71,26 @@ export default function CadastrarCobrança() {
     if (vlEmprestimo && qtParcela) {
       const vlCapitalValue = parseFloat(vlEmprestimo) / parseInt(qtParcela);
       setVlCapital(vlCapitalValue.toFixed(2));
-      setValue("vlCapital", vlCapitalValue);
 
-      const vlJurosValue = parseFloat(vlEmprestimo) * 0.2;
-      setVlJuros(vlJurosValue.toFixed(2));
-      setValue("vlJuros", vlJurosValue);
+      const vlJurosValue = parseFloat(vlEmprestimo) * 0.1;
+      setVlJurosUm(vlJurosValue.toFixed(2));
+
+      const vlJurosValueDois = parseFloat(vlEmprestimo) * 0.1;
+      setVlJurosDois(vlJurosValueDois.toFixed(2));
 
       const vlTotalValue =
-        parseFloat(vlCapitalValue) + parseFloat(vlJurosValue);
+        parseFloat(vlCapitalValue) +
+        parseFloat(vlJurosValue) +
+        parseFloat(vlJurosValueDois);
+
       setVlTotal(vlTotalValue.toFixed(2));
       setValue("vlTotal", vlTotalValue);
     } else {
       setVlCapital("");
-      setVlJuros("");
       setVlTotal("");
-
-      resetField("vlCapital");
-      resetField("vlJuros");
-      resetField("vlTotal");
+      setVlJurosUm("");
+      setVlJurosDois("");
+      setVlJuros("");
     }
   }, [vlEmprestimo, qtParcela]);
 
@@ -105,7 +102,7 @@ export default function CadastrarCobrança() {
       no_cliente: noCliente.toUpperCase(),
       vl_emprestimo: parseFloat(vlEmprestimo),
       vl_capital: parseFloat(vlCapital),
-      vl_juros: parseFloat(vlJuros),
+      vl_juros: parseFloat(vlJurosUm) + parseFloat(vlJurosDois),
       vl_total: parseFloat(vlTotal),
       qt_parcela: parseInt(qtParcela),
       observacao: observacao,
@@ -210,6 +207,7 @@ export default function CadastrarCobrança() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {console.log("vlEmprestimo >> ", vlEmprestimo)}
             <TextField
               {...register("vlEmprestimo")}
               error={Boolean(errors.vlEmprestimo)}
@@ -244,7 +242,7 @@ export default function CadastrarCobrança() {
               }}
               size="small"
               label="Quantidade de parcelas"
-              // placeholder=""
+              placeholder="Insira a quantidade de parcelas do empréstimo"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
@@ -262,13 +260,8 @@ export default function CadastrarCobrança() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("vlCapital")}
-              error={Boolean(errors.vlCapital)}
               disabled
-              value={vlCapital}
-              // onChange={(e) => {
-
-              // }}
+              value={`R$ ${parseFloat(vlCapital || 0)}`}
               size="small"
               label="Valor do capital"
               placeholder="R$ 0,00"
@@ -282,21 +275,35 @@ export default function CadastrarCobrança() {
               }
               inputProps={{ maxLength: 10 }}
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.vlCapital?.message}
-            </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("vlJuros")}
-              error={Boolean(errors.vlJuros)}
               disabled
-              value={vlJuros}
+              value={`R$ ${vlJurosUm}`}
+              size="small"
+              label="1 - Valor dos juros 10%"
+              placeholder="R$ 0,00"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              // onInput={(e) =>
+              //   (e.target.value = e.target.value
+              //     .replace(/[^0-9.]/g, "")
+              //     .replace(/(\..*?)\..*/g, "$1"))
+              // }
+              inputProps={{ maxLength: 10 }}
+            />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              disabled
+              value={vlJurosDois}
               onChange={(e) => {
-                setVlJuros(e.target.value);
+                setVlJurosDois(e.target.value);
               }}
               size="small"
-              label="Valor do juros"
+              label="2 - Valor dos juros 10%"
               placeholder="R$ 0,00"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
@@ -308,14 +315,9 @@ export default function CadastrarCobrança() {
               }
               inputProps={{ maxLength: 10 }}
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.vlJuros?.message}
-            </Typography>
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("vlTotal")}
-              error={Boolean(errors.vlTotal)}
               disabled
               value={vlTotal}
               onChange={(e) => {
@@ -334,9 +336,6 @@ export default function CadastrarCobrança() {
               }
               inputProps={{ maxLength: 10 }}
             />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.vlTotal?.message}
-            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
@@ -362,8 +361,7 @@ export default function CadastrarCobrança() {
               variant="contained"
               endIcon={<SaveIcon />}
               disableElevation
-              //loading={loadingButton}
-              // fullWidth
+              loading={loadingButton}
             >
               SALVAR
             </LoadingButton>

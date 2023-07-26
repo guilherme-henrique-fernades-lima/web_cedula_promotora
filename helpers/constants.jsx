@@ -483,9 +483,14 @@ export const TIPO_DESPESA = [
 
 export const NATUREZA_DESPESA = [
   { value: "aluguel", label: "ALUGUEL" },
+  { value: "aux_familia", label: "AUXÍLIO FAMÍLIA" },
+  { value: "corretor", label: "CORRETOR(A)" },
   { value: "fgts", label: "FGTS" },
+  { value: "inss", label: "INSS" },
+  { value: "iptu", label: "IPTU" },
   { value: "refeicao", label: "REFEIÇÃO" },
   { value: "salario", label: "SALÁRIO" },
+  { value: "vale_transporte", label: "VALE TRANSPORTE" },
   { value: "outro", label: "OUTRO" },
 ];
 
@@ -495,7 +500,6 @@ export const SITUACAO_PAGAMENTO = [
 ];
 
 export const TP_CONVENIO = [
-  { value: "ESTADO", label: "ESTADO" },
   { value: "FGTS", label: "FGTS" },
   { value: "INSS", label: "INSS" },
   { value: "FEDERAL", label: "FEDERAL" },
@@ -509,9 +513,14 @@ export const TP_CONVENIO = [
 ];
 
 export const TP_OPERACAO = [
-  { value: "NOVO", label: "NOVO" },
-  { value: "SAQUE COMPL. CARTAO", label: "SAQUE COMPL. CARTÃO" },
-  { value: "REFIN", label: "REFIN" },
   { value: "CARTAO BENEFICIO", label: "CARTÃO BENEFÍCIO" },
-  { value: "CARTAO", label: "CARTÃO" },
+  { value: "CARTAO CONSIGNADO", label: "CARTÃO CONSIGNADO" },
+  { value: "NOVO", label: "NOVO" },
+  { value: "PORTABILIDADE", label: "PORTABILIDADE" },
+  {
+    value: "PORTABILIDADE_REFINANCIAMENTO",
+    label: "PORTABILIDADE E REFINANCIAMENTO",
+  },
+  { value: "REFINANCIAMENTO", label: "REFINANCIAMENTO" },
+  { value: "SAQUE COMPLEMENTAR CARTAO", label: "SAQUE COMPLEMENTAR CARTÃO" },
 ];

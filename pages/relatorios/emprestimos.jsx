@@ -347,10 +347,23 @@ export default function RelatorioEmprestimos() {
       },
     },
     {
-      field: "vl_juros",
-      headerName: "VLR. DO JUROS",
-      renderHeader: (params) => <strong>VLR. DO JUROS</strong>,
-      minWidth: 200,
+      field: "vl_juros_um",
+      headerName: "1 -  VLR. DO JUROS 10%",
+      renderHeader: (params) => <strong>1 - VLR. DO JUROS 10%</strong>,
+      minWidth: 220,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarValorBRL(parseFloat(params.value));
+        }
+      },
+    },
+    {
+      field: "vl_juros_dois",
+      headerName: "1 - VLR. DO JUROS 10%",
+      renderHeader: (params) => <strong>2 - VLR. DO JUROS 10%</strong>,
+      minWidth: 220,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -399,6 +412,8 @@ export default function RelatorioEmprestimos() {
         vl_emprestimo: row.vl_emprestimo,
         vl_capital: row.vl_capital,
         vl_juros: row.vl_juros,
+        vl_juros_um: row.vl_juros / 2,
+        vl_juros_dois: row.vl_juros / 2,
         vl_total: row.vl_total,
         qt_parcela: row.qt_parcela,
         observacao: row.observacao,

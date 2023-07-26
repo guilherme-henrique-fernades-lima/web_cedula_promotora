@@ -74,25 +74,16 @@ export default function CadastrarContrato() {
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
 
-  // const MOCK_DATA = {
-  //   id: id,
-  //   promotora: "EFETIVA",
-  //   dt_digitacao: "2023-07-21",
-  //   nr_contrato: "111111111",
-  //   no_cliente: "GLAYSON SILVA VISGUEIRA",
-  //   cpf: "05251596308",
-  //   convenio: "FGTS",
-  //   operacao: "REFIN",
-  //   banco: "BANCO DO BRASIL",
-  //   vl_contrato: 200,
-  //   qt_parcelas: "6",
-  //   vl_parcela: 200,
-  //   dt_pag_cliente: "2023-07-21",
-  //   dt_pag_comissao: "2023-07-21",
-  //   vl_comissao: 200,
-  //   porcentagem: 2,
-  //   corretor: "teste",
-  // };
+  // useEffect(() => {
+  //   console.log("Entrou no useeffect");
+  //   console.log(cpf);
+  //   console.log(cpf.length);
+  //   const cpfSearch = cpf.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
+  //   console.log(cpfSearch);
+  //   if (cpfSearch.length == 11) {
+  //     getCliente(cpfSearch);
+  //   }
+  // }, [cpf]);
 
   function getPayload() {
     const data = {
@@ -150,6 +141,22 @@ export default function CadastrarContrato() {
     setLoadingButton(false);
   }
 
+  async function getCliente() {
+    const response = await fetch(`/api/cadastros/contrato/?cpf=${cpf}`, {
+      method: "GET",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    console.log(response);
+
+    if (response.ok) {
+    } else {
+      toast.error("Cliente não existe na base de dados do callcenter");
+    }
+  }
+
   function clearStatesAndErrors() {
     clearErrors();
     reset();
@@ -190,10 +197,12 @@ export default function CadastrarContrato() {
               {...register("promotora")}
               error={Boolean(errors.promotora)}
               fullWidth
-              label="Tipo de despesa"
+              label="Tipo de promotora"
+              placeholder="Insira a promotora"
               size="small"
               value={promotora}
               autoComplete="off"
+              InputLabelProps={{ shrink: true }}
               onChange={(e) => {
                 setPromotora(e.target.value);
               }}
@@ -255,30 +264,6 @@ export default function CadastrarContrato() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("no_cliente")}
-              error={Boolean(errors.no_cliente)}
-              value={no_cliente}
-              onChange={(e) => {
-                setNoCliente(e.target.value);
-              }}
-              size="small"
-              label="Nome do cliente"
-              placeholder="Insira o nome completo do cliente"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, ""))
-              }
-              inputProps={{ maxLength: 255 }}
-            />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.no_cliente?.message}
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("cpf")}
               error={Boolean(errors.cpf)}
@@ -304,6 +289,30 @@ export default function CadastrarContrato() {
             </InputMask>
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.cpf?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("no_cliente")}
+              error={Boolean(errors.no_cliente)}
+              value={no_cliente}
+              onChange={(e) => {
+                setNoCliente(e.target.value);
+              }}
+              size="small"
+              label="Nome do cliente"
+              placeholder="Insira o nome completo do cliente"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value.replace(/[^A-Za-z\s]/g, ""))
+              }
+              inputProps={{ maxLength: 255 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.no_cliente?.message}
             </Typography>
           </Grid>
 
@@ -504,32 +513,6 @@ export default function CadastrarContrato() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("vl_comissao")}
-              error={Boolean(errors.vl_comissao)}
-              value={vl_comissao}
-              onChange={(e) => {
-                setVlComissao(e.target.value);
-              }}
-              size="small"
-              label="Valor da comissão"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
-            />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.vl_comissao?.message}
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
               {...register("porcentagem")}
               error={Boolean(errors.porcentagem)}
               value={porcentagem}
@@ -556,6 +539,32 @@ export default function CadastrarContrato() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
+              {...register("vl_comissao")}
+              error={Boolean(errors.vl_comissao)}
+              value={vl_comissao}
+              onChange={(e) => {
+                setVlComissao(e.target.value);
+              }}
+              size="small"
+              label="Valor da comissão"
+              placeholder="R$ 0,00"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              onInput={(e) =>
+                (e.target.value = e.target.value
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1"))
+              }
+              inputProps={{ maxLength: 10 }}
+            />
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.vl_comissao?.message}
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
               {...register("corretor")}
               error={Boolean(errors.corretor)}
               value={corretor}
@@ -563,7 +572,7 @@ export default function CadastrarContrato() {
                 setCorretor(e.target.value);
               }}
               size="small"
-              label="Correto"
+              label="Corretor(a)"
               placeholder="Insira o corretor"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
