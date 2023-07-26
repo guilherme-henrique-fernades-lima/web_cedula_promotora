@@ -7,10 +7,11 @@ import { useRouter } from "next/router";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
 import { useSession } from "next-auth/react";
+import { NumericFormat } from "react-number-format";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -39,7 +40,7 @@ import { converterDataParaJS } from "@/helpers/utils";
 //Schema validation
 import { contratoSchema } from "@/schemas/contratoSchema";
 
-export default function CadastrarContrato() {
+export default function CadastrarContrato(props) {
   const { data: session } = useSession();
 
   const {
@@ -49,6 +50,8 @@ export default function CadastrarContrato() {
     setValue,
     clearErrors,
     reset,
+    resetField,
+    control,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(contratoSchema),
@@ -74,17 +77,6 @@ export default function CadastrarContrato() {
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
 
-  // useEffect(() => {
-  //   console.log("Entrou no useeffect");
-  //   console.log(cpf);
-  //   console.log(cpf.length);
-  //   const cpfSearch = cpf.replace(/[^0-9.]/g, "").replace(/(\..*?)\..*/g, "$1");
-  //   console.log(cpfSearch);
-  //   if (cpfSearch.length == 11) {
-  //     getCliente(cpfSearch);
-  //   }
-  // }, [cpf]);
-
   function getPayload() {
     const data = {
       //id: id,
@@ -98,7 +90,7 @@ export default function CadastrarContrato() {
       convenio: convenio,
       operacao: operacao,
       banco: banco.toUpperCase(),
-      vl_contrato: parseFloat(vl_contrato),
+      vl_contrato: vl_contrato,
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
       dt_pag_cliente: dt_pag_cliente
@@ -118,7 +110,7 @@ export default function CadastrarContrato() {
   async function salvarContrato() {
     setLoadingButton(true);
     const payload = getPayload();
-    // const payload = MOCK_DATA;
+    console.log("vl_contrato: ", vl_contrato);
     console.log(payload);
 
     const response = await fetch("/api/cadastros/contrato", {
@@ -128,8 +120,6 @@ export default function CadastrarContrato() {
       },
       body: JSON.stringify(payload),
     });
-
-    console.log(response);
 
     if (response.ok) {
       toast.success("Contrato cadastrado com sucesso!");
@@ -141,19 +131,27 @@ export default function CadastrarContrato() {
     setLoadingButton(false);
   }
 
-  async function getCliente() {
-    const response = await fetch(`/api/cadastros/contrato/?cpf=${cpf}`, {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
-
-    console.log(response);
+  async function getCliente(cpfSearch) {
+    const response = await fetch(
+      `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
     if (response.ok) {
+      const json = await response.json();
+      setNoCliente(json.nome);
+      setValue("no_cliente", json.nome);
     } else {
-      toast.error("Cliente não existe na base de dados do callcenter");
+      setNoCliente("");
+      resetField("no_cliente");
+      toast.error(
+        "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+      );
     }
   }
 
@@ -272,6 +270,10 @@ export default function CadastrarContrato() {
               value={cpf}
               onChange={(e) => {
                 setCpf(e.target.value);
+
+                if (e.target.value?.length === 14) {
+                  getCliente(e.target.value);
+                }
               }}
             >
               {(inputProps) => (
@@ -386,26 +388,34 @@ export default function CadastrarContrato() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("vl_contrato")}
-              error={Boolean(errors.vl_contrato)}
-              value={vl_contrato}
-              onChange={(e) => {
-                setVlContrato(e.target.value);
-              }}
-              size="small"
-              label="Valor do contrato"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
+            <Controller
+              name="vl_contrato"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  onValueChange={(values) => {
+                    setVlContrato(values?.floatValue);
+                  }}
+                  error={Boolean(errors.vl_contrato)}
+                  size="small"
+                  label="Valor do contrato"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
+
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.vl_contrato?.message}
             </Typography>
@@ -438,26 +448,34 @@ export default function CadastrarContrato() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("vl_parcela")}
-              error={Boolean(errors.vl_parcela)}
-              value={vl_parcela}
-              onChange={(e) => {
-                setVlParcela(e.target.value);
-              }}
-              size="small"
-              label="Valor da parcela"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
+            <Controller
+              name="vl_parcela"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  onValueChange={(values) => {
+                    setVlParcela(values?.floatValue);
+                  }}
+                  error={Boolean(errors.vl_parcela)}
+                  size="small"
+                  label="Valor da parcela"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
+
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.vl_parcela?.message}
             </Typography>
@@ -512,25 +530,34 @@ export default function CadastrarContrato() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("porcentagem")}
-              error={Boolean(errors.porcentagem)}
-              value={porcentagem}
-              onChange={(e) => {
-                setPorcentagem(e.target.value);
-              }}
-              size="small"
-              label="(%) Porcentagem"
-              placeholder="% de juros"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 3 }}
+            <Controller
+              name="porcentagem"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  decimalSeparator=","
+                  isNumericString
+                  suffix="%"
+                  allowEmptyFormatting
+                  onValueChange={(values) => {
+                    setPorcentagem(values?.floatValue);
+                  }}
+                  //Aqui pra baixo textfield
+                  error={Boolean(errors.porcentagem)}
+                  size="small"
+                  label="(%) Porcentagem"
+                  placeholder="% de juros"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.porcentagem?.message}
@@ -538,25 +565,32 @@ export default function CadastrarContrato() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("vl_comissao")}
-              error={Boolean(errors.vl_comissao)}
-              value={vl_comissao}
-              onChange={(e) => {
-                setVlComissao(e.target.value);
-              }}
-              size="small"
-              label="Valor da comissão"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
+            <Controller
+              name="vl_comissao"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  onValueChange={(values) => {
+                    setVlComissao(values?.floatValue);
+                  }}
+                  error={Boolean(errors.vl_comissao)}
+                  size="small"
+                  label="Valor da comissão"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.vl_comissao?.message}
@@ -591,8 +625,6 @@ export default function CadastrarContrato() {
               endIcon={<SaveIcon />}
               disableElevation
               loading={loadingButton}
-              //onClick={salvarContrato}
-              // fullWidth
             >
               SALVAR
             </LoadingButton>

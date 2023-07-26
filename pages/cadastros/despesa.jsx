@@ -7,10 +7,11 @@ import { useRouter } from "next/router";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
 import { useSession } from "next-auth/react";
+import { NumericFormat } from "react-number-format";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -55,6 +56,7 @@ export default function CadastrarDespesa() {
     setValue,
     clearErrors,
     reset,
+    control,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(despesaSchema),
@@ -172,19 +174,32 @@ export default function CadastrarDespesa() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("valorDespesa")}
-              error={Boolean(errors.valorDespesa)}
-              value={valorDespesa}
-              onChange={(e) => {
-                setValorDespesa(e.target.value);
-              }}
-              size="small"
-              label="Valor da despesa"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
+            <Controller
+              name="valorDespesa"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  onValueChange={(values) => {
+                    setValorDespesa(values?.floatValue);
+                  }}
+                  error={Boolean(errors.valorDespesa)}
+                  size="small"
+                  label="Valor do despesa"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.valorDespesa?.message}

@@ -1,3 +1,5 @@
+import Chip from "@mui/material/Chip";
+
 export function formatarData(data) {
   const partes = data.split("-");
   const ano = partes[0];
@@ -60,4 +62,14 @@ export function converterDataParaJS(dataNoFormatoYYYYMMDD) {
   const dia = parseInt(partesDaData[2]);
 
   return new Date(ano, mes, dia);
+}
+
+export function renderTipoPagamentoEmprestimo(value) {
+  if (value === "JUROS") {
+    return <Chip label="JUROS" color="error" size="small" />;
+  } else if (value === "PARCELA") {
+    return <Chip label="PARCELA" color="success" size="small" />;
+  } else {
+    return "";
+  }
 }

@@ -45,6 +45,7 @@ import {
   formatarData,
   formatarValorBRL,
   converterDataParaJS,
+  renderTipoPagamentoEmprestimo,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
@@ -240,8 +241,6 @@ export default function RelatorioEmprestimos() {
       tp_pagamento: tpBaixaParcela,
     };
 
-    console.log(payload);
-
     const response = await fetch(`/api/relatorios/emprestimos-item`, {
       method: "POST",
       headers: {
@@ -250,13 +249,12 @@ export default function RelatorioEmprestimos() {
       body: JSON.stringify(payload),
     });
 
-    console.log(response);
-
     if (response.ok) {
       toast.success("Operação realizada com sucesso!");
       handleOpenCloseDialog();
       setDadosEmprestimoItem({});
       setTpBaixaParcela("");
+      handleOpenCloseModal();
     } else {
       toast.success("Erro na operação, tente novamente.");
     }
@@ -886,11 +884,15 @@ export default function RelatorioEmprestimos() {
                       <TableCell align="center" sx={{ fontWeight: 700 }}>
                         DT. PAGAMENTO
                       </TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 700 }}>
+                        TIPO PAGAMENTO
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {emprestimoItem?.map((item) => (
-                      <TableRow key={item.id}>
+                    {console.log(emprestimoItem)}
+                    {emprestimoItem?.map((item, index) => (
+                      <TableRow key={index}>
                         <TableCell align="center">
                           {item.dt_pagamento ? (
                             <IconButton disabled onClick={() => {}}>
@@ -918,12 +920,20 @@ export default function RelatorioEmprestimos() {
                             : "---"}
                         </TableCell>
                         <TableCell align="center">
-                          {item.nr_parcela}/{emprestimoItem.length}
+                          {item.nr_parcela}/
+                          {
+                            emprestimoItem?.filter(
+                              (item) => item.tp_pagamento != "JUROS"
+                            ).length
+                          }
                         </TableCell>
                         <TableCell align="center">
                           {item.dt_pagamento
                             ? formatarData(item.dt_pagamento)
                             : "---"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {renderTipoPagamentoEmprestimo(item.tp_pagamento)}
                         </TableCell>
                       </TableRow>
                     ))}

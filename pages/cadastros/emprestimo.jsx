@@ -7,10 +7,11 @@ import { useRouter } from "next/router";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
 import { useSession } from "next-auth/react";
+import { NumericFormat } from "react-number-format";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -49,6 +50,7 @@ export default function CadastrarCobrança() {
     clearErrors,
     reset,
     resetField,
+    control,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(emprestimoSchema),
@@ -56,6 +58,7 @@ export default function CadastrarCobrança() {
 
   const [loadingButton, setLoadingButton] = useState(false);
 
+  const [cpf, setCpf] = useState("");
   const [dtEmprestimo, setDtEmprestimo] = useState(new Date());
   const [noCliente, setNoCliente] = useState("");
   const [vlEmprestimo, setVlEmprestimo] = useState("");
@@ -133,6 +136,30 @@ export default function CadastrarCobrança() {
     setLoadingButton(false);
   }
 
+  async function getCliente(cpfSearch) {
+    const response = await fetch(
+      `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const json = await response.json();
+      setNoCliente(json.nome);
+      setValue("noCliente", json.nome);
+    } else {
+      setNoCliente("");
+      resetField("noCliente");
+      toast.error(
+        "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+      );
+    }
+  }
+
   function clearStatesAndErrors() {
     clearErrors();
     reset();
@@ -207,26 +234,32 @@ export default function CadastrarCobrança() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            {console.log("vlEmprestimo >> ", vlEmprestimo)}
-            <TextField
-              {...register("vlEmprestimo")}
-              error={Boolean(errors.vlEmprestimo)}
-              value={vlEmprestimo}
-              onChange={(e) => {
-                setVlEmprestimo(e.target.value);
-              }}
-              size="small"
-              label="Valor do empréstimo"
-              placeholder="R$ 0,00"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
+            <Controller
+              name="vlEmprestimo"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  onValueChange={(values) => {
+                    setVlEmprestimo(values?.floatValue);
+                  }}
+                  error={Boolean(errors.vlEmprestimo)}
+                  size="small"
+                  label="Valor do empréstimo"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
             />
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.vlEmprestimo?.message}
@@ -261,81 +294,167 @@ export default function CadastrarCobrança() {
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               disabled
-              value={`R$ ${parseFloat(vlCapital || 0)}`}
+              value={
+                vlCapital
+                  ? formatarValorBRL(parseFloat(vlCapital))
+                  : formatarValorBRL(parseFloat(0))
+              }
               size="small"
               label="Valor do capital"
               placeholder="R$ 0,00"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
             />
+
+            {/* <Controller
+              name="vlCapital"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  disabled
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  size="small"
+                  label="Valor do capital"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
+            /> */}
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               disabled
-              value={`R$ ${vlJurosUm}`}
+              value={
+                vlJurosUm
+                  ? formatarValorBRL(parseFloat(vlJurosUm))
+                  : formatarValorBRL(parseFloat(0))
+              }
               size="small"
               label="1 - Valor dos juros 10%"
               placeholder="R$ 0,00"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              // onInput={(e) =>
-              //   (e.target.value = e.target.value
-              //     .replace(/[^0-9.]/g, "")
-              //     .replace(/(\..*?)\..*/g, "$1"))
-              // }
-              inputProps={{ maxLength: 10 }}
             />
+
+            {/* <Controller
+              name="vlJurosUm"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  disabled
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  size="small"
+                  label="1 - Valor dos juros 10%"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
+            /> */}
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               disabled
-              value={vlJurosDois}
-              onChange={(e) => {
-                setVlJurosDois(e.target.value);
-              }}
+              value={
+                vlJurosDois
+                  ? formatarValorBRL(parseFloat(vlJurosDois))
+                  : formatarValorBRL(parseFloat(0))
+              }
               size="small"
               label="2 - Valor dos juros 10%"
               placeholder="R$ 0,00"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
             />
+
+            {/* <Controller
+              name="vlJurosDois"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  disabled
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  size="small"
+                  label="2 - Valor dos juros 10%"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
+            /> */}
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               disabled
-              value={vlTotal}
-              onChange={(e) => {
-                setVlTotal(e.target.value);
-              }}
+              value={
+                vlTotal
+                  ? formatarValorBRL(parseFloat(vlTotal))
+                  : formatarValorBRL(parseFloat(0))
+              }
               size="small"
               label="Valor total"
               placeholder="R$ 0,00"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              onInput={(e) =>
-                (e.target.value = e.target.value
-                  .replace(/[^0-9.]/g, "")
-                  .replace(/(\..*?)\..*/g, "$1"))
-              }
-              inputProps={{ maxLength: 10 }}
             />
+
+            {/* <Controller
+              name="vlTotal"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <NumericFormat
+                  {...field}
+                  disabled
+                  customInput={TextField}
+                  thousandSeparator="."
+                  decimalSeparator=","
+                  decimalScale={2}
+                  fixedDecimalScale={true}
+                  prefix="R$ "
+                  size="small"
+                  label="Valor total"
+                  placeholder="R$ 0,00"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                  fullWidth
+                  inputProps={{ maxLength: 16 }}
+                />
+              )}
+            /> */}
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
