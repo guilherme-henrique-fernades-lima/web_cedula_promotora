@@ -39,6 +39,8 @@ import { converterDataParaJS, formatarValorBRL } from "@/helpers/utils";
 //Schema validation
 import { emprestimoSchema } from "@/schemas/emprestimoSchema";
 
+import { UF_ARRAY } from "@/helpers/constants";
+
 export default function CadastrarCobrança() {
   const { data: session } = useSession();
 
@@ -116,16 +118,15 @@ export default function CadastrarCobrança() {
       vl_total: parseFloat(vlTotal),
       qt_parcela: parseInt(qtParcela),
       observacao: observacao,
-
       cpf: cpf.replace(/\D/g, ""),
       logradouro: logradouro,
       numLogr: numLogr,
       complLogr: complLogr,
-      cep: cep,
+      cep: cep ? cep.replace(/\D/g, "") : null,
       bairro: bairro,
-      cidade: cidade.replace(/\D/g, ""),
+      cidade: cidade,
       estado: estado,
-      telefone: telefone,
+      telefone: telefone ? telefone.replace(/\D/g, "") : telefone,
     };
 
     return data;
@@ -145,7 +146,7 @@ export default function CadastrarCobrança() {
 
     if (response.ok) {
       toast.success("Empréstimo cadastrado com sucesso!");
-      clearStatesAndErrors();
+      //clearStatesAndErrors();
     } else {
       toast.error("Erro ao cadastrar o empréstimo.");
     }
@@ -235,6 +236,39 @@ export default function CadastrarCobrança() {
                 disableHighlightToday
               />
             </LocalizationProvider>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <InputMask
+              {...register("cpf")}
+              error={Boolean(errors.cpf)}
+              mask="999.999.999-99"
+              maskChar={null}
+              value={cpf}
+              onChange={(e) => {
+                setCpf(e.target.value);
+
+                if (e.target.value?.length === 14) {
+                  getCliente(e.target.value);
+                }
+              }}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="CPF"
+                  placeholder="000.000.000-000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.cpf?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -333,31 +367,6 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
-
-            {/* <Controller
-              name="vlCapital"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <NumericFormat
-                  {...field}
-                  disabled
-                  customInput={TextField}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  prefix="R$ "
-                  size="small"
-                  label="Valor do capital"
-                  placeholder="R$ 0,00"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                  fullWidth
-                  inputProps={{ maxLength: 16 }}
-                />
-              )}
-            /> */}
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
@@ -374,31 +383,6 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
-
-            {/* <Controller
-              name="vlJurosUm"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <NumericFormat
-                  {...field}
-                  disabled
-                  customInput={TextField}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  prefix="R$ "
-                  size="small"
-                  label="1 - Valor dos juros 10%"
-                  placeholder="R$ 0,00"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                  fullWidth
-                  inputProps={{ maxLength: 16 }}
-                />
-              )}
-            /> */}
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -416,31 +400,6 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
-
-            {/* <Controller
-              name="vlJurosDois"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <NumericFormat
-                  {...field}
-                  disabled
-                  customInput={TextField}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  prefix="R$ "
-                  size="small"
-                  label="2 - Valor dos juros 10%"
-                  placeholder="R$ 0,00"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                  fullWidth
-                  inputProps={{ maxLength: 16 }}
-                />
-              )}
-            /> */}
           </Grid>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
@@ -457,84 +416,9 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
-
-            {/* <Controller
-              name="vlTotal"
-              control={control}
-              defaultValue=""
-              render={({ field }) => (
-                <NumericFormat
-                  {...field}
-                  disabled
-                  customInput={TextField}
-                  thousandSeparator="."
-                  decimalSeparator=","
-                  decimalScale={2}
-                  fixedDecimalScale={true}
-                  prefix="R$ "
-                  size="small"
-                  label="Valor total"
-                  placeholder="R$ 0,00"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                  fullWidth
-                  inputProps={{ maxLength: 16 }}
-                />
-              )}
-            /> */}
-          </Grid>
-
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <TextField
-              multiline
-              rows={3}
-              value={observacao}
-              onChange={(e) => {
-                setObservacao(e.target.value);
-              }}
-              size="small"
-              label="Observação"
-              placeholder="Insira a observação"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-            />
           </Grid>
 
           {/* NOVOS CAMPOS A PARTIR DAQUI */}
-
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <InputMask
-              {...register("cpf")}
-              error={Boolean(errors.cpf)}
-              mask="999.999.999-99"
-              maskChar={null}
-              value={cpf}
-              onChange={(e) => {
-                setCpf(e.target.value);
-
-                if (e.target.value?.length === 14) {
-                  getCliente(e.target.value);
-                }
-              }}
-            >
-              {(inputProps) => (
-                <TextField
-                  {...inputProps}
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  label="CPF"
-                  placeholder="000.000.000-000"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                />
-              )}
-            </InputMask>
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.cpf?.message}
-            </Typography>
-          </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
@@ -600,24 +484,25 @@ export default function CadastrarCobrança() {
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              // {...register("qtParcela")}
-              // error={Boolean(errors.qtParcela)}
+            <InputMask
+              mask="99999-999"
+              maskChar={null}
               value={cep}
-              onChange={(e) => {
-                setCep(e.target.value);
-              }}
-              size="small"
-              label="CEP"
-              placeholder="Insira o CEP"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              inputProps={{ maxLength: 250 }}
-            />
-            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.qtParcela?.message}
-            </Typography> */}
+              onChange={(e) => setCep(e.target.value)}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="CEP"
+                  placeholder="00000-000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -650,7 +535,7 @@ export default function CadastrarCobrança() {
                 setCidade(e.target.value);
               }}
               size="small"
-              label="Bairro"
+              label="Cidade"
               placeholder="Insira a cidade"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
@@ -686,23 +571,40 @@ export default function CadastrarCobrança() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              // {...register("qtParcela")}
-              // error={Boolean(errors.qtParcela)}
+              select
+              fullWidth
+              label="UF"
+              size="small"
+              placeholder="Selecione o estado"
+              InputLabelProps={{ shrink: true }}
               value={estado}
               onChange={(e) => {
                 setEstado(e.target.value);
               }}
+            >
+              {UF_ARRAY.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <TextField
+              multiline
+              rows={3}
+              value={observacao}
+              onChange={(e) => {
+                setObservacao(e.target.value);
+              }}
               size="small"
-              label="Bairro"
-              placeholder="Selecione o estado"
+              label="Observação"
+              placeholder="Insira a observação"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
-              inputProps={{ maxLength: 250 }}
             />
-            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.qtParcela?.message}
-            </Typography> */}
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

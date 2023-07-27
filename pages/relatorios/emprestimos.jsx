@@ -46,6 +46,8 @@ import {
   formatarValorBRL,
   converterDataParaJS,
   renderTipoPagamentoEmprestimo,
+  formatarCPFSemAnonimidade,
+  formatarTelefone,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
@@ -400,6 +402,113 @@ export default function RelatorioEmprestimos() {
       align: "center",
       headerAlign: "center",
     },
+    {
+      field: "cpf",
+      headerName: "CPF",
+      renderHeader: (params) => <strong>CPF</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarCPFSemAnonimidade(params.value);
+        }
+      },
+    },
+    {
+      field: "logradouro",
+      headerName: "LOGRADOURO",
+      renderHeader: (params) => <strong>LOGRADOURO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return params.value.toUpperCase();
+        }
+      },
+    },
+    {
+      field: "numLogr",
+      headerName: "NÚMERO",
+      renderHeader: (params) => <strong>NÚMERO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "complLogr",
+      headerName: "COMPLEMENTO",
+      renderHeader: (params) => <strong>COMPLEMENTO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return params.value.toUpperCase();
+        }
+      },
+    },
+    {
+      field: "cep",
+      headerName: "CEP",
+      renderHeader: (params) => <strong>CEP</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "bairro",
+      headerName: "BAIRRO",
+      renderHeader: (params) => <strong>BAIRRO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return params.value.toUpperCase();
+        }
+      },
+    },
+    {
+      field: "cidade",
+      headerName: "CIDADE",
+      renderHeader: (params) => <strong>CIDADE</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return params.value.toUpperCase();
+        }
+      },
+    },
+    {
+      field: "estado",
+      headerName: "ESTADO",
+      renderHeader: (params) => <strong>ESTADO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return params.value.toUpperCase();
+        }
+      },
+    },
+    {
+      field: "telefone",
+      headerName: "TELEFONE",
+      renderHeader: (params) => <strong>TELEFONE</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarTelefone(params.value);
+        }
+      },
+    },
   ];
 
   try {
@@ -416,6 +525,16 @@ export default function RelatorioEmprestimos() {
         vl_total: row.vl_total,
         qt_parcela: row.qt_parcela,
         observacao: row.observacao,
+        cpf: row.cpf,
+        logradouro: row.logradouro,
+        numLogr: row.numLogr,
+        complLogr: row.complLogr,
+
+        cep: row.cep,
+        bairro: row.bairro,
+        cidade: row.cidade,
+        estado: row.estado,
+        telefone: row.telefone,
       };
     });
   } catch (err) {

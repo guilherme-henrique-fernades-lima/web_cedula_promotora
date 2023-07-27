@@ -24,6 +24,7 @@ export default function Vencimentos() {
   const { data: session } = useSession();
 
   const [emprestimosVencidos, setEmprestimosVencidos] = useState([]);
+  console.log(emprestimosVencidos);
   const [loadingDataFetch, setLoadingDataFetch] = useState(true);
 
   useEffect(() => {
