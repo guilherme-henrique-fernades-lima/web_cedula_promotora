@@ -58,7 +58,6 @@ export default function CadastrarCobrança() {
 
   const [loadingButton, setLoadingButton] = useState(false);
 
-  const [cpf, setCpf] = useState("");
   const [dtEmprestimo, setDtEmprestimo] = useState(new Date());
   const [noCliente, setNoCliente] = useState("");
   const [vlEmprestimo, setVlEmprestimo] = useState("");
@@ -69,6 +68,16 @@ export default function CadastrarCobrança() {
   const [vlJurosDois, setVlJurosDois] = useState("");
   const [vlTotal, setVlTotal] = useState("");
   const [observacao, setObservacao] = useState("");
+
+  const [cpf, setCpf] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [numLogr, setNumLogr] = useState("");
+  const [complLogr, setComplLogr] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [cep, setCep] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
 
   useEffect(() => {
     if (vlEmprestimo && qtParcela) {
@@ -87,13 +96,11 @@ export default function CadastrarCobrança() {
         parseFloat(vlJurosValueDois);
 
       setVlTotal(vlTotalValue.toFixed(2));
-      setValue("vlTotal", vlTotalValue);
     } else {
       setVlCapital("");
       setVlTotal("");
       setVlJurosUm("");
       setVlJurosDois("");
-      setVlJuros("");
     }
   }, [vlEmprestimo, qtParcela]);
 
@@ -110,21 +117,16 @@ export default function CadastrarCobrança() {
       qt_parcela: parseInt(qtParcela),
       observacao: observacao,
 
-      cpf: null,
+      cpf: cpf.replace(/\D/g, ""),
+      logradouro: logradouro,
+      numLogr: numLogr,
+      complLogr: complLogr,
+      cep: cep,
+      bairro: bairro,
+      cidade: cidade.replace(/\D/g, ""),
+      estado: estado,
+      telefone: telefone,
     };
-
-    //   {
-    //     "cpf": null,
-
-    //     "telefone": null,
-    //     "cep": null,
-    //     "logradouro": null,
-    //     "numLogr": null,
-    //     "complLogr": null,
-    //     "bairro": null,
-    //     "cidade": null,
-    //     "estado": null
-    // }
 
     return data;
   }
@@ -183,10 +185,20 @@ export default function CadastrarCobrança() {
     setNoCliente("");
     setVlEmprestimo("");
     setVlCapital("");
-    setVlJuros("");
     setVlTotal("");
     setQtParcela("");
     setObservacao("");
+    setVlJurosUm("");
+    setVlJurosDois("");
+    setCpf("");
+    setLogradouro("");
+    setNumLogr("");
+    setComplLogr("");
+    setCep("");
+    setTelefone("");
+    setBairro("");
+    setCidade("");
+    setEstado("");
   }
 
   return (
@@ -489,6 +501,8 @@ export default function CadastrarCobrança() {
             />
           </Grid>
 
+          {/* NOVOS CAMPOS A PARTIR DAQUI */}
+
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <InputMask
               {...register("cpf")}
@@ -520,6 +534,175 @@ export default function CadastrarCobrança() {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.cpf?.message}
             </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={logradouro}
+              onChange={(e) => {
+                setLogradouro(e.target.value);
+              }}
+              size="small"
+              label="Endereço"
+              placeholder="Insira o endereço"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={numLogr}
+              onChange={(e) => {
+                setNumLogr(e.target.value);
+              }}
+              size="small"
+              label="Número"
+              // placeholder=""
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={complLogr}
+              onChange={(e) => {
+                setComplLogr(e.target.value);
+              }}
+              size="small"
+              label="Complemento"
+              placeholder="Insira um complemento"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={cep}
+              onChange={(e) => {
+                setCep(e.target.value);
+              }}
+              size="small"
+              label="CEP"
+              placeholder="Insira o CEP"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={bairro}
+              onChange={(e) => {
+                setBairro(e.target.value);
+              }}
+              size="small"
+              label="Bairro"
+              placeholder="Insira o bairro"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={cidade}
+              onChange={(e) => {
+                setCidade(e.target.value);
+              }}
+              size="small"
+              label="Bairro"
+              placeholder="Insira a cidade"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <InputMask
+              mask="(99) 9 9999-9999"
+              maskChar={null}
+              value={telefone}
+              onChange={(e) => setTelefone(e.target.value)}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="Telefone"
+                  placeholder="00 00000-0000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              // {...register("qtParcela")}
+              // error={Boolean(errors.qtParcela)}
+              value={estado}
+              onChange={(e) => {
+                setEstado(e.target.value);
+              }}
+              size="small"
+              label="Bairro"
+              placeholder="Selecione o estado"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              fullWidth
+              inputProps={{ maxLength: 250 }}
+            />
+            {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.qtParcela?.message}
+            </Typography> */}
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
