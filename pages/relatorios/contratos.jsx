@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import InputMask from "react-input-mask";
 import moment from "moment";
 import { useSession } from "next-auth/react";
+import { NumericFormat } from "react-number-format";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -86,6 +87,7 @@ export default function RelatorioContratos() {
     setValue,
     clearErrors,
     reset,
+    control,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(contratoSchema),
@@ -201,9 +203,9 @@ export default function RelatorioContratos() {
     setValue("convenio", data.convenio);
     setValue("operacao", data.operacao);
     setValue("banco", data.banco);
-    setValue("vl_contrato", data.vl_contrato);
-    setValue("vl_parcela", data.vl_parcela);
-    setValue("vl_comissao", data.vl_comissao);
+    setValue("vl_contrato", parseFloat(data.vl_contrato));
+    setValue("vl_parcela", parseFloat(data.vl_parcela));
+    setValue("vl_comissao", parseFloat(data.vl_comissao));
     setValue("porcentagem", data.porcentagem);
     setValue("corretor", data.corretor);
 
@@ -667,26 +669,34 @@ export default function RelatorioContratos() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("vl_contrato")}
-                error={Boolean(errors.vl_contrato)}
-                value={vl_contrato}
-                onChange={(e) => {
-                  setVlContrato(e.target.value);
-                }}
-                size="small"
-                label="Valor do contrato"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                onInput={(e) =>
-                  (e.target.value = e.target.value
-                    .replace(/[^0-9.]/g, "")
-                    .replace(/(\..*?)\..*/g, "$1"))
-                }
-                inputProps={{ maxLength: 10 }}
+              <Controller
+                name="vl_contrato"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <NumericFormat
+                    {...field}
+                    customInput={TextField}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix="R$ "
+                    onValueChange={(values) => {
+                      setVlContrato(values?.floatValue);
+                    }}
+                    error={Boolean(errors.vl_contrato)}
+                    size="small"
+                    label="Valor do contrato"
+                    placeholder="R$ 0,00"
+                    InputLabelProps={{ shrink: true }}
+                    autoComplete="off"
+                    fullWidth
+                    inputProps={{ maxLength: 16 }}
+                  />
+                )}
               />
+
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.vl_contrato?.message}
               </Typography>
@@ -719,26 +729,34 @@ export default function RelatorioContratos() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("vl_parcela")}
-                error={Boolean(errors.vl_parcela)}
-                value={vl_parcela}
-                onChange={(e) => {
-                  setVlParcela(e.target.value);
-                }}
-                size="small"
-                label="Valor da parcela"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                onInput={(e) =>
-                  (e.target.value = e.target.value
-                    .replace(/[^0-9.]/g, "")
-                    .replace(/(\..*?)\..*/g, "$1"))
-                }
-                inputProps={{ maxLength: 10 }}
+              <Controller
+                name="vl_parcela"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <NumericFormat
+                    {...field}
+                    customInput={TextField}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix="R$ "
+                    onValueChange={(values) => {
+                      setVlParcela(values?.floatValue);
+                    }}
+                    error={Boolean(errors.vl_parcela)}
+                    size="small"
+                    label="Valor da parcela"
+                    placeholder="R$ 0,00"
+                    InputLabelProps={{ shrink: true }}
+                    autoComplete="off"
+                    fullWidth
+                    inputProps={{ maxLength: 16 }}
+                  />
+                )}
               />
+
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.vl_parcela?.message}
               </Typography>
@@ -793,26 +811,34 @@ export default function RelatorioContratos() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("vl_comissao")}
-                error={Boolean(errors.vl_comissao)}
-                value={vl_comissao}
-                onChange={(e) => {
-                  setVlComissao(e.target.value);
-                }}
-                size="small"
-                label="Valor da comissão"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                onInput={(e) =>
-                  (e.target.value = e.target.value
-                    .replace(/[^0-9.]/g, "")
-                    .replace(/(\..*?)\..*/g, "$1"))
-                }
-                inputProps={{ maxLength: 10 }}
+              <Controller
+                name="vl_comissao"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <NumericFormat
+                    {...field}
+                    customInput={TextField}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix="R$ "
+                    onValueChange={(values) => {
+                      setVlComissao(values?.floatValue);
+                    }}
+                    error={Boolean(errors.vl_comissao)}
+                    size="small"
+                    label="Valor da comissão"
+                    placeholder="R$ 0,00"
+                    InputLabelProps={{ shrink: true }}
+                    autoComplete="off"
+                    fullWidth
+                    inputProps={{ maxLength: 16 }}
+                  />
+                )}
               />
+
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.vl_comissao?.message}
               </Typography>

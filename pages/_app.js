@@ -41,7 +41,11 @@ export default function App({
   pageProps: { session, ...pageProps },
 }) {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider
+      session={session}
+      refetchOnWindowFocus={false}
+      refetchInterval={15 * 60}
+    >
       <HeadWebsite />
       {/* {Component.auth ? (
         <Auth>
@@ -60,13 +64,13 @@ export default function App({
   );
 }
 
-function Auth({ children }) {
-  // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
-  const { status } = useSession();
+// function Auth({ children }) {
+//   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
+//   const { status } = useSession();
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
+//   if (status === "loading") {
+//     return <div>Loading...</div>;
+//   }
 
-  return children;
-}
+//   return children;
+// }

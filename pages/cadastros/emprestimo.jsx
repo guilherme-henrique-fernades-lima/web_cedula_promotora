@@ -109,7 +109,22 @@ export default function CadastrarCobrança() {
       vl_total: parseFloat(vlTotal),
       qt_parcela: parseInt(qtParcela),
       observacao: observacao,
+
+      cpf: null,
     };
+
+    //   {
+    //     "cpf": null,
+
+    //     "telefone": null,
+    //     "cep": null,
+    //     "logradouro": null,
+    //     "numLogr": null,
+    //     "complLogr": null,
+    //     "bairro": null,
+    //     "cidade": null,
+    //     "estado": null
+    // }
 
     return data;
   }
@@ -472,6 +487,39 @@ export default function CadastrarCobrança() {
               autoComplete="off"
               fullWidth
             />
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <InputMask
+              {...register("cpf")}
+              error={Boolean(errors.cpf)}
+              mask="999.999.999-99"
+              maskChar={null}
+              value={cpf}
+              onChange={(e) => {
+                setCpf(e.target.value);
+
+                if (e.target.value?.length === 14) {
+                  getCliente(e.target.value);
+                }
+              }}
+            >
+              {(inputProps) => (
+                <TextField
+                  {...inputProps}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  label="CPF"
+                  placeholder="000.000.000-000"
+                  InputLabelProps={{ shrink: true }}
+                  autoComplete="off"
+                />
+              )}
+            </InputMask>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.cpf?.message}
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import moment from "moment";
 import { NumericFormat } from "react-number-format";
 
@@ -79,6 +79,7 @@ export default function RelatorioDespesas() {
     setValue,
     clearErrors,
     reset,
+    control,
   } = useForm({
     mode: "onChange",
     resolver: yupResolver(despesaSchema),
@@ -163,7 +164,7 @@ export default function RelatorioDespesas() {
     clearErrors();
 
     setValue("descricaoDespesa", data.descricao);
-    setValue("valorDespesa", data.valor);
+    setValue("valorDespesa", parseFloat(data.valor));
     setValue("situacaoPagamentoDespesa", data.situacao);
     setValue("tipoDespesa", data.tp_despesa);
     setValue("naturezaDespesa", data.natureza_despesa);
@@ -373,7 +374,35 @@ export default function RelatorioDespesas() {
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
+              <Controller
+                name="valorDespesa"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <NumericFormat
+                    {...field}
+                    customInput={TextField}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix="R$ "
+                    onValueChange={(values) => {
+                      setValorDespesa(values?.floatValue);
+                    }}
+                    error={Boolean(errors.valorDespesa)}
+                    size="small"
+                    label="Valor da despesa"
+                    placeholder="R$ 0,00"
+                    InputLabelProps={{ shrink: true }}
+                    autoComplete="off"
+                    fullWidth
+                    inputProps={{ maxLength: 16 }}
+                  />
+                )}
+              />
+
+              {/* <TextField
                 {...register("valorDespesa")}
                 error={Boolean(errors.valorDespesa)}
                 value={valorDespesa}
@@ -386,7 +415,7 @@ export default function RelatorioDespesas() {
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
                 fullWidth
-              />
+              /> */}
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.valorDespesa?.message}
               </Typography>

@@ -69,6 +69,7 @@ export default function RelatorioEmprestimos() {
   const [openModal, setOpenModal] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [emprestimos, setEmprestimos] = useState([]);
+
   const [emprestimoItem, setEmprestimoItem] = useState([]);
 
   const [showEditForm, setShowEditForm] = useState(false);
