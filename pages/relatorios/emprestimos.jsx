@@ -879,25 +879,32 @@ export default function RelatorioEmprestimos() {
                   Total empréstimos: {""}
                   {emprestimos?.indicadores?.vl_emprestimo
                     ? formatarValorBRL(emprestimos?.indicadores?.vl_emprestimo)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total capital: {""}
                   {emprestimos?.indicadores?.vl_capital
                     ? formatarValorBRL(emprestimos?.indicadores?.vl_capital)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
-                  Total juros: {""}
+                  1 - Total juros 10%: {""}
                   {emprestimos?.indicadores?.vl_juros
-                    ? formatarValorBRL(emprestimos?.indicadores?.vl_juros)
-                    : 0}
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_juros / 2)
+                    : formatarValorBRL(0)}
+                </Typography>
+
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  2 - Total juros 10%: {""}
+                  {emprestimos?.indicadores?.vl_juros
+                    ? formatarValorBRL(emprestimos?.indicadores?.vl_juros / 2)
+                    : formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total: {""}
                   {emprestimos?.indicadores?.vl_total
                     ? formatarValorBRL(emprestimos?.indicadores?.vl_total)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
               </Box>
 

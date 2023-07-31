@@ -30,6 +30,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import MenuItem from "@mui/material/MenuItem";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
+import Stack from "@mui/material/Stack";
 
 //Constants
 import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
@@ -44,7 +48,7 @@ import {
 import { contratoSchema } from "@/schemas/contratoSchema";
 
 //Icons
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
@@ -61,6 +65,7 @@ export default function RelatorioContratos() {
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [loadingDataFetch, setLoadingDataFetch] = useState(true);
+  const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
 
   const [id, setId] = useState("");
   const [promotora, setPromotora] = useState("");
@@ -96,6 +101,32 @@ export default function RelatorioContratos() {
   useEffect(() => {
     getContratos();
   }, [session?.user]);
+
+  const handleOpenDialogExcluir = () => {
+    setOpenDialogExcluir(!openDialogExcluir);
+  };
+
+  async function excluirContrato() {
+    setLoadingButton(true);
+
+    const response = await fetch(`/api/relatorios/contratos/?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      toast.success("Contrato excluída com sucesso");
+      getContratos();
+      setId("");
+      handleOpenDialogExcluir();
+    } else {
+      toast.error("Erro ao excluir contrato");
+    }
+
+    setLoadingButton(false);
+  }
 
   async function getContratos() {
     setLoadingDataFetch(true);
@@ -238,14 +269,27 @@ export default function RelatorioContratos() {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() => {
-              setShowEditForm(!showEditForm);
-              getDataForEdit(params.row);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <Stack direction="row">
+            <IconButton
+              onClick={() => {
+                setShowEditForm(!showEditForm);
+                getDataForEdit(params.row);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+
+            <IconButton
+              color="error"
+              sx={{ ml: 1 }}
+              onClick={() => {
+                setId(params.value);
+                handleOpenDialogExcluir();
+              }}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          </Stack>
         );
       },
     },
@@ -1002,19 +1046,19 @@ export default function RelatorioContratos() {
                   Total contratos: {""}
                   {contratos?.indicadores?.vl_contrato
                     ? formatarValorBRL(contratos?.indicadores?.vl_comissao)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total parcelas: {""}
                   {contratos?.indicadores?.vl_parcela
                     ? formatarValorBRL(contratos?.indicadores?.vl_parcela)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total comissão: {""}
                   {contratos?.indicadores?.vl_comissao
                     ? formatarValorBRL(contratos?.indicadores?.vl_comissao)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
               </Box>
 
@@ -1023,6 +1067,37 @@ export default function RelatorioContratos() {
           )}
         </Box>
       </Fade>
+
+      <Dialog
+        open={openDialogExcluir}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700 }}>
+          Deseja deletar o contrato?
+        </DialogTitle>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              handleOpenDialogExcluir();
+              setId("");
+            }}
+          >
+            CANCELAR
+          </Button>
+
+          <LoadingButton
+            onClick={excluirContrato}
+            color="error"
+            variant="contained"
+            disableElevation
+            loading={loadingButton}
+          >
+            EXCLUIR
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </ContentWrapper>
   );
 }

@@ -24,6 +24,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 
 //Constants
 import { ESPECIES_INSS } from "@/helpers/constants";
@@ -44,6 +48,7 @@ import Spinner from "@/components/Spinner";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 //Schema validation
 import { clienteCallCenterSchema } from "@/schemas/clienteCallCenterSchema";
@@ -55,6 +60,7 @@ export default function CadastrarCliente() {
   const [clientes, setClientes] = useState([]);
 
   const [showEditForm, setShowEditForm] = useState(false);
+  const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
@@ -83,6 +89,32 @@ export default function CadastrarCliente() {
   useEffect(() => {
     getClientes();
   }, [session?.user]);
+
+  const handleOpenDialogExcluir = () => {
+    setOpenDialogExcluir(!openDialogExcluir);
+  };
+
+  async function excluirCliente() {
+    setLoadingButton(true);
+
+    const response = await fetch(`/api/relatorios/clientes/?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      toast.success("Cliente excluído com sucesso");
+      getClientes();
+      setId("");
+      handleOpenDialogExcluir();
+    } else {
+      toast.error("Erro ao excluir cliente");
+    }
+
+    setLoadingButton(false);
+  }
 
   async function getClientes() {
     const response = await fetch("/api/relatorios/clientes", {
@@ -242,14 +274,26 @@ export default function CadastrarCliente() {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() => {
-              setShowEditForm(!showEditForm);
-              getDataForEdit(params.row);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <Stack direction="row">
+            <IconButton
+              onClick={() => {
+                setShowEditForm(!showEditForm);
+                getDataForEdit(params.row);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+            <IconButton
+              color="error"
+              sx={{ ml: 1 }}
+              onClick={() => {
+                setId(params.value);
+                handleOpenDialogExcluir();
+              }}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          </Stack>
         );
       },
     },
@@ -628,6 +672,37 @@ export default function CadastrarCliente() {
           )}
         </Box>
       </Fade>
+
+      <Dialog
+        open={openDialogExcluir}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700 }}>
+          Deseja deletar o cliente?
+        </DialogTitle>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              handleOpenDialogExcluir();
+              setId("");
+            }}
+          >
+            CANCELAR
+          </Button>
+
+          <LoadingButton
+            onClick={excluirCliente}
+            color="error"
+            variant="contained"
+            disableElevation
+            loading={loadingButton}
+          >
+            EXCLUIR
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </ContentWrapper>
   );
 }

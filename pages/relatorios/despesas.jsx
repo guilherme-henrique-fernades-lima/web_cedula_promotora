@@ -23,6 +23,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import MenuItem from "@mui/material/MenuItem";
+import Stack from "@mui/material/Stack";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -47,7 +51,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
-import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
@@ -64,6 +68,9 @@ export default function RelatorioDespesas() {
 
   const [loadingDataFetch, setLoadingDataFetch] = useState(true);
   const [loadingButton, setLoadingButton] = useState(false);
+  const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
+
+  //States para dados do formulário
   const [id, setId] = useState("");
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
   const [descricaoDespesa, setDescricaoDespesa] = useState("");
@@ -88,6 +95,32 @@ export default function RelatorioDespesas() {
   useEffect(() => {
     getDespesas();
   }, [session?.user]);
+
+  const handleOpenDialogExcluir = () => {
+    setOpenDialogExcluir(!openDialogExcluir);
+  };
+
+  async function excluirDespesa() {
+    setLoadingButton(true);
+
+    const response = await fetch(`/api/relatorios/despesas/?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      toast.success("Despesa excluída com sucesso");
+      getDespesas();
+      setId("");
+      handleOpenDialogExcluir();
+    } else {
+      toast.error("Erro ao excluir despesa");
+    }
+
+    setLoadingButton(false);
+  }
 
   async function editarDadosDespesa() {
     setLoadingButton(true);
@@ -188,14 +221,27 @@ export default function RelatorioDespesas() {
       headerAlign: "center",
       renderCell: (params) => {
         return (
-          <IconButton
-            onClick={() => {
-              setShowEditForm(!showEditForm);
-              getDataForEdit(params.row);
-            }}
-          >
-            <EditIcon />
-          </IconButton>
+          <Stack direction="row">
+            <IconButton
+              onClick={() => {
+                setShowEditForm(!showEditForm);
+                getDataForEdit(params.row);
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+
+            <IconButton
+              color="error"
+              sx={{ ml: 1 }}
+              onClick={() => {
+                setId(params.value);
+                handleOpenDialogExcluir();
+              }}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          </Stack>
         );
       },
     },
@@ -599,72 +645,52 @@ export default function RelatorioDespesas() {
               >
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total de despesas:
-                  {(despesas?.data?.length && despesas?.data?.length) || 0}
+                  {(despesas?.data?.length && despesas?.data?.length) ||
+                    formatarValorBRL(0)}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Valor total:
                   {despesas?.indicadores?.total
                     ? formatarValorBRL(despesas?.indicadores?.total)
-                    : 0}
+                    : formatarValorBRL(0)}
                 </Typography>
               </Box>
               <DataTable rows={rows} columns={columns} />
             </>
           )}
-
-          {/* {despesas?.length == 0 ? (
-            <Box
-              sx={{
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mt: 5,
-                mb: 5,
-              }}
-            >
-              <Spinner />
-            </Box>
-          ) : (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "flex-start",
-                  // width: 240,
-                  height: 70,
-                  borderRadius: "14px",
-                  // background:
-                  //   "linear-gradient(135deg, #b1ea4d 0%,#459522 100%)",
-                }}
-              >
-                <MonetizationOnIcon sx={{ fontSize: 38, color: "#0f0f0f" }} />
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    justifyContent: "flex-start",
-                    flexDirection: "column",
-                  }}
-                >
-                  <Typography sx={{ fontWeight: 700, color: "#0f0f0f", ml: 1 }}>
-                    Total de despesas: {despesas?.data?.length || 0}
-                  </Typography>
-                  <Typography sx={{ fontWeight: 700, color: "#0f0f0f", ml: 1 }}>
-                    Valor total:
-                    {despesas?.indicadores?.total
-                      ? formatarValorBRL(despesas?.indicadores?.total)
-                      : 0}
-                  </Typography>
-                </Box>
-              </Box>
-              <DataTable rows={rows} columns={columns} />
-            </>
-          )} */}
         </Box>
       </Fade>
+
+      <Dialog
+        open={openDialogExcluir}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700 }}>
+          Deseja deletar a despesa?
+        </DialogTitle>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              handleOpenDialogExcluir();
+              setId("");
+            }}
+          >
+            CANCELAR
+          </Button>
+
+          <LoadingButton
+            onClick={excluirDespesa}
+            color="error"
+            variant="contained"
+            disableElevation
+            loading={loadingButton}
+          >
+            EXCLUIR
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </ContentWrapper>
   );
 }
