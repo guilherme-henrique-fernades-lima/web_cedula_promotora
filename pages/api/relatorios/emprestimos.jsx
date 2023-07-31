@@ -44,11 +44,32 @@ async function editarEmprestimo(req, res) {
   return res.status(result.status).json(json);
 }
 
+async function excluirEmprestimo(req, res) {
+  const token = req.headers.authorization;
+  const id = req.query.id ?? "";
+
+  const result = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/${id}/`,
+    {
+      method: "DELETE",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.status(result.status).json({ message: "deletado com sucesso" });
+}
+
 export default async function handler(req, res) {
   if (req.method == "GET") {
     getEmprestimos(req, res);
   } else if (req.method == "PUT") {
     editarEmprestimo(req, res);
+  } else if (req.method == "DELETE") {
+    excluirEmprestimo(req, res);
   } else {
     res.status(405).send();
   }

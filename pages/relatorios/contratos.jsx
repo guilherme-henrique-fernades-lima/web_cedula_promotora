@@ -34,6 +34,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
 
 //Constants
 import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
@@ -270,25 +271,28 @@ export default function RelatorioContratos() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            <IconButton
-              onClick={() => {
-                setShowEditForm(!showEditForm);
-                getDataForEdit(params.row);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-
-            <IconButton
-              color="error"
-              sx={{ ml: 1 }}
-              onClick={() => {
-                setId(params.value);
-                handleOpenDialogExcluir();
-              }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            <Tooltip title="Editar contrato" placement="top">
+              <IconButton
+                onClick={() => {
+                  setShowEditForm(!showEditForm);
+                  getDataForEdit(params.row);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Deletar contrato" placement="top">
+              <IconButton
+                color="error"
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setId(params.value);
+                  handleOpenDialogExcluir();
+                }}
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
         );
       },

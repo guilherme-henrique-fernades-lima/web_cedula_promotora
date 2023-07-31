@@ -14,6 +14,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Fade from "@mui/material/Fade";
 import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -222,25 +223,28 @@ export default function RelatorioDespesas() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            <IconButton
-              onClick={() => {
-                setShowEditForm(!showEditForm);
-                getDataForEdit(params.row);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-
-            <IconButton
-              color="error"
-              sx={{ ml: 1 }}
-              onClick={() => {
-                setId(params.value);
-                handleOpenDialogExcluir();
-              }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            <Tooltip title="Editar despesa" placement="top">
+              <IconButton
+                onClick={() => {
+                  setShowEditForm(!showEditForm);
+                  getDataForEdit(params.row);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Deletar despesa" placement="top">
+              <IconButton
+                color="error"
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setId(params.value);
+                  handleOpenDialogExcluir();
+                }}
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
         );
       },

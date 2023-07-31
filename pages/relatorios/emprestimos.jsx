@@ -27,6 +27,7 @@ import Modal from "@mui/material/Modal";
 import Backdrop from "@mui/material/Backdrop";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogActions from "@mui/material/DialogActions";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -59,6 +60,7 @@ import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import CloseIcon from "@mui/icons-material/Close";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import InputIcon from "@mui/icons-material/Input";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 //Schema validation
 import { emprestimoSchema } from "@/schemas/emprestimoSchema";
@@ -76,6 +78,7 @@ export default function RelatorioEmprestimos() {
 
   const [showEditForm, setShowEditForm] = useState(false);
   const [loadingDataFetch, setLoadingDataFetch] = useState(true);
+  const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
@@ -110,6 +113,10 @@ export default function RelatorioEmprestimos() {
     getEmprestimos();
   }, [session?.user]);
 
+  const handleOpenDialogExcluir = () => {
+    setOpenDialogExcluir(!openDialogExcluir);
+  };
+
   const handleOpenCloseModal = () => setOpenModal(!openModal);
 
   const handleOpenCloseDialog = () => {
@@ -119,6 +126,28 @@ export default function RelatorioEmprestimos() {
   const handleRadioChange = (event) => {
     setTpBaixaParcela(event.target.value);
   };
+
+  async function excluirEmprestimo() {
+    setLoadingButton(true);
+
+    const response = await fetch(`/api/relatorios/emprestimos/?id=${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    if (response.ok) {
+      toast.success("Empréstimo excluído com sucesso");
+      getEmprestimos();
+      setId("");
+      handleOpenDialogExcluir();
+    } else {
+      toast.error("Erro ao excluir empréstimo");
+    }
+
+    setLoadingButton(false);
+  }
 
   async function editarDadosEmprestimo() {
     setLoadingButton(true);
@@ -293,6 +322,18 @@ export default function RelatorioEmprestimos() {
                 sx={{ ml: 1 }}
               >
                 <CurrencyExchangeIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Deletar empréstimo" placement="top">
+              <IconButton
+                color="error"
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setId(params.value);
+                  handleOpenDialogExcluir();
+                }}
+              >
+                <DeleteForeverIcon />
               </IconButton>
             </Tooltip>
           </Stack>
@@ -1213,6 +1254,37 @@ export default function RelatorioEmprestimos() {
           </Box>
         </Fade>
       </Modal>
+
+      <Dialog
+        open={openDialogExcluir}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700 }}>
+          Deseja deletar o empréstimo?
+        </DialogTitle>
+
+        <DialogActions>
+          <Button
+            onClick={() => {
+              handleOpenDialogExcluir();
+              setId("");
+            }}
+          >
+            CANCELAR
+          </Button>
+
+          <LoadingButton
+            onClick={excluirEmprestimo}
+            color="error"
+            variant="contained"
+            disableElevation
+            loading={loadingButton}
+          >
+            EXCLUIR
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </ContentWrapper>
   );
 }

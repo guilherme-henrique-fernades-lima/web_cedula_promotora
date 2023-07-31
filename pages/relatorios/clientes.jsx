@@ -28,6 +28,7 @@ import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import Tooltip from "@mui/material/Tooltip";
 
 //Constants
 import { ESPECIES_INSS } from "@/helpers/constants";
@@ -275,24 +276,29 @@ export default function CadastrarCliente() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            <IconButton
-              onClick={() => {
-                setShowEditForm(!showEditForm);
-                getDataForEdit(params.row);
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              color="error"
-              sx={{ ml: 1 }}
-              onClick={() => {
-                setId(params.value);
-                handleOpenDialogExcluir();
-              }}
-            >
-              <DeleteForeverIcon />
-            </IconButton>
+            <Tooltip title="Editar cliente" placement="top">
+              <IconButton
+                onClick={() => {
+                  setShowEditForm(!showEditForm);
+                  getDataForEdit(params.row);
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Deletar cliente" placement="top">
+              <IconButton
+                color="error"
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setId(params.value);
+                  handleOpenDialogExcluir();
+                }}
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
         );
       },
