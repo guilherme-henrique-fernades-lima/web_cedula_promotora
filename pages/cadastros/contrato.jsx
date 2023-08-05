@@ -229,7 +229,7 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -499,7 +499,7 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -523,7 +523,7 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>

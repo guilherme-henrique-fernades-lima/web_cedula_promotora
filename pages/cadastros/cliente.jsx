@@ -210,7 +210,7 @@ export default function CadastrarCliente() {
                   />
                 )}
                 value={dataNascimento}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>

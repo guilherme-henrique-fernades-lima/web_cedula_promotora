@@ -639,7 +639,7 @@ export default function RelatorioEmprestimos() {
                       autoComplete="off"
                     />
                   )}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -849,7 +849,7 @@ export default function RelatorioEmprestimos() {
                     //   return true;
                     // }
                   }}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -868,14 +868,7 @@ export default function RelatorioEmprestimos() {
                   renderInput={(params) => (
                     <TextField {...params} fullWidth size="small" />
                   )}
-                  shouldDisableDate={(dateParam) => {
-                    // if (dateParam > dataInicio) {
-                    //   return false;
-                    // } else if (dateParam < dataInicio) {
-                    //   return true;
-                    // }
-                  }}
-                  disableFuture
+                 
                   disableHighlightToday
                 />
               </LocalizationProvider>

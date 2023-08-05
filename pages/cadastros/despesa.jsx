@@ -148,7 +148,7 @@ export default function CadastrarDespesa() {
                     autoComplete="off"
                   />
                 )}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>

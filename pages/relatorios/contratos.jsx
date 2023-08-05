@@ -562,7 +562,7 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -828,7 +828,7 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -852,7 +852,7 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -979,7 +979,7 @@ export default function RelatorioContratos() {
                     //   return true;
                     // }
                   }}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -1005,7 +1005,7 @@ export default function RelatorioContratos() {
                     //   return true;
                     // }
                   }}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>

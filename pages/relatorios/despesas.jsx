@@ -398,7 +398,7 @@ export default function RelatorioDespesas() {
                       autoComplete="off"
                     />
                   )}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -573,14 +573,7 @@ export default function RelatorioDespesas() {
                   renderInput={(params) => (
                     <TextField {...params} fullWidth size="small" />
                   )}
-                  shouldDisableDate={(dateParam) => {
-                    // if (dateParam < dataFim) {
-                    //   return false;
-                    // } else if (dateParam > dataFim) {
-                    //   return true;
-                    // }
-                  }}
-                  disableFuture
+                
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -606,7 +599,7 @@ export default function RelatorioDespesas() {
                     //   return true;
                     // }
                   }}
-                  disableFuture
+                  
                   disableHighlightToday
                 />
               </LocalizationProvider>

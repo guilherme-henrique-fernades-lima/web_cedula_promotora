@@ -27,7 +27,7 @@ export default function DatepickerField(props) {
           // }
         }}
         value={props.value}
-        disableFuture
+        
         disableHighlightToday
       />
     </LocalizationProvider>

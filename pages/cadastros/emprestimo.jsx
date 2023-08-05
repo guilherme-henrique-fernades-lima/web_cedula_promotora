@@ -232,7 +232,7 @@ export default function CadastrarCobrança() {
                     autoComplete="off"
                   />
                 )}
-                disableFuture
+                
                 disableHighlightToday
               />
             </LocalizationProvider>
