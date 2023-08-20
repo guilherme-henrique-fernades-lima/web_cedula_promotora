@@ -109,3 +109,13 @@ export function renderTipoDespesa(value) {
     return "";
   }
 }
+
+export function formatarCEP(cep) {
+  cep = cep.replace(/\D/g, ""); // Remove todos os caracteres não numéricos
+  if (cep.length === 8) {
+    cep = cep.replace(/(\d{5})(\d{3})/, "$1-$2"); // Formata o CEP no padrão xxxxx-xxx
+    return cep;
+  } else {
+    return "CEP inválido";
+  }
+}

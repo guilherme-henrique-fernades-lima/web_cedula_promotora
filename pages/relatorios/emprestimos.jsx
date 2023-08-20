@@ -49,6 +49,7 @@ import {
   renderTipoPagamentoEmprestimo,
   formatarCPFSemAnonimidade,
   formatarTelefone,
+  formatarCEP,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
@@ -87,6 +88,7 @@ export default function RelatorioEmprestimos() {
   const [tpBaixaParcela, setTpBaixaParcela] = useState("");
   const [dadosEmprestimoItem, setDadosEmprestimoItem] = useState({});
 
+  //Estados para armazenar os dados de cada row caso seja necessário habilitar a edição dos empréstimos
   const [id, setId] = useState("");
   const [dtEmprestimo, setDtEmprestimo] = useState(null);
   const [noCliente, setNoCliente] = useState("");
@@ -497,6 +499,11 @@ export default function RelatorioEmprestimos() {
       minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarCEP(params.value);
+        }
+      },
     },
     {
       field: "bairro",
@@ -639,7 +646,6 @@ export default function RelatorioEmprestimos() {
                       autoComplete="off"
                     />
                   )}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -849,7 +855,6 @@ export default function RelatorioEmprestimos() {
                     //   return true;
                     // }
                   }}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -868,7 +873,6 @@ export default function RelatorioEmprestimos() {
                   renderInput={(params) => (
                     <TextField {...params} fullWidth size="small" />
                   )}
-                 
                   disableHighlightToday
                 />
               </LocalizationProvider>

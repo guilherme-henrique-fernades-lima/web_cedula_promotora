@@ -59,6 +59,7 @@ var DATA_HOJE = new Date();
 export default function RelatorioContratos() {
   const { data: session } = useSession();
   const [contratos, setContratos] = useState([]);
+  console.log(contratos);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -562,7 +563,6 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -828,7 +828,6 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -852,7 +851,6 @@ export default function RelatorioContratos() {
                       autoComplete="off"
                     />
                   )}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -979,7 +977,6 @@ export default function RelatorioContratos() {
                     //   return true;
                     // }
                   }}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -1005,7 +1002,6 @@ export default function RelatorioContratos() {
                     //   return true;
                     // }
                   }}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -1049,15 +1045,10 @@ export default function RelatorioContratos() {
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total contratos: {""}
                   {contratos?.indicadores?.vl_contrato
-                    ? formatarValorBRL(contratos?.indicadores?.vl_comissao)
+                    ? formatarValorBRL(contratos?.indicadores?.vl_contrato)
                     : formatarValorBRL(0)}
                 </Typography>
-                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
-                  Total parcelas: {""}
-                  {contratos?.indicadores?.vl_parcela
-                    ? formatarValorBRL(contratos?.indicadores?.vl_parcela)
-                    : formatarValorBRL(0)}
-                </Typography>
+
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total comissão: {""}
                   {contratos?.indicadores?.vl_comissao
