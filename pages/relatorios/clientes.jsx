@@ -174,7 +174,7 @@ export default function CadastrarCliente() {
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
       telefone3: telefoneTres.replace(/\D/g, ""),
-      observacoes: observacao.toUpperCase(),
+      observacoes: observacao,
     };
 
     return payload;
