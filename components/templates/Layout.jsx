@@ -30,6 +30,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import EqualizerIcon from "@mui/icons-material/Equalizer";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
@@ -37,6 +38,7 @@ export default function Layout({ children }) {
   const [open, setOpen] = useState(false);
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
+  const [openDropdownDashboards, setOpenDropdownDashboards] = useState(false);
   const [activeOption, setActiveOption] = useState("");
 
   const handleDrawerCloseOpen = () => {
@@ -99,8 +101,11 @@ export default function Layout({ children }) {
               <ListItem
                 disablePadding
                 onClick={() => {
-                  setOpenDropdownCadastros(!openDropdownCadastros);
+                  setOpenDropdownCadastros(
+                    (openDropdownCadastros) => !openDropdownCadastros
+                  );
                   setOpenDropdownRelatorios(false);
+                  setOpenDropdownDashboards(false);
                   setActiveOption("cadastros");
                 }}
                 sx={{
@@ -189,8 +194,67 @@ export default function Layout({ children }) {
               <ListItem
                 disablePadding
                 onClick={() => {
-                  setOpenDropdownRelatorios(!openDropdownRelatorios);
+                  setOpenDropdownDashboards(
+                    (openDropdownDashboards) => !openDropdownDashboards
+                  );
                   setOpenDropdownCadastros(false);
+                  setOpenDropdownRelatorios(false);
+                  setActiveOption("dashboards");
+                }}
+                sx={{
+                  transition: "all 0.3s ease",
+                  backgroundColor:
+                    activeOption == "dashboards" ? "#e6e6e6" : "transparent",
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>
+                    <EqualizerIcon />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<TitleTypography>Dashboards</TitleTypography>}
+                  />
+                  <ExpandLess
+                    sx={{
+                      fontSize: "20px",
+                      transition: "all 0.3s ease",
+                      transform: `${
+                        openDropdownDashboards ? "rotate(0)" : "rotate(180deg)"
+                      }`,
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+
+              <Collapse
+                in={openDropdownDashboards}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="nav" disablePadding>
+                  <Link href="/dashboards/contratos">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Contratos</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                </List>
+              </Collapse>
+
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  setOpenDropdownRelatorios(
+                    (openDropdownRelatorios) => !openDropdownRelatorios
+                  );
+                  setOpenDropdownCadastros(false);
+                  setOpenDropdownDashboards(false);
                   setActiveOption("relatorios");
                 }}
                 sx={{

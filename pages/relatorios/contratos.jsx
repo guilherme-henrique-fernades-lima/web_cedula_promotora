@@ -59,7 +59,6 @@ var DATA_HOJE = new Date();
 export default function RelatorioContratos() {
   const { data: session } = useSession();
   const [contratos, setContratos] = useState([]);
-  console.log(contratos);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));

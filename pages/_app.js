@@ -11,8 +11,6 @@ function HeadWebsite() {
       <meta name="theme-color" content="#1976d2" />
       <meta name="msapplication-navbutton-color" content="#1976d2" />
       <meta name="apple-mobile-web-app-status-bar-style" content="#1976d2" />
-      {/* <meta name="description" content="" /> */}
-      {/* <meta name="keywords" content="" /> */}
       <link
         rel="icon"
         type="image/png"
@@ -47,30 +45,9 @@ export default function App({
       refetchInterval={15 * 60}
     >
       <HeadWebsite />
-      {/* {Component.auth ? (
-        <Auth>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </Auth>
-      ) : (
-        <Component {...pageProps} />
-      )} */}
-
       <Layout>
         <Component {...pageProps} />
       </Layout>
     </SessionProvider>
   );
 }
-
-// function Auth({ children }) {
-//   // if `{ required: true }` is supplied, `status` can only be "loading" or "authenticated"
-//   const { status } = useSession();
-
-//   if (status === "loading") {
-//     return <div>Loading...</div>;
-//   }
-
-//   return children;
-// }
