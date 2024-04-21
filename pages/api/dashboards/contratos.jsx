@@ -1,14 +1,16 @@
 async function getContratos(req, res) {
   const token = req.headers.authorization;
 
-  // const dt_inicio = req.query.dt_inicio ?? "";
-  // const dt_final = req.query.dt_final ?? "";
+  const dt_inicio = req.query.dt_inicio ?? "";
+  const dt_final = req.query.dt_final ?? "";
+  const convenios = req.query.convenios ?? "";
 
-  const dt_inicio = "2024-03-01";
-  const dt_final = "2024-04-20";
+  //Mock data filter
+  // const dt_inicio = "2024-03-01";
+  // const dt_final = "2024-04-20";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/contratos/dashboard/?dt_inicio=${dt_inicio}&dt_final=${dt_final}`,
+    `${process.env.NEXT_INTEGRATION_URL}/contratos/dashboard/?dt_inicio=${dt_inicio}&dt_final=${dt_final}&convenios=${convenios}`,
     {
       method: "GET",
       headers: {

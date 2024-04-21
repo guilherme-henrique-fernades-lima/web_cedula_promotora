@@ -1,12 +1,5 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import NextAuth from "next-auth";
-import { addHours, differenceInSeconds } from "date-fns";
-
-function getExpiryTime() {
-  const agora = new Date();
-  const expiracao = addHours(agora, 4);
-  return differenceInSeconds(expiracao, agora); // Diferença em segundos
-}
 
 export const authOptions = {
   providers: [
@@ -63,7 +56,7 @@ export const authOptions = {
 
   session: {
     strategy: "jwt",
-    maxAge: getExpiryTime(),
+    maxAge: 60 * 60 * 8,
   },
 
   pages: {

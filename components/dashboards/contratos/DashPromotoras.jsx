@@ -14,7 +14,7 @@ import { COLORS } from "@/helpers/utils";
 //Utils
 import { formatarReal } from "@/helpers/utils";
 
-export default function DashConvenios({ data, label, legend, viewType }) {
+export default function DashPromotoras({ data, label, legend, viewType }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active) {
       return (

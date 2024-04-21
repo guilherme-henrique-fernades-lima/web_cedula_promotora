@@ -122,9 +122,9 @@ export function formatarCEP(cep) {
 
 export const COLORS = [
   "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
+  "#0d00c4",
+  "#dda327",
+  "#ff42e6",
   "#20B2AA",
   "#ADFF2F",
   "#FF00FF",

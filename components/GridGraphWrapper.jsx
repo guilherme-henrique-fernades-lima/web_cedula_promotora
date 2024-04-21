@@ -15,6 +15,7 @@ export default function GridGraph({
   xl,
   title,
   helperText,
+  size,
 }) {
   return (
     <Grid
@@ -25,7 +26,7 @@ export default function GridGraph({
       lg={lg || 12}
       xl={xl || 12}
       sx={{
-        height: 300,
+        height: size || 360,
         display: "flex",
         alignItems: "flex-start",
         justifyContent: "flex-start",
@@ -55,12 +56,15 @@ export default function GridGraph({
             flexDirection: "row",
           }}
         >
-          <LeaderboardIcon sx={{ mr: 1, color: "#292929", fontSize: 26 }} />
+          {/* <LeaderboardIcon sx={{ mr: 1, color: "#292929", fontSize: 26 }} /> */}
           <Typography sx={{ fontWeight: "bold", color: "#292929" }}>
-            {title.toUpperCase()}
+            {title ? title.toUpperCase() : ""}
           </Typography>
         </Box>
-        {/* <Box sx={{ width: "100%", borderTop: "1px solid #cacaca" }} /> */}
+
+        {title && (
+          <Box sx={{ width: "100%", borderTop: "1px solid #cacaca" }} />
+        )}
 
         {children}
 
