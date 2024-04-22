@@ -6,10 +6,13 @@ import { useSession } from "next-auth/react";
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import GridGraph from "@/components/GridGraphWrapper";
+import DataTable from "@/components/Datatable";
 
 //Icons
 import SearchIcon from "@mui/icons-material/Search";
 import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
+import TableRowsIcon from "@mui/icons-material/TableRows";
+import LineAxisIcon from "@mui/icons-material/LineAxis";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -27,6 +30,8 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
 //Constants
 import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
@@ -38,7 +43,13 @@ import DashBancos from "@/components/dashboards/contratos/DashBancos";
 import DashOperacoes from "@/components/dashboards/contratos/DashOperacoes";
 import DashPromotoras from "@/components/dashboards/contratos/DashPromotoras";
 
-import { formatarReal } from "@/helpers/utils";
+// Utils
+import {
+  formatarReal,
+  formatarCPFSemAnonimidade,
+  formatarData,
+  formatarValorBRL,
+} from "@/helpers/utils";
 
 var DATA_HOJE = new Date();
 
@@ -65,6 +76,12 @@ export default function DashboardContratos() {
   const [promotoras, setPromotoras] = useState([]);
   const [corretores, setCorretores] = useState([]);
 
+  const [alignment, setAlignment] = useState("dash");
+
+  const handleAlignment = (event, newAlignment) => {
+    setAlignment(newAlignment);
+  };
+
   useEffect(() => {
     if (session?.user?.token) {
       getContratos();
@@ -86,6 +103,14 @@ export default function DashboardContratos() {
     return arrayData;
   }
 
+  function handleQueryWithKey(array, key) {
+    const arrayData = [];
+    for (var i = 0; i < array.length; i++) {
+      arrayData.push(array[i][key]);
+    }
+    return arrayData;
+  }
+
   const getContratos = useCallback(async () => {
     try {
       setLoadingButton(true);
@@ -95,7 +120,17 @@ export default function DashboardContratos() {
           "YYYY-MM-DD"
         )}&dt_final=${moment(dataFim).format(
           "YYYY-MM-DD"
-        )}&convenios=${handleQuery(conveniosFilter)}`,
+        )}&convenios=${handleQuery(
+          conveniosFilter
+        )}&promotoras=${handleQueryWithKey(
+          promotorasFilter,
+          "promotora"
+        )}&corretores=${handleQueryWithKey(
+          corretoresFilter,
+          "corretor"
+        )}&operacoes=${handleQuery(
+          operacoesFilter
+        )}&bancos=${handleQueryWithKey(bancosFilter, "banco")}`,
         {
           method: "GET",
           headers: {
@@ -111,7 +146,16 @@ export default function DashboardContratos() {
     } catch (error) {
       console.error("Erro ao obter contratos:", error);
     }
-  }, [session?.user?.token, dataInicio, dataFim, conveniosFilter]);
+  }, [
+    session?.user?.token,
+    dataInicio,
+    dataFim,
+    conveniosFilter,
+    bancosFilter,
+    corretoresFilter,
+    promotorasFilter,
+    operacoesFilter,
+  ]);
 
   const getBancos = useCallback(async () => {
     try {
@@ -210,6 +254,175 @@ export default function DashboardContratos() {
       perc_qtd: row.perc_qtd,
     }));
   }, [contratos?.indicadores?.operacoes]);
+
+  const columns = useMemo(
+    () => [
+      {
+        field: "promotora",
+        headerName: "PROMOTORA",
+        renderHeader: (params) => <strong>PROMOTORA</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "dt_digitacao",
+        headerName: "DATA DIGITAÇÃO",
+        renderHeader: (params) => <strong>DATA DIGITAÇÃO</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarData(params.value);
+          }
+        },
+      },
+      {
+        field: "nr_contrato",
+        headerName: "NR. CONTRATO",
+        renderHeader: (params) => <strong>NR. CONTRATO</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "no_cliente",
+        headerName: "NOME CLIENTE",
+        renderHeader: (params) => <strong>NOME CLIENTE</strong>,
+        minWidth: 300,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "cpf",
+        headerName: "CPF CLIENTE",
+        renderHeader: (params) => <strong>CPF CLIENTE</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarCPFSemAnonimidade(params.value);
+          }
+        },
+      },
+      {
+        field: "convenio",
+        headerName: "CONVÊNIO",
+        renderHeader: (params) => <strong>CONVÊNIO</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "operacao",
+        headerName: "OPERAÇÃO",
+        renderHeader: (params) => <strong>OPERAÇÃO</strong>,
+        minWidth: 170,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "banco",
+        headerName: "BANCO",
+        renderHeader: (params) => <strong>BANCO</strong>,
+        minWidth: 220,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "vl_contrato",
+        headerName: "VLR. CONTRATO",
+        renderHeader: (params) => <strong>VLR. CONTRATO</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarValorBRL(parseFloat(params.value));
+          }
+        },
+      },
+      {
+        field: "qt_parcelas",
+        headerName: "QTD. PARCELAS",
+        renderHeader: (params) => <strong>QTD. PARCELAS</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "vl_parcela",
+        headerName: "VLR. PARCELA",
+        renderHeader: (params) => <strong>VLR. PARCELA</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarValorBRL(parseFloat(params.value));
+          }
+        },
+      },
+      {
+        field: "dt_pag_cliente",
+        headerName: "DT. PAG. CLIENTE",
+        renderHeader: (params) => <strong>DT. PAG. CLIENTE</strong>,
+        minWidth: 230,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarData(params.value);
+          }
+        },
+      },
+      {
+        field: "dt_pag_comissao",
+        headerName: "DT. PAG. COMISSÃO",
+        renderHeader: (params) => <strong>DT. PAG. COMISSÃO</strong>,
+        minWidth: 230,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarData(params.value);
+          }
+        },
+      },
+      {
+        field: "vl_comissao",
+        headerName: "VLR. COMISSÃO",
+        renderHeader: (params) => <strong>VLR. COMISSÃO</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params) => {
+          if (params.value) {
+            return formatarValorBRL(parseFloat(params.value));
+          }
+        },
+      },
+      {
+        field: "porcentagem",
+        headerName: "(%) PORCENTAGEM",
+        renderHeader: (params) => <strong>(%) PORCENTAGEM</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+      },
+      {
+        field: "corretor",
+        headerName: "CORRETOR",
+        renderHeader: (params) => <strong>CORRETOR</strong>,
+        minWidth: 200,
+        align: "center",
+        headerAlign: "center",
+      },
+    ],
+    [contratos?.data]
+  );
 
   return (
     <ContentWrapper title="Dashboard de contratos">
@@ -453,126 +666,153 @@ export default function DashboardContratos() {
           />
         </Grid>
       </Grid>
+      <ToggleButtonGroup
+        value={alignment}
+        exclusive
+        onChange={handleAlignment}
+        size="small"
+        color="primary"
+        sx={{ mt: 2 }}
+      >
+        <ToggleButton value="dash">
+          <LineAxisIcon />
+        </ToggleButton>
+        <ToggleButton value="table">
+          <TableRowsIcon />
+        </ToggleButton>
+      </ToggleButtonGroup>
 
-      <Grid container sx={{ width: "100%", mt: 2 }}>
-        <GridGraph
-          title="Quantidade total de contratos"
-          xs={12}
-          sm={12}
-          md={6}
-          lg={4}
-          xl={4}
-          size={100}
-        >
-          <Typography
-            variant="span"
-            sx={{
-              fontWeight: "bold",
-              color: "#292929",
-            }}
+      {alignment == "dash" ? (
+        <Grid container sx={{ width: "100%", mt: 2 }}>
+          <GridGraph
+            title="Quantidade total de contratos"
+            xs={12}
+            sm={12}
+            md={6}
+            lg={4}
+            xl={4}
+            size={100}
           >
-            {contratos?.indicadores?.tt_contratos
-              ? contratos?.indicadores?.tt_contratos
-              : 0}
-          </Typography>
-        </GridGraph>
+            <Typography
+              variant="span"
+              sx={{
+                fontWeight: "bold",
+                color: "#292929",
+              }}
+            >
+              {contratos?.indicadores?.tt_contratos
+                ? contratos?.indicadores?.tt_contratos
+                : 0}
+            </Typography>
+          </GridGraph>
 
-        <GridGraph
-          title="Valor total de contratos"
-          xs={12}
-          sm={12}
-          md={6}
-          lg={4}
-          xl={4}
-          size={100}
-        >
-          <Typography
-            variant="span"
-            sx={{
-              fontWeight: "bold",
-              color: "#292929",
-            }}
+          <GridGraph
+            title="Valor total de contratos"
+            xs={12}
+            sm={12}
+            md={6}
+            lg={4}
+            xl={4}
+            size={100}
           >
-            {contratos?.indicadores?.tt_vl_contratos
-              ? formatarReal(contratos?.indicadores?.tt_vl_contratos)
-              : formatarReal(0)}
-          </Typography>
-        </GridGraph>
+            <Typography
+              variant="span"
+              sx={{
+                fontWeight: "bold",
+                color: "#292929",
+              }}
+            >
+              {contratos?.indicadores?.tt_vl_contratos
+                ? formatarReal(contratos?.indicadores?.tt_vl_contratos)
+                : formatarReal(0)}
+            </Typography>
+          </GridGraph>
 
-        <GridGraph
-          title="Valor total de comissões"
-          xs={12}
-          sm={12}
-          md={12}
-          lg={4}
-          xl={4}
-          size={100}
-        >
-          <Typography
-            variant="span"
-            sx={{
-              fontWeight: "bold",
-              color: "#292929",
-            }}
+          <GridGraph
+            title="Valor total de comissões"
+            xs={12}
+            sm={12}
+            md={12}
+            lg={4}
+            xl={4}
+            size={100}
           >
-            {contratos?.indicadores?.tt_vl_comissoes
-              ? formatarReal(contratos?.indicadores?.tt_vl_comissoes)
-              : formatarReal(0)}
-          </Typography>
-        </GridGraph>
+            <Typography
+              variant="span"
+              sx={{
+                fontWeight: "bold",
+                color: "#292929",
+              }}
+            >
+              {contratos?.indicadores?.tt_vl_comissoes
+                ? formatarReal(contratos?.indicadores?.tt_vl_comissoes)
+                : formatarReal(0)}
+            </Typography>
+          </GridGraph>
 
-        <GridGraph title="Corretores" xs={12} sm={12} md={12} lg={12} xl={12}>
-          {dataArrayCorretores?.length == 0 ? (
-            <NoDataToShow />
-          ) : (
-            <DashCorretores data={dataArrayCorretores} viewType={viewType} />
-          )}
-        </GridGraph>
+          <GridGraph title="Corretores" xs={12} sm={12} md={12} lg={12} xl={12}>
+            {dataArrayCorretores?.length == 0 ? (
+              <NoDataToShow />
+            ) : (
+              <DashCorretores data={dataArrayCorretores} viewType={viewType} />
+            )}
+          </GridGraph>
 
-        <GridGraph title="Bancos" xs={12} sm={12} md={12} lg={12} xl={12}>
-          {dataArrayBancos?.length == 0 ? (
-            <NoDataToShow />
-          ) : (
-            <DashBancos data={dataArrayBancos} viewType={viewType} />
-          )}
-        </GridGraph>
+          <GridGraph title="Bancos" xs={12} sm={12} md={12} lg={12} xl={12}>
+            {dataArrayBancos?.length == 0 ? (
+              <NoDataToShow />
+            ) : (
+              <DashBancos data={dataArrayBancos} viewType={viewType} />
+            )}
+          </GridGraph>
 
-        <GridGraph title="Convênios" xs={12} sm={12} md={12} lg={6} xl={6}>
-          {dataArrayConvenios?.length == 0 ? (
-            <NoDataToShow />
-          ) : (
-            <DashConvenios
-              data={dataArrayConvenios}
-              legend
-              viewType={viewType}
-            />
-          )}
-        </GridGraph>
+          <GridGraph title="Convênios" xs={12} sm={12} md={12} lg={6} xl={6}>
+            {dataArrayConvenios?.length == 0 ? (
+              <NoDataToShow />
+            ) : (
+              <DashConvenios
+                data={dataArrayConvenios}
+                legend
+                viewType={viewType}
+              />
+            )}
+          </GridGraph>
 
-        <GridGraph title="Promotoras" xs={12} sm={12} md={12} lg={6} xl={6}>
-          {dataArrayPromotoras?.length == 0 ? (
-            <NoDataToShow />
-          ) : (
-            <DashPromotoras
-              data={dataArrayPromotoras}
-              legend
-              viewType={viewType}
-            />
-          )}
-        </GridGraph>
+          <GridGraph title="Promotoras" xs={12} sm={12} md={12} lg={6} xl={6}>
+            {dataArrayPromotoras?.length == 0 ? (
+              <NoDataToShow />
+            ) : (
+              <DashPromotoras
+                data={dataArrayPromotoras}
+                legend
+                viewType={viewType}
+              />
+            )}
+          </GridGraph>
 
-        <GridGraph title="Operações" xs={12} sm={12} md={12} lg={12} xl={12}>
-          {dataArrayOperacoes?.length == 0 ? (
-            <NoDataToShow />
+          <GridGraph title="Operações" xs={12} sm={12} md={12} lg={12} xl={12}>
+            {dataArrayOperacoes?.length == 0 ? (
+              <NoDataToShow />
+            ) : (
+              <DashOperacoes
+                data={dataArrayOperacoes}
+                legend
+                viewType={viewType}
+              />
+            )}
+          </GridGraph>
+        </Grid>
+      ) : (
+        <Box sx={{ width: "100%" }}>
+          {contratos?.data?.length > 0 ? (
+            <DataTable rows={contratos?.data} columns={columns} />
           ) : (
-            <DashOperacoes
-              data={dataArrayOperacoes}
-              legend
-              viewType={viewType}
-            />
+            <GridGraph xs={12} sm={12} md={12} lg={12} xl={12}>
+              <NoDataToShow />
+            </GridGraph>
           )}
-        </GridGraph>
-      </Grid>
+        </Box>
+      )}
     </ContentWrapper>
   );
 }
