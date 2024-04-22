@@ -1,3 +1,4 @@
+//Mui components
 import Chip from "@mui/material/Chip";
 
 export function formatarData(data) {
@@ -118,4 +119,29 @@ export function formatarCEP(cep) {
   } else {
     return "CEP inválido";
   }
+}
+
+export const COLORS = [
+  "#0088FE",
+  "#0d00c4",
+  "#dda327",
+  "#ff42e6",
+  "#20B2AA",
+  "#ADFF2F",
+  "#FF00FF",
+  "#FFD700",
+  "#746758",
+  "#87CEFA",
+  "#228B22",
+  "#000080",
+  "#008B8B",
+  "#778899",
+  "#800000",
+  "#FFFF00",
+  "#DE3163",
+  "#CCCCFF",
+];
+
+export function formatarReal(valor) {
+  return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
