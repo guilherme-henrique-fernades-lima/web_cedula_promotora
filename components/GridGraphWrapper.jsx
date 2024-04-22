@@ -62,19 +62,19 @@ export default function GridGraph({
           </Typography>
         </Box>
 
+        {helperText && (
+          <Typography
+            sx={{ fontWeight: "regular", fontSize: 12, color: "#292929" }}
+          >
+            {helperText}
+          </Typography>
+        )}
+
         {title && (
           <Box sx={{ width: "100%", borderTop: "1px solid #cacaca" }} />
         )}
 
         {children}
-
-        {helperText && (
-          <Typography
-            sx={{ fontWeight: "regular", fontSize: 12, color: "#ccc" }}
-          >
-            {helperText}
-          </Typography>
-        )}
       </Box>
     </Grid>
   );

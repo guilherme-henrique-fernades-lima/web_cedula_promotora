@@ -232,6 +232,19 @@ export default function Layout({ children }) {
                 unmountOnExit
               >
                 <List component="nav" disablePadding>
+                  <Link href="/dashboards/clientes">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Clientes</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+
                   <Link href="/dashboards/contratos">
                     <ListItem disablePadding>
                       <ListItemButton>

@@ -7,10 +7,10 @@ import { useSession } from "next-auth/react";
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import GridGraph from "@/components/GridGraphWrapper";
 import DataTable from "@/components/Datatable";
+import NoDataToShow from "@/components/NoDataForShow";
 
 //Icons
 import SearchIcon from "@mui/icons-material/Search";
-import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import LineAxisIcon from "@mui/icons-material/LineAxis";
 
@@ -754,7 +754,11 @@ export default function DashboardContratos() {
             {dataArrayCorretores?.length == 0 ? (
               <NoDataToShow />
             ) : (
-              <DashCorretores data={dataArrayCorretores} viewType={viewType} />
+              <DashCorretores
+                data={dataArrayCorretores}
+                viewType={viewType}
+                label
+              />
             )}
           </GridGraph>
 
@@ -762,7 +766,7 @@ export default function DashboardContratos() {
             {dataArrayBancos?.length == 0 ? (
               <NoDataToShow />
             ) : (
-              <DashBancos data={dataArrayBancos} viewType={viewType} />
+              <DashBancos data={dataArrayBancos} viewType={viewType} label />
             )}
           </GridGraph>
 
@@ -798,6 +802,7 @@ export default function DashboardContratos() {
                 data={dataArrayOperacoes}
                 legend
                 viewType={viewType}
+                label
               />
             )}
           </GridGraph>
@@ -814,32 +819,5 @@ export default function DashboardContratos() {
         </Box>
       )}
     </ContentWrapper>
-  );
-}
-
-function NoDataToShow() {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <ReportGmailerrorredIcon sx={{ color: "#dbdbdb", fontSize: 160 }} />
-      <Typography
-        variant="span"
-        sx={{
-          fontFamily: "Lato, sans-serif",
-          fontWeight: 300,
-          color: "#696969",
-        }}
-      >
-        Sem dados para exibir
-      </Typography>
-    </Box>
   );
 }

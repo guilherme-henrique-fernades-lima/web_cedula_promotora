@@ -131,7 +131,19 @@ export default function DashOperacoes({ data, label, viewType }) {
           fill="#003f86"
           barSize={20}
           isAnimationActive={false}
-        ></Bar>
+        >
+          {label && (
+            <LabelList
+              dataKey={viewType == "money" ? "vlr_total" : "qtd"}
+              position="top"
+              formatter={viewType == "money" ? formatarReal : ""}
+              style={{
+                fontWeight: 400,
+                fontSize: 14,
+              }}
+            />
+          )}
+        </Bar>
         <Legend
           iconType="square"
           iconSize="8"
