@@ -116,8 +116,9 @@ export default function DashCorretores({ data, label, viewType }) {
         >
           {label && (
             <LabelList
-              dataKey="value"
+              dataKey={viewType == "money" ? "vlr_total" : "qtd"}
               position="top"
+              formatter={viewType == "money" ? formatarReal : ""}
               style={{
                 fontWeight: 400,
                 fontSize: 14,

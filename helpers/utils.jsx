@@ -1,6 +1,9 @@
 //Mui components
 import Chip from "@mui/material/Chip";
 
+//Constants
+import { ESPECIES_INSS_JSON } from "@/helpers/constants";
+
 export function formatarData(data) {
   const partes = data.split("-");
   const ano = partes[0];
@@ -144,4 +147,12 @@ export const COLORS = [
 
 export function formatarReal(valor) {
   return valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+export function formatarEspecieInss(value) {
+  if (ESPECIES_INSS_JSON[value]) {
+    return ESPECIES_INSS_JSON[value];
+  } else {
+    return value;
+  }
 }
