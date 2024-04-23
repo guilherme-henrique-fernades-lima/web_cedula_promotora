@@ -21,6 +21,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
+import { useTheme } from "@mui/material/styles";
 
 //Icons
 import SubjectIcon from "@mui/icons-material/Subject";
@@ -34,6 +35,7 @@ import EqualizerIcon from "@mui/icons-material/Equalizer";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
+  const theme = useTheme();
 
   const [open, setOpen] = useState(false);
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
@@ -66,17 +68,7 @@ export default function Layout({ children }) {
               >
                 {open ? <ChevronLeftIcon /> : <MenuIcon />}
               </IconButton>
-              <Typography
-                variant="h6"
-                noWrap
-                component="h6"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 18 },
-                }}
-              >
-                CÉDULA PROMOTORA
-              </Typography>
+              <LogoCedulaPromotora />
             </Toolbar>
             <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
               <LogoutIcon sx={{ color: "#fff" }} />
@@ -106,20 +98,42 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownRelatorios(false);
                   setOpenDropdownDashboards(false);
-                  setActiveOption("cadastros");
+                  setActiveOption((activeOption) =>
+                    activeOption == "cadastros" ? "" : "cadastros"
+                  );
                 }}
                 sx={{
                   transition: "all 0.3s ease",
                   backgroundColor:
-                    activeOption == "cadastros" ? "#e6e6e6" : "transparent",
+                    activeOption == "cadastros"
+                      ? theme?.palette?.primary?.main
+                      : "transparent",
                 }}
               >
                 <ListItemButton>
                   <ListItemIcon>
-                    <AddCircleOutlineIcon />
+                    <AddCircleOutlineIcon
+                      sx={{
+                        color: `${activeOption == "cadastros" ? "#fff" : "#"}`,
+                      }}
+                    />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<TitleTypography>Cadastros</TitleTypography>}
+                    primary={
+                      <Typography
+                        variant="span"
+                        component="span"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                          color: `${
+                            activeOption == "cadastros" ? "#fff" : "#292929"
+                          }`,
+                        }}
+                      >
+                        Cadastros
+                      </Typography>
+                    }
                   />
                   <ExpandLess
                     sx={{
@@ -128,6 +142,7 @@ export default function Layout({ children }) {
                       transform: `${
                         openDropdownCadastros ? "rotate(0)" : "rotate(180deg)"
                       }`,
+                      color: `${activeOption == "cadastros" ? "#fff" : "#"}`,
                     }}
                   />
                 </ListItemButton>
@@ -199,20 +214,42 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownCadastros(false);
                   setOpenDropdownRelatorios(false);
-                  setActiveOption("dashboards");
+                  setActiveOption((activeOption) =>
+                    activeOption == "dashboards" ? "" : "dashboards"
+                  );
                 }}
                 sx={{
                   transition: "all 0.3s ease",
                   backgroundColor:
-                    activeOption == "dashboards" ? "#e6e6e6" : "transparent",
+                    activeOption == "dashboards"
+                      ? theme?.palette?.primary?.main
+                      : "transparent",
                 }}
               >
                 <ListItemButton>
                   <ListItemIcon>
-                    <EqualizerIcon />
+                    <EqualizerIcon
+                      sx={{
+                        color: `${activeOption == "dashboards" ? "#fff" : "#"}`,
+                      }}
+                    />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<TitleTypography>Dashboards</TitleTypography>}
+                    primary={
+                      <Typography
+                        variant="span"
+                        component="span"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                          color: `${
+                            activeOption == "dashboards" ? "#fff" : "#292929"
+                          }`,
+                        }}
+                      >
+                        Dashboards
+                      </Typography>
+                    }
                   />
                   <ExpandLess
                     sx={{
@@ -221,6 +258,7 @@ export default function Layout({ children }) {
                       transform: `${
                         openDropdownDashboards ? "rotate(0)" : "rotate(180deg)"
                       }`,
+                      color: `${activeOption == "dashboards" ? "#fff" : "#"}`,
                     }}
                   />
                 </ListItemButton>
@@ -268,19 +306,41 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownCadastros(false);
                   setOpenDropdownDashboards(false);
-                  setActiveOption("relatorios");
+                  setActiveOption((activeOption) =>
+                    activeOption == "relatorios" ? "" : "relatorios"
+                  );
                 }}
                 sx={{
                   backgroundColor:
-                    activeOption == "relatorios" ? "#e6e6e6" : "transparent",
+                    activeOption == "relatorios"
+                      ? theme?.palette?.primary?.main
+                      : "transparent",
                 }}
               >
                 <ListItemButton>
                   <ListItemIcon>
-                    <SubjectIcon />
+                    <SubjectIcon
+                      sx={{
+                        color: `${activeOption == "relatorios" ? "#fff" : "#"}`,
+                      }}
+                    />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<TitleTypography>Relatórios</TitleTypography>}
+                    primary={
+                      <Typography
+                        variant="span"
+                        component="span"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                          color: `${
+                            activeOption == "relatorios" ? "#fff" : "#292929"
+                          }`,
+                        }}
+                      >
+                        Relatórios
+                      </Typography>
+                    }
                   />
                   <ExpandLess
                     sx={{
@@ -289,6 +349,7 @@ export default function Layout({ children }) {
                       transform: `${
                         openDropdownRelatorios ? "rotate(0)" : "rotate(180deg)"
                       }`,
+                      color: `${activeOption == "relatorios" ? "#fff" : "#"}`,
                     }}
                   />
                 </ListItemButton>
@@ -396,7 +457,6 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
     ["@media (max-width:780px)"]: {
       padding: theme.spacing(1),
     },
-
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -455,5 +515,39 @@ function TitleTypography({ children }) {
     >
       {children}
     </Typography>
+  );
+}
+
+function LogoCedulaPromotora() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+    >
+      <Typography
+        variant="h6"
+        component="h6"
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 16 },
+        }}
+      >
+        CÉDULA
+      </Typography>
+      <Typography
+        variant="h6"
+        component="h6"
+        sx={{
+          fontWeight: 700,
+          fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 16 },
+        }}
+      >
+        PROMOTORA
+      </Typography>
+    </Box>
   );
 }

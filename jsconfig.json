@@ -5,7 +5,8 @@
       "@/helpers/*": ["helpers/*"],
       "@/components/*": ["components/*"],
       "@/schemas/*": ["schemas/*"],
-      "@/styles/*": ["styles/*"]
+      "@/styles/*": ["styles/*"],
+      "@/context/*": ["context/*"]
     }
   }
 }

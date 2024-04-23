@@ -26,7 +26,7 @@ export default function ContentWrapper(props) {
         sx={{
           fontSize: { xs: 14, sm: 16, md: 16, lg: 18, xl: 20 },
           fontWeight: 700,
-          color: "#212121",
+          color: "#292929",
         }}
       >
         {title}

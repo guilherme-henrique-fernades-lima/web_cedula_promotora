@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
-//Third party libraries
-import Lottie from "react-lottie";
 import { signIn } from "next-auth/react";
 
 //Mui components
@@ -18,34 +17,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LoginIcon from "@mui/icons-material/Login";
-
-//Lottie animation
-import LottieAnimation from "../../public/lotties/authenticate.json";
-
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData: LottieAnimation,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
-  },
-};
-
-function AuthAnimation() {
-  const [isStopped] = useState(false);
-  const [isPaused] = useState(false);
-
-  return (
-    <Lottie
-      options={defaultOptions}
-      height={200}
-      width={200}
-      isStopped={isStopped}
-      isPaused={isPaused}
-      isClickToPauseDisabled={true}
-    />
-  );
-}
 
 export default function SingIn() {
   const [email, setEmail] = useState("");
@@ -100,9 +71,9 @@ export default function SingIn() {
           width: "100%",
           height: "100vh",
           flexGrow: 1,
-          background: "#000046",
+          background: "#1a3d74",
           background:
-            "linear-gradient(45deg, rgba(0, 0, 70, 0.9), rgba(28, 181, 224, 0.8)), url(/img/background_login_page.jpg) center center/cover no-repeat",
+            "linear-gradient(95deg, #ec590e, rgba(26, 60, 116, .9)), url(/img/background_login_page.jpg) center center/cover no-repeat",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -132,7 +103,26 @@ export default function SingIn() {
             },
           }}
         >
-          <AuthAnimation />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 190,
+              height: 190,
+              position: "relative",
+              borderRadius: "4px",
+              overflow: "hidden",
+              mb: 2,
+            }}
+          >
+            <Image
+              src="/img/cedula_promotora_logo_square.png"
+              fill
+              alt="Logo da Cédula Promotora"
+              priority
+            />
+          </Box>
 
           <TextField
             value={email}
@@ -224,9 +214,9 @@ export default function SingIn() {
                 control={
                   <Checkbox
                     sx={{
-                      color: "#5353c9",
+                      color: "#1a3d74",
                       "&.Mui-checked": {
-                        color: "#5353c9",
+                        color: "#1a3d74",
                       },
                     }}
                     checked={lembrarEmail}
@@ -238,7 +228,7 @@ export default function SingIn() {
                     sx={{
                       fontWeight: 700,
                       fontSize: 12,
-                      color: "#5353c9",
+                      color: "#1a3d74",
                     }}
                   >
                     Lembrar e-mail?
@@ -267,20 +257,3 @@ export default function SingIn() {
     </>
   );
 }
-
-// export const getServerSideProps = ({ req, res }) => {
-//   const token = getCookiesServerSide("@acai:user", { req, res });
-
-//   if (token) {
-//     return {
-//       redirect: {
-//         permanent: true,
-//         destination: "/home",
-//       },
-//     };
-//   }
-
-//   return {
-//     props: {},
-//   };
-// };
