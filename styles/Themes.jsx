@@ -4,6 +4,7 @@ export const primaryTheme = createTheme({
   palette: {
     primary: {
       main: "#1a3d74",
+      // main: "#ec590e",
     },
   },
   typography: {
@@ -14,7 +15,6 @@ export const primaryTheme = createTheme({
 /**
 //Colors pallet
 #1a3d74 Azul escuro
-#e6380d Laranja escuro
 #ec590e Laranja padrão
 #f3f3f1 Cinza claro
  * 

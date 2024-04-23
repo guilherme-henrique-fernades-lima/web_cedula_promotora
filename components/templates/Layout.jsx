@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import Image from "next/image";
 
 //Third party libraries
 import { useSession, signOut } from "next-auth/react";
@@ -22,6 +22,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import { useTheme } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
 
 //Icons
 import SubjectIcon from "@mui/icons-material/Subject";
@@ -68,11 +69,14 @@ export default function Layout({ children }) {
               >
                 {open ? <ChevronLeftIcon /> : <MenuIcon />}
               </IconButton>
+
               <LogoCedulaPromotora />
             </Toolbar>
-            <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-              <LogoutIcon sx={{ color: "#fff" }} />
-            </IconButton>
+            <Tooltip title="Sair" placement="bottom">
+              <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
+                <LogoutIcon sx={{ color: "#fff" }} />
+              </IconButton>
+            </Tooltip>
           </AppBar>
           <Drawer
             sx={{
@@ -528,26 +532,13 @@ function LogoCedulaPromotora() {
         flexDirection: "column",
       }}
     >
-      <Typography
-        variant="h6"
-        component="h6"
-        sx={{
-          fontWeight: 700,
-          fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 16 },
-        }}
-      >
-        CÉDULA
-      </Typography>
-      <Typography
-        variant="h6"
-        component="h6"
-        sx={{
-          fontWeight: 700,
-          fontSize: { xs: 14, sm: 14, md: 16, lg: 16, xl: 16 },
-        }}
-      >
-        PROMOTORA
-      </Typography>
+      <Image
+        src="/img/logotipo.png"
+        width={160}
+        height={56}
+        alt="Logo da Cédula Promotora"
+        priority
+      />
     </Box>
   );
 }
