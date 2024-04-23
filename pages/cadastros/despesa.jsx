@@ -38,10 +38,8 @@ import {
   SITUACAO_PAGAMENTO,
   NATUREZA_DESPESA,
   TIPO_DESPESA,
+  TIPO_LOJA,
 } from "@/helpers/constants";
-
-//Formatters
-import { converterDataParaJS } from "@/helpers/utils";
 
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
@@ -69,6 +67,7 @@ export default function CadastrarDespesa() {
   const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
+  const [tipoLoja, setTipoLoja] = useState("");
 
   function getPayload() {
     const data = {
@@ -80,6 +79,7 @@ export default function CadastrarDespesa() {
       situacao: situacaoPagamentoDespesa,
       tp_despesa: tipoDespesa,
       natureza_despesa: naturezaDespesa,
+      tipo_loja: tipoLoja,
     };
 
     return data;
@@ -116,6 +116,7 @@ export default function CadastrarDespesa() {
     setTipoDespesa("");
     setNaturezaDespesa("");
     setSituacaoPagamentoDespesa("");
+    setTipoLoja("");
   }
 
   return (
@@ -148,7 +149,6 @@ export default function CadastrarDespesa() {
                     autoComplete="off"
                   />
                 )}
-                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -277,6 +277,31 @@ export default function CadastrarDespesa() {
               {errors.tipoDespesa?.message}
             </Typography>
           </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("tipoLoja")}
+              error={Boolean(errors.tipoLoja)}
+              select
+              fullWidth
+              label="Loja"
+              size="small"
+              value={tipoLoja}
+              onChange={(e) => {
+                setTipoLoja(e.target.value);
+              }}
+            >
+              {TIPO_LOJA.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.tipoLoja?.message}
+            </Typography>
+          </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
               type="submit"

@@ -38,6 +38,7 @@ import {
   converterDataParaJS,
   renderNaturezaDespesa,
   renderTipoDespesa,
+  renderLoja,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
@@ -46,6 +47,7 @@ import {
   SITUACAO_PAGAMENTO,
   NATUREZA_DESPESA,
   TIPO_DESPESA,
+  TIPO_LOJA,
 } from "@/helpers/constants";
 
 //Icons
@@ -79,6 +81,7 @@ export default function RelatorioDespesas() {
   const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
+  const [tipoLoja, setTipoLoja] = useState("");
 
   const {
     register,
@@ -157,6 +160,7 @@ export default function RelatorioDespesas() {
       situacao: situacaoPagamentoDespesa,
       natureza_despesa: naturezaDespesa,
       tp_despesa: tipoDespesa,
+      tipo_loja: tipoLoja,
     };
 
     return payload;
@@ -171,6 +175,7 @@ export default function RelatorioDespesas() {
     setSituacaoPagamentoDespesa("");
     setNaturezaDespesa("");
     setTipoDespesa("");
+    setTipoLoja("");
   }
 
   async function getDespesas() {
@@ -202,6 +207,7 @@ export default function RelatorioDespesas() {
     setValue("situacaoPagamentoDespesa", data.situacao);
     setValue("tipoDespesa", data.tp_despesa);
     setValue("naturezaDespesa", data.natureza_despesa);
+    setValue("tipoLoja", data.tipo_loja);
 
     setId(data.id);
     setDescricaoDespesa(data.descricao);
@@ -210,6 +216,7 @@ export default function RelatorioDespesas() {
     setSituacaoPagamentoDespesa(data.situacao);
     setNaturezaDespesa(data.natureza_despesa);
     setTipoDespesa(data.tp_despesa);
+    setTipoLoja(data.tipo_loja);
   }
 
   const columns = [
@@ -321,6 +328,20 @@ export default function RelatorioDespesas() {
         }
       },
     },
+    {
+      field: "tipo_loja",
+      headerName: "LOJA",
+      renderHeader: (params) => <strong>LOJA</strong>,
+      minWidth: 180,
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
+      renderCell: (params) => {
+        if (params.value) {
+          return renderLoja(params.value);
+        }
+      },
+    },
   ];
 
   try {
@@ -335,6 +356,7 @@ export default function RelatorioDespesas() {
         natureza_despesa: row.natureza_despesa
           ? row.natureza_despesa
           : row.natureza_despesa,
+        tipo_loja: row.tipo_loja,
       };
     });
   } catch (err) {
@@ -398,7 +420,6 @@ export default function RelatorioDespesas() {
                       autoComplete="off"
                     />
                   )}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -542,6 +563,31 @@ export default function RelatorioDespesas() {
                 {errors.tipoDespesa?.message}
               </Typography>
             </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("tipoLoja")}
+                error={Boolean(errors.tipoLoja)}
+                select
+                fullWidth
+                label="Loja"
+                size="small"
+                value={tipoLoja}
+                onChange={(e) => {
+                  setTipoLoja(e.target.value);
+                }}
+              >
+                {TIPO_LOJA.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.tipoLoja?.message}
+              </Typography>
+            </Grid>
+
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <LoadingButton
                 type="submit"
@@ -573,7 +619,6 @@ export default function RelatorioDespesas() {
                   renderInput={(params) => (
                     <TextField {...params} fullWidth size="small" />
                   )}
-                
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -599,7 +644,6 @@ export default function RelatorioDespesas() {
                     //   return true;
                     // }
                   }}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>

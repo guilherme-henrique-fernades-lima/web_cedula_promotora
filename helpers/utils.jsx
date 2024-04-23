@@ -104,6 +104,16 @@ export function renderNaturezaDespesa(value) {
   }
 }
 
+export function renderLoja(value) {
+  if (value === "matriz") {
+    return "MATRIZ";
+  } else if (value === "loja") {
+    return "LOJA";
+  } else {
+    return value;
+  }
+}
+
 export function renderTipoDespesa(value) {
   if (value === "fixa") {
     return "FIXA";
