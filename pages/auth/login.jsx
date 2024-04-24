@@ -83,15 +83,13 @@ export default function SingIn() {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             flexDirection: "column",
             width: "100%",
-            maxWidth: 430,
-            height: 550,
+            maxWidth: 400,
             backgroundColor: "#fff",
-            borderRadius: "4px",
-            padding: "20px",
-            boxShadow: "rgb(0, 0, 0) 0px 20px 30px -10px",
+            paddingBottom: 3,
+            boxShadow: "rgba(0, 0, 0,0.5) 0px 20px 30px -10px",
 
             ["@media (max-width:600px)"]: {
               maxWidth: "100%",
@@ -108,150 +106,151 @@ export default function SingIn() {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              width: 190,
+              width: "100%",
               height: 190,
               position: "relative",
-              borderRadius: "4px",
+              //borderRadius: "4px",
               overflow: "hidden",
               mb: 2,
+              background: "#ec590e",
+              background: "linear-gradient(180deg, #ec590e, #ac410b)",
             }}
           >
             <Image
-              src="/img/cedula_promotora_logo_square.png"
-              fill
+              src="/img/cedula_logo.png"
+              height={160}
+              width={160}
               alt="Logo da Cédula Promotora"
               priority
             />
           </Box>
 
-          <TextField
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="text"
-            variant="outlined"
-            size="small"
-            fullWidth
-            label="Insira o e-mail"
-            placeholder="seu-email@email.com"
-            InputLabelProps={{ shrink: true }}
-            autoComplete="off"
-            sx={{ width: 280, mt: 1 }}
-          />
-
-          <TextField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            //error={Boolean(error)}
-            label="Senha"
-            placeholder="Senha"
-            sx={{
-              marginTop: "20px",
-              fontSize: 12,
-              width: 280,
-            }}
-            size="small"
-            type={showPassword ? "text" : "password"}
-            inputProps={{ maxLength: 16 }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment
-                  position="end"
-                  sx={{ cursor: "pointer" }}
-                  onClick={handleShowPassword}
-                >
-                  {showPassword ? (
-                    <VisibilityOffIcon
-                      sx={{
-                        color: "#B7B7B7",
-                        fontSize: 18,
-                        "&:hover": { color: "#7a7a7a" },
-                      }}
-                    />
-                  ) : (
-                    <VisibilityIcon
-                      sx={{
-                        color: "#B7B7B7",
-                        fontSize: 18,
-                        "&:hover": { color: "#7a7a7a" },
-                      }}
-                    />
-                  )}
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          {/* {error && (
-            <Typography
-              sx={{
-                fontSize: 10,
-                color: "red",
-                fontWeight: "bold",
-                mt: 1,
-              }}
-            >
-              * {error.message}
-            </Typography>
-          )} */}
-
           <Box
             sx={{
-              width: 280,
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "center",
+              width: "90%",
+              flexDirection: "column",
             }}
           >
-            <FormGroup
+            <TextField
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              label="Insira o e-mail"
+              placeholder="seu-email@email.com"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              sx={{ mt: 1 }}
+            />
+
+            <TextField
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              //error={Boolean(error)}
+              label="Senha"
+              placeholder="Senha"
+              sx={{
+                marginTop: "20px",
+                fontSize: 12,
+              }}
+              fullWidth
+              size="small"
+              type={showPassword ? "text" : "password"}
+              inputProps={{ maxLength: 16 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    sx={{ cursor: "pointer" }}
+                    onClick={handleShowPassword}
+                  >
+                    {showPassword ? (
+                      <VisibilityOffIcon
+                        sx={{
+                          color: "#B7B7B7",
+                          fontSize: 18,
+                          "&:hover": { color: "#7a7a7a" },
+                        }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        sx={{
+                          color: "#B7B7B7",
+                          fontSize: 18,
+                          "&:hover": { color: "#7a7a7a" },
+                        }}
+                      />
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box
               sx={{
                 width: "100%",
                 display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    sx={{
-                      color: "#1a3d74",
-                      "&.Mui-checked": {
+              <FormGroup
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "center",
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      sx={{
                         color: "#1a3d74",
-                      },
-                    }}
-                    checked={lembrarEmail}
-                    onChange={handleSaveEmailLocalStorage}
-                  />
-                }
-                label={
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: 12,
-                      color: "#1a3d74",
-                    }}
-                  >
-                    Lembrar e-mail?
-                  </Typography>
-                }
-              />
-            </FormGroup>
-          </Box>
+                        "&.Mui-checked": {
+                          color: "#1a3d74",
+                        },
+                      }}
+                      checked={lembrarEmail}
+                      onChange={handleSaveEmailLocalStorage}
+                    />
+                  }
+                  label={
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 12,
+                        color: "#1a3d74",
+                      }}
+                    >
+                      Lembrar e-mail?
+                    </Typography>
+                  }
+                />
+              </FormGroup>
+            </Box>
 
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{ width: 280, marginTop: "30px" }}
-            onClick={() => {
-              if (lembrarEmail) {
-                salvarEmailLocalStorage();
-              }
-              onSubmit();
-            }}
-            endIcon={<LoginIcon />}
-          >
-            LOGIN
-          </Button>
+            <Button
+              variant="contained"
+              disableElevation
+              sx={{ marginTop: "10px" }}
+              fullWidth
+              onClick={() => {
+                if (lembrarEmail) {
+                  salvarEmailLocalStorage();
+                }
+                onSubmit();
+              }}
+              endIcon={<LoginIcon />}
+            >
+              Acessar
+            </Button>
+          </Box>
         </Box>
       </Box>
     </>
