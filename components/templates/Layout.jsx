@@ -33,6 +33,8 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
+import SettingsIcon from "@mui/icons-material/Settings";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
@@ -42,6 +44,8 @@ export default function Layout({ children }) {
   const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
   const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
   const [openDropdownDashboards, setOpenDropdownDashboards] = useState(false);
+  const [openDropdownConfiguracoes, setOpenDropdownConfiguracoes] =
+    useState(false);
   const [activeOption, setActiveOption] = useState("");
 
   const handleDrawerCloseOpen = () => {
@@ -72,11 +76,22 @@ export default function Layout({ children }) {
 
               <LogoCedulaPromotora />
             </Toolbar>
-            <Tooltip title="Sair" placement="bottom">
-              <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-                <LogoutIcon sx={{ color: "#fff" }} />
-              </IconButton>
-            </Tooltip>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* <AccountCircleIcon sx={{ width: 44, height: 44 }} /> */}
+
+              <Tooltip title="Sair" placement="bottom">
+                <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
+                  <LogoutIcon sx={{ color: "#fff" }} />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </AppBar>
           <Drawer
             sx={{
@@ -102,6 +117,7 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownRelatorios(false);
                   setOpenDropdownDashboards(false);
+                  setOpenDropdownConfiguracoes(false);
                   setActiveOption((activeOption) =>
                     activeOption == "cadastros" ? "" : "cadastros"
                   );
@@ -218,6 +234,7 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownCadastros(false);
                   setOpenDropdownRelatorios(false);
+                  setOpenDropdownConfiguracoes(false);
                   setActiveOption((activeOption) =>
                     activeOption == "dashboards" ? "" : "dashboards"
                   );
@@ -299,6 +316,105 @@ export default function Layout({ children }) {
                       </ListItemButton>
                     </ListItem>
                   </Link>
+
+                  <Link href="/dashboards/despesas">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Despesas</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
+                </List>
+              </Collapse>
+
+              <ListItem
+                disablePadding
+                onClick={() => {
+                  setOpenDropdownConfiguracoes(
+                    (openDropdownConfiguracoes) => !openDropdownConfiguracoes
+                  );
+                  setOpenDropdownRelatorios(false);
+                  setOpenDropdownDashboards(false);
+                  setOpenDropdownCadastros(false);
+                  setActiveOption((activeOption) =>
+                    activeOption == "configuracoes" ? "" : "configuracoes"
+                  );
+                }}
+                sx={{
+                  transition: "all 0.3s ease",
+                  backgroundColor:
+                    activeOption == "configuracoes"
+                      ? theme?.palette?.primary?.main
+                      : "transparent",
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon>
+                    <SettingsIcon
+                      sx={{
+                        color: `${
+                          activeOption == "configuracoes" ? "#fff" : "#"
+                        }`,
+                      }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="span"
+                        component="span"
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                          color: `${
+                            activeOption == "configuracoes" ? "#fff" : "#292929"
+                          }`,
+                        }}
+                      >
+                        Configurações
+                      </Typography>
+                    }
+                  />
+                  <ExpandLess
+                    sx={{
+                      fontSize: "20px",
+                      transition: "all 0.3s ease",
+                      transform: `${
+                        openDropdownConfiguracoes
+                          ? "rotate(0)"
+                          : "rotate(180deg)"
+                      }`,
+                      color: `${
+                        activeOption == "configuracoes" ? "#fff" : "#"
+                      }`,
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+
+              <Collapse
+                in={openDropdownConfiguracoes}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="nav" disablePadding>
+                  <Link href="/configuracoes/lojas">
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemIcon sx={{ pl: 3 }}>
+                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={<TitleTypography>Lojas</TitleTypography>}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  </Link>
                 </List>
               </Collapse>
 
@@ -310,6 +426,7 @@ export default function Layout({ children }) {
                   );
                   setOpenDropdownCadastros(false);
                   setOpenDropdownDashboards(false);
+                  setOpenDropdownConfiguracoes(false);
                   setActiveOption((activeOption) =>
                     activeOption == "relatorios" ? "" : "relatorios"
                   );

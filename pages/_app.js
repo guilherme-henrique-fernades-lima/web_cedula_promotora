@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import Head from "next/head";
 import { SessionProvider } from "next-auth/react";
+import { useRouter } from "next/router";
 
 //Custom components
 import Layout from "../components/templates/Layout";
@@ -43,6 +44,10 @@ export default function App({
   Component,
   pageProps: { session, ...pageProps },
 }) {
+  const router = useRouter();
+
+  const isLoginPage = router.pathname === "/auth/login";
+
   return (
     <SessionProvider
       session={session}
@@ -52,9 +57,14 @@ export default function App({
       <CssBaseline />
       <HeadWebsite />
       <ContextThemeProvider>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        {/* Renderiza o Layout apenas se não for a página de login */}
+        {!isLoginPage && (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
+        {/* Renderiza o Componente diretamente se for a página de login */}
+        {isLoginPage && <Component {...pageProps} />}
       </ContextThemeProvider>
     </SessionProvider>
   );

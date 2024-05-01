@@ -38,7 +38,7 @@ export default function DashboardClientesEspecie() {
       const json = await response.json();
       setClientes(json);
     } catch (error) {
-      console.error("Erro ao obter contratos:", error);
+      console.error("Erro ao obter clientes:", error);
     }
   }, [session?.user?.token]);
 

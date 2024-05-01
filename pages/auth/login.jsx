@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -12,6 +13,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 
 //Icons
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -19,18 +23,38 @@ import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LoginIcon from "@mui/icons-material/Login";
 
 export default function SingIn() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [lembrarEmail, setLembrarEmail] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
 
   const onSubmit = async () => {
-    const result = await signIn("credentials", {
-      username: email,
-      password: password,
-      redirect: true,
-      callbackUrl: "/relatorios/emprestimos",
-    });
+    try {
+      setLoading(true);
+      setLoginError(false);
+
+      const result = await signIn("credentials", {
+        username: email,
+        password: password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        router.push("/relatorios/emprestimos");
+      } else {
+        console.log("error: ", result.error);
+        setLoginError(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setLoading(false);
+      setLoginError(true);
+    }
   };
 
   useEffect(() => {
@@ -109,7 +133,6 @@ export default function SingIn() {
               width: "100%",
               height: 190,
               position: "relative",
-              //borderRadius: "4px",
               overflow: "hidden",
               mb: 2,
               background: "#ec590e",
@@ -238,18 +261,29 @@ export default function SingIn() {
             <Button
               variant="contained"
               disableElevation
-              sx={{ marginTop: "10px" }}
+              sx={{ marginTop: "10px", minHeight: 36.5 }}
               fullWidth
+              disabled={loading ? true : false}
               onClick={() => {
                 if (lembrarEmail) {
                   salvarEmailLocalStorage();
                 }
                 onSubmit();
               }}
-              endIcon={<LoginIcon />}
+              endIcon={!loading && <LoginIcon />}
             >
-              Acessar
+              {loading ? (
+                <CircularProgress sx={{ color: "#fff" }} size={22} />
+              ) : (
+                "Acessar"
+              )}
             </Button>
+
+            {loginError && (
+              <Stack sx={{ width: "100%", mt: 2 }}>
+                <Alert severity="error">Senha ou e-mail incorretos.</Alert>
+              </Stack>
+            )}
           </Box>
         </Box>
       </Box>
