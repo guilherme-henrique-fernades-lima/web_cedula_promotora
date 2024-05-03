@@ -20,45 +20,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 
-const data = [
-  {
-    name: "Janeiro-24",
-    pv: 11560,
-    fill: "#35B117",
-  },
-  {
-    name: "Fevereiro-24",
-    pv: 1398,
-    fill: "#35B117",
-  },
-  {
-    name: "Março-24",
-    pv: -9800,
-    fill: "#DE1414",
-  },
-  {
-    name: "Abril-24",
-    pv: 3908,
-    fill: "#35B117",
-  },
-  {
-    name: "Maio-24",
-    pv: 4800,
-    fill: "#35B117",
-  },
-  {
-    name: "Junho-24",
-    pv: -3800,
-    fill: "#DE1414",
-  },
-  {
-    name: "Julho-24",
-    pv: 4300,
-    fill: "#35B117",
-  },
-];
-
-export default function DashDespesas({ label }) {
+export default function DashDespesas({ label, data }) {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload[0] !== undefined) {
       return (
@@ -144,7 +106,7 @@ export default function DashDespesas({ label }) {
         />
         <Tooltip content={CustomTooltip} cursor={{ fill: "#ececec" }} />
         <Bar
-          dataKey={"pv"}
+          dataKey="vlr_total"
           name="Valor total"
           //fill="#003f86"
           barSize={20}

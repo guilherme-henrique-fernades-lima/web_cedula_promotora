@@ -14,8 +14,6 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import CircularProgress from "@mui/material/CircularProgress";
-
-//Mui components
 import TextField from "@mui/material/TextField";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -55,7 +53,7 @@ export default function DashboardDespesas() {
     }
   }, [session?.user?.token]);
 
-  const getDespesas = useCallback(async () => {
+  async function getDespesas() {
     try {
       const response = await fetch(`/api/dashboards/despesas/`, {
         method: "GET",
@@ -64,22 +62,23 @@ export default function DashboardDespesas() {
         },
       });
 
-      const json = await response.json();
-      setDespesas(json);
+      if (response.ok) {
+        const json = await response.json();
+        setDespesas(json?.despesas);
+      }
     } catch (error) {
       console.error("Erro ao obter despesas:", error);
     }
-  }, [session?.user?.token]);
+  }
 
-  // const dataArrayClientesEspecies = useMemo(() => {
-  //   return clientes?.indicadores?.especies?.map((row, index) => ({
-  //     id: index,
-  //     name: row.especie,
-  //     qtd: row.qtd,
-  //     perc_qtd: row.perc_qtd,
-  //     fill: '#35B117' green '#DE1414' red
-  //   }));
-  // }, [clientes?.indicadores?.especies]);
+  const dataArrayDespesas = useMemo(() => {
+    return despesas?.map((row, index) => ({
+      id: index,
+      name: row.nome_mes_ano,
+      vlr_total: row.vlr_total,
+      fill: row.vlr_total > 0 ? "#35B117" : "#DE1414",
+    }));
+  }, [despesas]);
 
   return (
     <ContentWrapper title="Dashboard de despesas">
@@ -144,17 +143,31 @@ export default function DashboardDespesas() {
         </Grid>
 
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          <InputLabel>Loja</InputLabel>
+          {/* <InputLabel id="loja-label">Loja</InputLabel>
           <Select
-            value={loja}
+            labelId="loja-label"
             label="Loja"
+            value={loja}
             onChange={handleChangeLoja}
             size="small"
           >
             <MenuItem value="todas">Todas</MenuItem>
             <MenuItem value="filial">Filial</MenuItem>
             <MenuItem value="matriz">Matriz</MenuItem>
-          </Select>
+          </Select> */}
+
+          <TextField
+            id="outlined-select-currency"
+            select
+            label="Lojas"
+            value={loja}
+            size="small"
+            fullWidth
+          >
+            <MenuItem value="todas">Todas</MenuItem>
+            <MenuItem value="filial">Filial</MenuItem>
+            <MenuItem value="matriz">Matriz</MenuItem>
+          </TextField>
         </Grid>
       </Grid>
 
@@ -166,8 +179,9 @@ export default function DashboardDespesas() {
           md={12}
           lg={12}
           xl={12}
+          size={700}
         >
-          <DashDespesas />
+          <DashDespesas data={dataArrayDespesas} />
         </GridGraph>
       </Grid>
     </ContentWrapper>
