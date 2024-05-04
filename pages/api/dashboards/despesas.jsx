@@ -1,9 +1,10 @@
 async function getDespesas(req, res) {
   try {
     const token = req.headers.authorization;
+    const loja = req.query.loja ?? "";
 
     const result = await fetch(
-      `${process.env.NEXT_INTEGRATION_URL}/despesas/dashboard/`,
+      `${process.env.NEXT_INTEGRATION_URL}/despesas/dashboard/?loja=${loja}`,
       {
         method: "GET",
         headers: {

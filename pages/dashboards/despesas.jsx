@@ -21,8 +21,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
-import InputLabel from "@mui/material/InputLabel";
 
 //Icons
 import SearchIcon from "@mui/icons-material/Search";
@@ -36,11 +34,11 @@ export default function DashboardDespesas() {
 
   //Auxiliar para controlar o efeito do botao de pesquisar
   const [loadingButton, setLoadingButton] = useState(false);
+  const [picklist, setPicklistLojas] = useState([]);
 
   //Filtros
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
-
   const [loja, setLoja] = useState("");
 
   const handleChangeLoja = (event) => {
@@ -50,12 +48,14 @@ export default function DashboardDespesas() {
   useEffect(() => {
     if (session?.user?.token) {
       getDespesas();
+      getLojas();
     }
   }, [session?.user?.token]);
 
   async function getDespesas() {
     try {
-      const response = await fetch(`/api/dashboards/despesas/`, {
+      setLoadingButton(true);
+      const response = await fetch(`/api/dashboards/despesas/?loja=${loja}`, {
         method: "GET",
         headers: {
           Authorization: session?.user?.token,
@@ -68,6 +68,26 @@ export default function DashboardDespesas() {
       }
     } catch (error) {
       console.error("Erro ao obter despesas:", error);
+    }
+
+    setLoadingButton(false);
+  }
+
+  async function getLojas() {
+    try {
+      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -142,31 +162,22 @@ export default function DashboardDespesas() {
           </LoadingButton>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-          {/* <InputLabel id="loja-label">Loja</InputLabel>
-          <Select
-            labelId="loja-label"
-            label="Loja"
-            value={loja}
-            onChange={handleChangeLoja}
-            size="small"
-          >
-            <MenuItem value="todas">Todas</MenuItem>
-            <MenuItem value="filial">Filial</MenuItem>
-            <MenuItem value="matriz">Matriz</MenuItem>
-          </Select> */}
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />
 
+        <Grid item xs={12} sm={12} md={4} lg={3} xl={3}>
           <TextField
-            id="outlined-select-currency"
             select
             label="Lojas"
             value={loja}
             size="small"
             fullWidth
+            onChange={handleChangeLoja}
           >
-            <MenuItem value="todas">Todas</MenuItem>
-            <MenuItem value="filial">Filial</MenuItem>
-            <MenuItem value="matriz">Matriz</MenuItem>
+            {picklist?.map((loja) => (
+              <MenuItem value={loja.id} key={loja.id}>
+                {loja.sg_loja}
+              </MenuItem>
+            ))}
           </TextField>
         </Grid>
       </Grid>

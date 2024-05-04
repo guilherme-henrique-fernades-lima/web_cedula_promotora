@@ -707,3 +707,8 @@ export const ESPECIES_INSS_JSON = {
   8: "8 - Aposentadoria por Idade Empregador Rural",
   9: "9 - Compl. Acidente Trabalho p/Trabalhador (rural)",
 };
+
+export const ACTIVE_OPTIONS = [
+  { value: true, label: "ATIVADO" },
+  { value: false, label: "DESATIVADO" },
+];

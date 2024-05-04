@@ -112,17 +112,15 @@ export default function DashDespesas({ label, data }) {
           barSize={20}
           isAnimationActive={false}
         >
-          {label && (
-            <LabelList
-              dataKey={"pv"}
-              formatter={formatarReal}
-              position="top"
-              style={{
-                fontWeight: 400,
-                fontSize: 14,
-              }}
-            />
-          )}
+          <LabelList
+            dataKey={"vlr_total"}
+            formatter={formatarReal}
+            position="top"
+            style={{
+              fontWeight: 400,
+              fontSize: 10,
+            }}
+          />
         </Bar>
         <Legend
           iconType="square"
