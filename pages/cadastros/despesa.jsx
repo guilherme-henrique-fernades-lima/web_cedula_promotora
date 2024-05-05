@@ -38,7 +38,6 @@ import {
   SITUACAO_PAGAMENTO,
   NATUREZA_DESPESA,
   TIPO_DESPESA,
-  TIPO_LOJA,
 } from "@/helpers/constants";
 
 //Schema validation
@@ -60,6 +59,12 @@ export default function CadastrarDespesa() {
     resolver: yupResolver(despesaSchema),
   });
 
+  useEffect(() => {
+    if (session?.user?.token) {
+      getLojas();
+    }
+  }, [session?.user?.token]);
+
   const [loadingButton, setLoadingButton] = useState(false);
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
   const [descricaoDespesa, setDescricaoDespesa] = useState("");
@@ -68,6 +73,25 @@ export default function CadastrarDespesa() {
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
   const [tipoLoja, setTipoLoja] = useState("");
+  const [picklist, setPicklistLojas] = useState([]);
+
+  async function getLojas() {
+    try {
+      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   function getPayload() {
     const data = {
@@ -88,6 +112,8 @@ export default function CadastrarDespesa() {
   async function salvarDespesa() {
     setLoadingButton(true);
     const payload = getPayload();
+
+    console.log(payload);
 
     const response = await fetch("/api/cadastros/despesa", {
       method: "POST",
@@ -291,9 +317,9 @@ export default function CadastrarDespesa() {
                 setTipoLoja(e.target.value);
               }}
             >
-              {TIPO_LOJA.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+              {picklist?.map((loja) => (
+                <MenuItem value={loja.id} key={loja.id}>
+                  {loja.sg_loja}
                 </MenuItem>
               ))}
             </TextField>

@@ -1,10 +1,12 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 import { useSession } from "next-auth/react";
+import moment from "moment";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import GridGraph from "@/components/GridGraphWrapper";
+import NoDataToShow from "@/components/NoDataForShow";
 
 //Dashboards
 import DashDespesas from "@/components/dashboards/despesas/DashDespesas";
@@ -31,6 +33,7 @@ export default function DashboardDespesas() {
   const { data: session } = useSession();
 
   const [despesas, setDespesas] = useState([]);
+  console.log(despesas);
 
   //Auxiliar para controlar o efeito do botao de pesquisar
   const [loadingButton, setLoadingButton] = useState(false);
@@ -55,12 +58,17 @@ export default function DashboardDespesas() {
   async function getDespesas() {
     try {
       setLoadingButton(true);
-      const response = await fetch(`/api/dashboards/despesas/?loja=${loja}`, {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      });
+      const response = await fetch(
+        `/api/dashboards/despesas/?dt_inicio=${moment(dataInicio).format(
+          "YYYY-MM-DD"
+        )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&loja=${loja}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
 
       if (response.ok) {
         const json = await response.json();
@@ -192,7 +200,11 @@ export default function DashboardDespesas() {
           xl={12}
           size={700}
         >
-          <DashDespesas data={dataArrayDespesas} />
+          {dataArrayDespesas?.length > 0 ? (
+            <DashDespesas data={dataArrayDespesas} />
+          ) : (
+            <NoDataToShow />
+          )}
         </GridGraph>
       </Grid>
     </ContentWrapper>
