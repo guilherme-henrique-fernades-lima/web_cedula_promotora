@@ -103,7 +103,7 @@ export default function CadastrarDespesa() {
       situacao: situacaoPagamentoDespesa,
       tp_despesa: tipoDespesa,
       natureza_despesa: naturezaDespesa,
-      tipo_loja: tipoLoja,
+      id_loja: tipoLoja,
     };
 
     return data;

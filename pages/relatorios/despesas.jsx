@@ -47,7 +47,6 @@ import {
   SITUACAO_PAGAMENTO,
   NATUREZA_DESPESA,
   TIPO_DESPESA,
-  TIPO_LOJA,
 } from "@/helpers/constants";
 
 //Icons
@@ -64,6 +63,7 @@ var DATA_HOJE = new Date();
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
+  console.log("despesas: ", despesas);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -82,6 +82,32 @@ export default function RelatorioDespesas() {
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
   const [tipoLoja, setTipoLoja] = useState("");
+  const [picklist, setPicklistLojas] = useState([]);
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      getLojas();
+      getDespesas();
+    }
+  }, [session?.user?.token]);
+
+  async function getLojas() {
+    try {
+      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const {
     register,
@@ -95,10 +121,6 @@ export default function RelatorioDespesas() {
     mode: "onChange",
     resolver: yupResolver(despesaSchema),
   });
-
-  useEffect(() => {
-    getDespesas();
-  }, [session?.user]);
 
   const handleOpenDialogExcluir = () => {
     setOpenDialogExcluir(!openDialogExcluir);
@@ -160,7 +182,7 @@ export default function RelatorioDespesas() {
       situacao: situacaoPagamentoDespesa,
       natureza_despesa: naturezaDespesa,
       tp_despesa: tipoDespesa,
-      tipo_loja: tipoLoja,
+      id_loja: tipoLoja,
     };
 
     return payload;
@@ -207,7 +229,7 @@ export default function RelatorioDespesas() {
     setValue("situacaoPagamentoDespesa", data.situacao);
     setValue("tipoDespesa", data.tp_despesa);
     setValue("naturezaDespesa", data.natureza_despesa);
-    setValue("tipoLoja", data.tipo_loja);
+    setValue("tipoLoja", data.id_loja);
 
     setId(data.id);
     setDescricaoDespesa(data.descricao);
@@ -216,7 +238,7 @@ export default function RelatorioDespesas() {
     setSituacaoPagamentoDespesa(data.situacao);
     setNaturezaDespesa(data.natureza_despesa);
     setTipoDespesa(data.tp_despesa);
-    setTipoLoja(data.tipo_loja);
+    setTipoLoja(data.id_loja);
   }
 
   const columns = [
@@ -356,13 +378,15 @@ export default function RelatorioDespesas() {
         natureza_despesa: row.natureza_despesa
           ? row.natureza_despesa
           : row.natureza_despesa,
-        tipo_loja: row.tipo_loja,
+        tipo_loja: row.id_loja,
       };
     });
   } catch (err) {
     console.log(err);
     var rows = [];
   }
+
+  //TODO: Editar a loja da despesa
 
   return (
     <ContentWrapper title="Relação de despesas">
@@ -577,9 +601,9 @@ export default function RelatorioDespesas() {
                   setTipoLoja(e.target.value);
                 }}
               >
-                {TIPO_LOJA.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {picklist?.map((loja) => (
+                  <MenuItem value={loja.id} key={loja.id}>
+                    {loja.sg_loja}
                   </MenuItem>
                 ))}
               </TextField>

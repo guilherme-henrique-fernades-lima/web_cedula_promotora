@@ -32,7 +32,9 @@ export default function SingIn() {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
-  const onSubmit = async () => {
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
     try {
       setLoading(true);
       setLoginError(false);
@@ -149,6 +151,8 @@ export default function SingIn() {
           </Box>
 
           <Box
+            component="form"
+            onSubmit={onSubmit}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -165,7 +169,7 @@ export default function SingIn() {
               size="small"
               fullWidth
               label="Insira o e-mail"
-              placeholder="seu-email@email.com"
+              placeholder="Insira o seu endereço de e-mail"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               sx={{ mt: 1 }}
@@ -176,7 +180,7 @@ export default function SingIn() {
               onChange={(e) => setPassword(e.target.value)}
               //error={Boolean(error)}
               label="Senha"
-              placeholder="Senha"
+              placeholder="Insira sua senha"
               sx={{
                 marginTop: "20px",
                 fontSize: 12,
@@ -184,6 +188,7 @@ export default function SingIn() {
               fullWidth
               size="small"
               type={showPassword ? "text" : "password"}
+              InputLabelProps={{ shrink: true }}
               inputProps={{ maxLength: 16 }}
               InputProps={{
                 endAdornment: (
@@ -259,6 +264,7 @@ export default function SingIn() {
             </Box>
 
             <Button
+              type="submit"
               variant="contained"
               disableElevation
               sx={{ marginTop: "10px", minHeight: 36.5 }}
@@ -268,7 +274,6 @@ export default function SingIn() {
                 if (lembrarEmail) {
                   salvarEmailLocalStorage();
                 }
-                onSubmit();
               }}
               endIcon={!loading && <LoginIcon />}
             >

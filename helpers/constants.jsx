@@ -537,8 +537,14 @@ export const TP_OPERACAO = [
     value: "PORTABILIDADE_REFINANCIAMENTO",
     label: "REFIN. DA PORTABILIDADE",
   },
+
   { value: "REFINANCIAMENTO", label: "REFINANCIAMENTO" },
+  {
+    value: "REFIN_MARGEM",
+    label: "REFIN. + MARGEM",
+  },
   { value: "SAQUE COMPLEMENTAR CARTAO", label: "SAQUE COMPLEMENTAR CARTÃO" },
+  { value: "OUTROS", label: "OUTROS" },
 ];
 
 export const UF_OBJECT = [

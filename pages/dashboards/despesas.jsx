@@ -33,7 +33,6 @@ export default function DashboardDespesas() {
   const { data: session } = useSession();
 
   const [despesas, setDespesas] = useState([]);
-  console.log(despesas);
 
   //Auxiliar para controlar o efeito do botao de pesquisar
   const [loadingButton, setLoadingButton] = useState(false);
@@ -50,7 +49,6 @@ export default function DashboardDespesas() {
 
   useEffect(() => {
     if (session?.user?.token) {
-      getDespesas();
       getLojas();
     }
   }, [session?.user?.token]);
