@@ -79,6 +79,27 @@ export function renderTipoPagamentoEmprestimo(value) {
 }
 
 export function renderNaturezaDespesa(value) {
+  // { value: "acessoria_redes_sociais", label: "ACESSORIA REDES SOCIAIS" },
+  // { value: "agua", label: "ÁGUA" },
+  // { value: "aluguel", label: "ALUGUEL" },
+  // { value: "aux_familia", label: "AUXÍLIO FAMÍLIA" },
+  // { value: "contador", label: "CONTADOR" },
+  // { value: "conteudo_divulgacao", label: "CONTEÚDO PARA DIVULGAÇÃO" },
+  // { value: "corretor", label: "CORRETOR(A)" },
+  // { value: "energia", label: "ENERGIA" },
+  // { value: "fgts", label: "FGTS" },
+  // { value: "inss", label: "INSS" },
+  // { value: "internet", label: "INTERNET" },
+  // { value: "iptu", label: "IPTU" },
+  // { value: "plano_telefonico", label: "PLANOS TELEFÔNICOS" },
+  // { value: "refeicao", label: "REFEIÇÃO" },
+  // { value: "salario", label: "SALÁRIO" },
+  // { value: "simples_nacional_nota", label: "SIMPLES NACIONAL (NOTA FISCAL)" },
+  // { value: "sistema_consulta", label: "SISTEMA DE CONSULTA" },
+  // { value: "trafego_pago", label: "TRÁFEGO PAGO" },
+  // { value: "vale_transporte", label: "VALE TRANSPORTE" },
+  // { value: "outro", label: "OUTRO" },
+
   if (value === "aluguel") {
     return "ALUGUEL";
   } else if (value === "aux_familia") {
