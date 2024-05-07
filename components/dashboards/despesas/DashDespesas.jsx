@@ -52,13 +52,14 @@ export default function DashDespesas({ label, data }) {
           <Typography
             variant="span"
             sx={{
-              color: "#242424",
+              color:
+                payload[0]?.payload?.vlr_total >= 0 ? "#35B117" : "#DE1414",
               fontFamily: "Lato, sans-serif",
               fontSize: "14px",
               mt: 1,
             }}
           >
-            {/* Valor total: {formatarReal(payload[0].payload.vlr_total)} */}
+            Valor total: {formatarReal(payload[0]?.payload?.vlr_total)}
           </Typography>
           <Typography
             variant="span"
@@ -68,12 +69,7 @@ export default function DashDespesas({ label, data }) {
               fontSize: "14px",
               mt: 1,
             }}
-          >
-            {/* Quantidade de contratos: {payload[0].payload.qtd}{" "}
-            <strong>
-              ({payload[0].payload.perc_qtd}% do total de contratos)
-            </strong> */}
-          </Typography>
+          ></Typography>
         </Box>
       );
     }

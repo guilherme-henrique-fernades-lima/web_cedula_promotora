@@ -102,7 +102,7 @@ export default function DashboardDespesas() {
       id: index,
       name: row.nome_mes_ano,
       vlr_total: row.vlr_total,
-      fill: row.vlr_total > 0 ? "#35B117" : "#DE1414",
+      fill: row.vlr_total >= 0 ? "#35B117" : "#DE1414",
     }));
   }, [despesas]);
 
@@ -189,7 +189,7 @@ export default function DashboardDespesas() {
         </Grid>
       </Grid>
 
-      <Grid container sx={{ width: "100%" }}>
+      <Grid container sx={{ width: "100%", mt: 2 }}>
         <GridGraph
           title="Mapa de lucros e despesas"
           xs={12}

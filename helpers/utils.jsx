@@ -79,49 +79,48 @@ export function renderTipoPagamentoEmprestimo(value) {
 }
 
 export function renderNaturezaDespesa(value) {
-  // { value: "acessoria_redes_sociais", label: "ACESSORIA REDES SOCIAIS" },
-  // { value: "agua", label: "ÁGUA" },
-  // { value: "aluguel", label: "ALUGUEL" },
-  // { value: "aux_familia", label: "AUXÍLIO FAMÍLIA" },
-  // { value: "contador", label: "CONTADOR" },
-  // { value: "conteudo_divulgacao", label: "CONTEÚDO PARA DIVULGAÇÃO" },
-  // { value: "corretor", label: "CORRETOR(A)" },
-  // { value: "energia", label: "ENERGIA" },
-  // { value: "fgts", label: "FGTS" },
-  // { value: "inss", label: "INSS" },
-  // { value: "internet", label: "INTERNET" },
-  // { value: "iptu", label: "IPTU" },
-  // { value: "plano_telefonico", label: "PLANOS TELEFÔNICOS" },
-  // { value: "refeicao", label: "REFEIÇÃO" },
-  // { value: "salario", label: "SALÁRIO" },
-  // { value: "simples_nacional_nota", label: "SIMPLES NACIONAL (NOTA FISCAL)" },
-  // { value: "sistema_consulta", label: "SISTEMA DE CONSULTA" },
-  // { value: "trafego_pago", label: "TRÁFEGO PAGO" },
-  // { value: "vale_transporte", label: "VALE TRANSPORTE" },
-  // { value: "outro", label: "OUTRO" },
-
-  if (value === "aluguel") {
+  if (value === "acessoria_redes_sociais") {
+    return "ACESSORIA REDES SOCIAIS";
+  } else if (value === "agua") {
+    return "ÁGUA";
+  } else if (value === "aluguel") {
     return "ALUGUEL";
   } else if (value === "aux_familia") {
     return "AUXÍLIO FAMÍLIA";
+  } else if (value === "contador") {
+    return "CONTADOR";
+  } else if (value === "conteudo_divulgacao") {
+    return "CONTEÚDO PARA DIVULGAÇÃO";
   } else if (value === "corretor") {
     return "CORRETOR(A)";
+  } else if (value === "energia") {
+    return "ENERGIA";
   } else if (value === "fgts") {
     return "FGTS";
+  } else if (value === "internet") {
+    return "INTERNET";
   } else if (value === "inss") {
     return "INSS";
   } else if (value === "iptu") {
-    return "INSS";
+    return "IPTU";
+  } else if (value === "plano_telefonico") {
+    return "PLANOS TELEFÔNICOS";
   } else if (value === "refeicao") {
     return "REFEIÇÃO";
   } else if (value === "salario") {
     return "SALÁRIO";
+  } else if (value === "simples_nacional_nota") {
+    return "SIMPLES NACIONAL (NOTA FISCAL)";
+  } else if (value === "sistema_consulta") {
+    return "SISTEMA DE CONSULTA";
+  } else if (value === "trafego_pago") {
+    return "TRÁFEGO PAGO";
   } else if (value === "vale_transporte") {
     return "VALE TRANSPORTE";
   } else if (value === "outro") {
     return "OUTRO";
   } else {
-    return value;
+    return "Não mapeado: " + value;
   }
 }
 

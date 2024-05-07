@@ -111,8 +111,6 @@ export default function CadastrarContrato(props) {
     setLoadingButton(true);
     const payload = getPayload();
 
-    console.log(payload);
-
     const response = await fetch("/api/cadastros/contrato", {
       method: "POST",
       headers: {
@@ -229,7 +227,6 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -499,7 +496,6 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -523,7 +519,6 @@ export default function CadastrarContrato(props) {
                     autoComplete="off"
                   />
                 )}
-                
                 disableHighlightToday
               />
             </LocalizationProvider>
