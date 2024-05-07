@@ -113,8 +113,6 @@ export default function CadastrarDespesa() {
     setLoadingButton(true);
     const payload = getPayload();
 
-    console.log(payload);
-
     const response = await fetch("/api/cadastros/despesa", {
       method: "POST",
       headers: {

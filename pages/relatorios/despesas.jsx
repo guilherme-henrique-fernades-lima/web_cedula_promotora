@@ -63,7 +63,6 @@ var DATA_HOJE = new Date();
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
-  console.log("despesas: ", despesas);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -221,7 +220,6 @@ export default function RelatorioDespesas() {
   }
 
   function getDataForEdit(data) {
-    console.log(data);
     clearErrors();
 
     setValue("descricaoDespesa", data.descricao);
@@ -229,7 +227,7 @@ export default function RelatorioDespesas() {
     setValue("situacaoPagamentoDespesa", data.situacao);
     setValue("tipoDespesa", data.tp_despesa);
     setValue("naturezaDespesa", data.natureza_despesa);
-    setValue("tipoLoja", data.id_loja);
+    setValue("tipoLoja", data.tipo_loja);
 
     setId(data.id);
     setDescricaoDespesa(data.descricao);
@@ -238,7 +236,7 @@ export default function RelatorioDespesas() {
     setSituacaoPagamentoDespesa(data.situacao);
     setNaturezaDespesa(data.natureza_despesa);
     setTipoDespesa(data.tp_despesa);
-    setTipoLoja(data.id_loja);
+    setTipoLoja(data.tipo_loja);
   }
 
   const columns = [
@@ -351,18 +349,27 @@ export default function RelatorioDespesas() {
       },
     },
     {
-      field: "tipo_loja",
-      headerName: "LOJA",
-      renderHeader: (params) => <strong>LOJA</strong>,
+      field: "nome_loja",
+      headerName: "NOME DA LOJA",
+      renderHeader: (params) => <strong>NOME DA LOJA</strong>,
       minWidth: 180,
       align: "center",
       headerAlign: "center",
       flex: 1,
-      renderCell: (params) => {
-        if (params.value) {
-          return renderLoja(params.value);
-        }
-      },
+      // renderCell: (params) => {
+      //   if (params.value) {
+      //     return renderLoja(params.value);
+      //   }
+      // },
+    },
+    {
+      field: "tipo_loja",
+      headerName: "CÓD. DA LOJA",
+      renderHeader: (params) => <strong>CÓD. DA LOJA</strong>,
+      minWidth: 180,
+      align: "center",
+      headerAlign: "center",
+      flex: 1,
     },
   ];
 
@@ -375,18 +382,15 @@ export default function RelatorioDespesas() {
         valor: row.valor,
         situacao: row.situacao,
         tp_despesa: row.tp_despesa,
-        natureza_despesa: row.natureza_despesa
-          ? row.natureza_despesa
-          : row.natureza_despesa,
+        natureza_despesa: row.natureza_despesa,
         tipo_loja: row.id_loja,
+        nome_loja: row.sg_loja,
       };
     });
   } catch (err) {
     console.log(err);
     var rows = [];
   }
-
-  //TODO: Editar a loja da despesa
 
   return (
     <ContentWrapper title="Relação de despesas">
@@ -596,7 +600,7 @@ export default function RelatorioDespesas() {
                 fullWidth
                 label="Loja"
                 size="small"
-                value={tipoLoja}
+                value={parseInt(tipoLoja)}
                 onChange={(e) => {
                   setTipoLoja(e.target.value);
                 }}

@@ -27,7 +27,7 @@ export default function GridGraph({
       xl={xl || 12}
       sx={{
         height: size || 360,
-        display: "flex",
+        width: "100%",
         alignItems: "flex-start",
         justifyContent: "flex-start",
         flexDirection: "column",

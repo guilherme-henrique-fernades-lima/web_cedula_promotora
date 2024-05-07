@@ -33,15 +33,13 @@ export default function DashboardDespesas() {
   const { data: session } = useSession();
 
   const [despesas, setDespesas] = useState([]);
-
   //Auxiliar para controlar o efeito do botao de pesquisar
   const [loadingButton, setLoadingButton] = useState(false);
   const [picklist, setPicklistLojas] = useState([]);
-
   //Filtros
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
-  const [loja, setLoja] = useState("");
+  const [loja, setLoja] = useState("TODAS_AS_LOJAS");
 
   const handleChangeLoja = (event) => {
     setLoja(event.target.value);
@@ -59,7 +57,9 @@ export default function DashboardDespesas() {
       const response = await fetch(
         `/api/dashboards/despesas/?dt_inicio=${moment(dataInicio).format(
           "YYYY-MM-DD"
-        )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&loja=${loja}`,
+        )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&loja=${
+          loja === "TODAS_AS_LOJAS" ? "" : loja
+        }`,
         {
           method: "GET",
           headers: {
@@ -179,6 +179,7 @@ export default function DashboardDespesas() {
             fullWidth
             onChange={handleChangeLoja}
           >
+            <MenuItem value="TODAS_AS_LOJAS">TODAS AS LOJAS</MenuItem>
             {picklist?.map((loja) => (
               <MenuItem value={loja.id} key={loja.id}>
                 {loja.sg_loja}
@@ -196,7 +197,7 @@ export default function DashboardDespesas() {
           md={12}
           lg={12}
           xl={12}
-          size={700}
+          size={600}
         >
           {dataArrayDespesas?.length > 0 ? (
             <DashDespesas data={dataArrayDespesas} />

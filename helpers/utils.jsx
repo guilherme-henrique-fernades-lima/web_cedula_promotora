@@ -100,7 +100,7 @@ export function renderNaturezaDespesa(value) {
   } else if (value === "outro") {
     return "OUTRO";
   } else {
-    return "";
+    return value;
   }
 }
 
