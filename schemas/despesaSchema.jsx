@@ -8,4 +8,5 @@ export const despesaSchema = yup.object().shape({
     .required("Selecione uma situação de pagamento para esta despesa"),
   tipoDespesa: yup.string().required("Selecione o tipo desta despesa"),
   naturezaDespesa: yup.string().required("Selecione a natureza desta despesa"),
+  tipoLoja: yup.string().required("Selecione a loja desta despesa"),
 });

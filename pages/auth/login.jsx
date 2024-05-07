@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
-//Third party libraries
-import Lottie from "react-lottie";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -13,53 +13,50 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 
 //Icons
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LoginIcon from "@mui/icons-material/Login";
 
-//Lottie animation
-import LottieAnimation from "../../public/lotties/authenticate.json";
-
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData: LottieAnimation,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
-  },
-};
-
-function AuthAnimation() {
-  const [isStopped] = useState(false);
-  const [isPaused] = useState(false);
-
-  return (
-    <Lottie
-      options={defaultOptions}
-      height={200}
-      width={200}
-      isStopped={isStopped}
-      isPaused={isPaused}
-      isClickToPauseDisabled={true}
-    />
-  );
-}
-
 export default function SingIn() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [lembrarEmail, setLembrarEmail] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState(false);
 
-  const onSubmit = async () => {
-    const result = await signIn("credentials", {
-      username: email,
-      password: password,
-      redirect: true,
-      callbackUrl: "/relatorios/emprestimos",
-    });
+  const onSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      setLoading(true);
+      setLoginError(false);
+
+      const result = await signIn("credentials", {
+        username: email,
+        password: password,
+        redirect: false,
+      });
+
+      if (result?.ok) {
+        router.push("/relatorios/emprestimos");
+      } else {
+        console.log("error: ", result.error);
+        setLoginError(true);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setLoading(false);
+      setLoginError(true);
+    }
   };
 
   useEffect(() => {
@@ -100,9 +97,9 @@ export default function SingIn() {
           width: "100%",
           height: "100vh",
           flexGrow: 1,
-          background: "#000046",
+          background: "#1a3d74",
           background:
-            "linear-gradient(45deg, rgba(0, 0, 70, 0.9), rgba(28, 181, 224, 0.8)), url(/img/background_login_page.jpg) center center/cover no-repeat",
+            "linear-gradient(95deg, #ec590e, rgba(26, 60, 116, .9)), url(/img/background_login_page.jpg) center center/cover no-repeat",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -112,15 +109,13 @@ export default function SingIn() {
           sx={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
             flexDirection: "column",
             width: "100%",
-            maxWidth: 430,
-            height: 550,
+            maxWidth: 400,
             backgroundColor: "#fff",
-            borderRadius: "4px",
-            padding: "20px",
-            boxShadow: "rgb(0, 0, 0) 0px 20px 30px -10px",
+            paddingBottom: 3,
+            boxShadow: "rgba(0, 0, 0,0.5) 0px 20px 30px -10px",
 
             ["@media (max-width:600px)"]: {
               maxWidth: "100%",
@@ -132,155 +127,171 @@ export default function SingIn() {
             },
           }}
         >
-          <AuthAnimation />
-
-          <TextField
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="text"
-            variant="outlined"
-            size="small"
-            fullWidth
-            label="Insira o e-mail"
-            placeholder="seu-email@email.com"
-            InputLabelProps={{ shrink: true }}
-            autoComplete="off"
-            sx={{ width: 280, mt: 1 }}
-          />
-
-          <TextField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            //error={Boolean(error)}
-            label="Senha"
-            placeholder="Senha"
-            sx={{
-              marginTop: "20px",
-              fontSize: 12,
-              width: 280,
-            }}
-            size="small"
-            type={showPassword ? "text" : "password"}
-            inputProps={{ maxLength: 16 }}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment
-                  position="end"
-                  sx={{ cursor: "pointer" }}
-                  onClick={handleShowPassword}
-                >
-                  {showPassword ? (
-                    <VisibilityOffIcon
-                      sx={{
-                        color: "#B7B7B7",
-                        fontSize: 18,
-                        "&:hover": { color: "#7a7a7a" },
-                      }}
-                    />
-                  ) : (
-                    <VisibilityIcon
-                      sx={{
-                        color: "#B7B7B7",
-                        fontSize: 18,
-                        "&:hover": { color: "#7a7a7a" },
-                      }}
-                    />
-                  )}
-                </InputAdornment>
-              ),
-            }}
-          />
-
-          {/* {error && (
-            <Typography
-              sx={{
-                fontSize: 10,
-                color: "red",
-                fontWeight: "bold",
-                mt: 1,
-              }}
-            >
-              * {error.message}
-            </Typography>
-          )} */}
-
           <Box
             sx={{
-              width: 280,
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: "center",
+              width: "100%",
+              height: 190,
+              position: "relative",
+              overflow: "hidden",
+              mb: 2,
+              background: "#ec590e",
+              background: "linear-gradient(180deg, #ec590e, #ac410b)",
             }}
           >
-            <FormGroup
+            <Image
+              src="/img/cedula_logo.png"
+              height={160}
+              width={160}
+              alt="Logo da Cédula Promotora"
+              priority
+            />
+          </Box>
+
+          <Box
+            component="form"
+            onSubmit={onSubmit}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: "90%",
+              flexDirection: "column",
+            }}
+          >
+            <TextField
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              variant="outlined"
+              size="small"
+              fullWidth
+              label="Insira o e-mail"
+              placeholder="Insira o seu endereço de e-mail"
+              InputLabelProps={{ shrink: true }}
+              autoComplete="off"
+              sx={{ mt: 1 }}
+            />
+
+            <TextField
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              //error={Boolean(error)}
+              label="Senha"
+              placeholder="Insira sua senha"
+              sx={{
+                marginTop: "20px",
+                fontSize: 12,
+              }}
+              fullWidth
+              size="small"
+              type={showPassword ? "text" : "password"}
+              InputLabelProps={{ shrink: true }}
+              inputProps={{ maxLength: 16 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment
+                    position="end"
+                    sx={{ cursor: "pointer" }}
+                    onClick={handleShowPassword}
+                  >
+                    {showPassword ? (
+                      <VisibilityOffIcon
+                        sx={{
+                          color: "#B7B7B7",
+                          fontSize: 18,
+                          "&:hover": { color: "#7a7a7a" },
+                        }}
+                      />
+                    ) : (
+                      <VisibilityIcon
+                        sx={{
+                          color: "#B7B7B7",
+                          fontSize: 18,
+                          "&:hover": { color: "#7a7a7a" },
+                        }}
+                      />
+                    )}
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box
               sx={{
                 width: "100%",
                 display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    sx={{
-                      color: "#5353c9",
-                      "&.Mui-checked": {
-                        color: "#5353c9",
-                      },
-                    }}
-                    checked={lembrarEmail}
-                    onChange={handleSaveEmailLocalStorage}
-                  />
-                }
-                label={
-                  <Typography
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: 12,
-                      color: "#5353c9",
-                    }}
-                  >
-                    Lembrar e-mail?
-                  </Typography>
-                }
-              />
-            </FormGroup>
-          </Box>
+              <FormGroup
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "center",
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      sx={{
+                        color: "#1a3d74",
+                        "&.Mui-checked": {
+                          color: "#1a3d74",
+                        },
+                      }}
+                      checked={lembrarEmail}
+                      onChange={handleSaveEmailLocalStorage}
+                    />
+                  }
+                  label={
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 12,
+                        color: "#1a3d74",
+                      }}
+                    >
+                      Lembrar e-mail?
+                    </Typography>
+                  }
+                />
+              </FormGroup>
+            </Box>
 
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{ width: 280, marginTop: "30px" }}
-            onClick={() => {
-              if (lembrarEmail) {
-                salvarEmailLocalStorage();
-              }
-              onSubmit();
-            }}
-            endIcon={<LoginIcon />}
-          >
-            LOGIN
-          </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disableElevation
+              sx={{ marginTop: "10px", minHeight: 36.5 }}
+              fullWidth
+              disabled={loading ? true : false}
+              onClick={() => {
+                if (lembrarEmail) {
+                  salvarEmailLocalStorage();
+                }
+              }}
+              endIcon={!loading && <LoginIcon />}
+            >
+              {loading ? (
+                <CircularProgress sx={{ color: "#fff" }} size={22} />
+              ) : (
+                "Acessar"
+              )}
+            </Button>
+
+            {loginError && (
+              <Stack sx={{ width: "100%", mt: 2 }}>
+                <Alert severity="error">Senha ou e-mail incorretos.</Alert>
+              </Stack>
+            )}
+          </Box>
         </Box>
       </Box>
     </>
   );
 }
-
-// export const getServerSideProps = ({ req, res }) => {
-//   const token = getCookiesServerSide("@acai:user", { req, res });
-
-//   if (token) {
-//     return {
-//       redirect: {
-//         permanent: true,
-//         destination: "/home",
-//       },
-//     };
-//   }
-
-//   return {
-//     props: {},
-//   };
-// };

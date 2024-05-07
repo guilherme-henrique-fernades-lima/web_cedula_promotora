@@ -79,28 +79,58 @@ export function renderTipoPagamentoEmprestimo(value) {
 }
 
 export function renderNaturezaDespesa(value) {
-  if (value === "aluguel") {
+  if (value === "acessoria_redes_sociais") {
+    return "ACESSORIA REDES SOCIAIS";
+  } else if (value === "agua") {
+    return "ÁGUA";
+  } else if (value === "aluguel") {
     return "ALUGUEL";
   } else if (value === "aux_familia") {
     return "AUXÍLIO FAMÍLIA";
+  } else if (value === "contador") {
+    return "CONTADOR";
+  } else if (value === "conteudo_divulgacao") {
+    return "CONTEÚDO PARA DIVULGAÇÃO";
   } else if (value === "corretor") {
     return "CORRETOR(A)";
+  } else if (value === "energia") {
+    return "ENERGIA";
   } else if (value === "fgts") {
     return "FGTS";
+  } else if (value === "internet") {
+    return "INTERNET";
   } else if (value === "inss") {
     return "INSS";
   } else if (value === "iptu") {
-    return "INSS";
+    return "IPTU";
+  } else if (value === "plano_telefonico") {
+    return "PLANOS TELEFÔNICOS";
   } else if (value === "refeicao") {
     return "REFEIÇÃO";
   } else if (value === "salario") {
     return "SALÁRIO";
+  } else if (value === "simples_nacional_nota") {
+    return "SIMPLES NACIONAL (NOTA FISCAL)";
+  } else if (value === "sistema_consulta") {
+    return "SISTEMA DE CONSULTA";
+  } else if (value === "trafego_pago") {
+    return "TRÁFEGO PAGO";
   } else if (value === "vale_transporte") {
     return "VALE TRANSPORTE";
   } else if (value === "outro") {
     return "OUTRO";
   } else {
-    return "";
+    return "Não mapeado: " + value;
+  }
+}
+
+export function renderLoja(value) {
+  if (value === "matriz") {
+    return "MATRIZ";
+  } else if (value === "loja") {
+    return "LOJA";
+  } else {
+    return value;
   }
 }
 

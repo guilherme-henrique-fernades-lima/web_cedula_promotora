@@ -23,9 +23,6 @@ async function baixarParcelaJuros(req, res) {
   const token = req.headers.authorization;
   const data = req.body;
 
-  console.log("Entrou no baixar parcela");
-  console.log(data);
-
   const response = await fetch(
     `${process.env.NEXT_INTEGRATION_URL}/emprestimos/pagamento/`,
     {

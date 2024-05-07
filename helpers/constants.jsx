@@ -481,15 +481,30 @@ export const TIPO_DESPESA = [
   { value: "variavel", label: "VARIÁVEL" },
 ];
 
+export const TIPO_LOJA = [
+  { value: "matriz", label: "MATRIZ" },
+  { value: "filial", label: "FILIAL" },
+];
+
 export const NATUREZA_DESPESA = [
+  { value: "acessoria_redes_sociais", label: "ACESSORIA REDES SOCIAIS" },
+  { value: "agua", label: "ÁGUA" },
   { value: "aluguel", label: "ALUGUEL" },
   { value: "aux_familia", label: "AUXÍLIO FAMÍLIA" },
+  { value: "contador", label: "CONTADOR" },
+  { value: "conteudo_divulgacao", label: "CONTEÚDO PARA DIVULGAÇÃO" },
   { value: "corretor", label: "CORRETOR(A)" },
+  { value: "energia", label: "ENERGIA" },
   { value: "fgts", label: "FGTS" },
   { value: "inss", label: "INSS" },
+  { value: "internet", label: "INTERNET" },
   { value: "iptu", label: "IPTU" },
+  { value: "plano_telefonico", label: "PLANOS TELEFÔNICOS" },
   { value: "refeicao", label: "REFEIÇÃO" },
   { value: "salario", label: "SALÁRIO" },
+  { value: "simples_nacional_nota", label: "SIMPLES NACIONAL (NOTA FISCAL)" },
+  { value: "sistema_consulta", label: "SISTEMA DE CONSULTA" },
+  { value: "trafego_pago", label: "TRÁFEGO PAGO" },
   { value: "vale_transporte", label: "VALE TRANSPORTE" },
   { value: "outro", label: "OUTRO" },
 ];
@@ -516,13 +531,20 @@ export const TP_OPERACAO = [
   { value: "CARTAO BENEFICIO", label: "CARTÃO BENEFÍCIO" },
   { value: "CARTAO CONSIGNADO", label: "CARTÃO CONSIGNADO" },
   { value: "NOVO", label: "NOVO" },
+  { value: "NOVO", label: "NOVO (CONTRATO CHEIO)" },
   { value: "PORTABILIDADE", label: "PORTABILIDADE" },
   {
     value: "PORTABILIDADE_REFINANCIAMENTO",
     label: "REFIN. DA PORTABILIDADE",
   },
+
   { value: "REFINANCIAMENTO", label: "REFINANCIAMENTO" },
+  {
+    value: "REFIN_MARGEM",
+    label: "REFIN. + MARGEM",
+  },
   { value: "SAQUE COMPLEMENTAR CARTAO", label: "SAQUE COMPLEMENTAR CARTÃO" },
+  { value: "OUTROS", label: "OUTROS" },
 ];
 
 export const UF_OBJECT = [
@@ -691,3 +713,8 @@ export const ESPECIES_INSS_JSON = {
   8: "8 - Aposentadoria por Idade Empregador Rural",
   9: "9 - Compl. Acidente Trabalho p/Trabalhador (rural)",
 };
+
+export const ACTIVE_OPTIONS = [
+  { value: true, label: "ATIVADO" },
+  { value: false, label: "DESATIVADO" },
+];

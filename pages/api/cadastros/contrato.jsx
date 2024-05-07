@@ -2,8 +2,6 @@ async function getCliente(req, res) {
   const token = req.headers.authorization;
   const cpf = req.query.cpf ?? "";
 
-  console.log("entrou no get");
-
   const result = await fetch(
     `${process.env.NEXT_INTEGRATION_URL}/clientes/${cpf}`,
     {

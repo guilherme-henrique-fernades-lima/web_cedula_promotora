@@ -20,7 +20,6 @@ async function getCliente(req, res) {
 }
 
 async function salvarEmprestimo(req, res) {
-  console.log("Salvar despesa");
   const token = req.headers.authorization;
   const data = req.body;
 

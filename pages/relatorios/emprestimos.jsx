@@ -155,7 +155,6 @@ export default function RelatorioEmprestimos() {
     setLoadingButton(true);
 
     const payload = getPayload();
-    console.log(payload);
 
     const response = await fetch(`/api/relatorios/emprestimos/?id=${id}`, {
       method: "PUT",
@@ -1055,7 +1054,6 @@ export default function RelatorioEmprestimos() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {console.log(emprestimoItem)}
                     {emprestimoItem?.map((item, index) => (
                       <TableRow key={index}>
                         <TableCell align="center">

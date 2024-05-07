@@ -40,9 +40,6 @@ import {
   TIPO_DESPESA,
 } from "@/helpers/constants";
 
-//Formatters
-import { converterDataParaJS } from "@/helpers/utils";
-
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
 
@@ -62,6 +59,12 @@ export default function CadastrarDespesa() {
     resolver: yupResolver(despesaSchema),
   });
 
+  useEffect(() => {
+    if (session?.user?.token) {
+      getLojas();
+    }
+  }, [session?.user?.token]);
+
   const [loadingButton, setLoadingButton] = useState(false);
   const [dataVencimentoDespesa, setDataVencimentoDespesa] = useState(null);
   const [descricaoDespesa, setDescricaoDespesa] = useState("");
@@ -69,6 +72,26 @@ export default function CadastrarDespesa() {
   const [situacaoPagamentoDespesa, setSituacaoPagamentoDespesa] = useState("");
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
+  const [tipoLoja, setTipoLoja] = useState("");
+  const [picklist, setPicklistLojas] = useState([]);
+
+  async function getLojas() {
+    try {
+      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   function getPayload() {
     const data = {
@@ -80,6 +103,7 @@ export default function CadastrarDespesa() {
       situacao: situacaoPagamentoDespesa,
       tp_despesa: tipoDespesa,
       natureza_despesa: naturezaDespesa,
+      id_loja: tipoLoja,
     };
 
     return data;
@@ -116,6 +140,7 @@ export default function CadastrarDespesa() {
     setTipoDespesa("");
     setNaturezaDespesa("");
     setSituacaoPagamentoDespesa("");
+    setTipoLoja("");
   }
 
   return (
@@ -148,7 +173,6 @@ export default function CadastrarDespesa() {
                     autoComplete="off"
                   />
                 )}
-                
                 disableHighlightToday
               />
             </LocalizationProvider>
@@ -277,6 +301,31 @@ export default function CadastrarDespesa() {
               {errors.tipoDespesa?.message}
             </Typography>
           </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("tipoLoja")}
+              error={Boolean(errors.tipoLoja)}
+              select
+              fullWidth
+              label="Loja"
+              size="small"
+              value={tipoLoja}
+              onChange={(e) => {
+                setTipoLoja(e.target.value);
+              }}
+            >
+              {picklist?.map((loja) => (
+                <MenuItem value={loja.id} key={loja.id}>
+                  {loja.sg_loja}
+                </MenuItem>
+              ))}
+            </TextField>
+            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+              {errors.tipoLoja?.message}
+            </Typography>
+          </Grid>
+
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <LoadingButton
               type="submit"

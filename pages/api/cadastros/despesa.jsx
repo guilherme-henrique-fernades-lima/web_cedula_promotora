@@ -1,5 +1,4 @@
 async function salvarDespesa(req, res) {
-  console.log("Salvar despesa");
   const token = req.headers.authorization;
   const data = req.body;
 
