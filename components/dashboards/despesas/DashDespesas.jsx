@@ -35,20 +35,44 @@ export default function DashDespesas({ label, data }) {
             boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px",
           }}
         >
-          <Stack direction="row" spacing={1}>
-            <Typography
-              variant="span"
-              sx={{
-                color: "#242424",
-                fontFamily: "Lato, sans-serif",
-                fontSize: "16px",
-                fontWeight: 700,
-                mt: 1,
-              }}
-            >
-              {payload[0].payload.name}
-            </Typography>
-          </Stack>
+          <Typography
+            variant="span"
+            sx={{
+              color: "#242424",
+              fontFamily: "Lato, sans-serif",
+              fontSize: "16px",
+              fontWeight: 700,
+              mt: 1,
+            }}
+          >
+            {payload[0].payload.name}
+          </Typography>
+
+          <Typography
+            variant="span"
+            sx={{
+              color: "#242424",
+              fontFamily: "Lato, sans-serif",
+              fontSize: "16px",
+              fontSize: "14px",
+            }}
+          >
+            Despesa
+          </Typography>
+
+          <Typography
+            variant="span"
+            sx={{
+              color: "#242424",
+              fontFamily: "Lato, sans-serif",
+              fontSize: "14px",
+            }}
+          >
+            Comissão
+          </Typography>
+
+          <Box sx={{ width: "100%", borderTop: "1px solid #ccc" }} />
+
           <Typography
             variant="span"
             sx={{
@@ -56,20 +80,10 @@ export default function DashDespesas({ label, data }) {
                 payload[0]?.payload?.vlr_total >= 0 ? "#35B117" : "#DE1414",
               fontFamily: "Lato, sans-serif",
               fontSize: "14px",
-              mt: 1,
             }}
           >
-            Valor total: {formatarReal(payload[0]?.payload?.vlr_total)}
+            Lucro: {formatarReal(payload[0]?.payload?.vlr_total)}
           </Typography>
-          <Typography
-            variant="span"
-            sx={{
-              color: "#242424",
-              fontFamily: "Lato, sans-serif",
-              fontSize: "14px",
-              mt: 1,
-            }}
-          ></Typography>
         </Box>
       );
     }
@@ -82,29 +96,31 @@ export default function DashDespesas({ label, data }) {
         data={data}
         margin={{
           top: 40,
-          right: 40,
-          bottom: 10,
+          right: 10,
+          // bottom: 10,
         }}
+        stackOffset="wiggle"
       >
         <CartesianGrid strokeDasharray="0" />
         <XAxis
           dataKey="name"
           tick={{
             fontWeight: 400,
-            fontSize: 14,
+            fontSize: 12,
           }}
         />
         <YAxis
           tick={{
             fontWeight: 400,
-            fontSize: 14,
+            fontSize: 12,
           }}
+          includeHidden
+          padding={{ bottom: 20 }}
         />
         <Tooltip content={CustomTooltip} cursor={{ fill: "#ececec" }} />
         <Bar
           dataKey="vlr_total"
           name="Valor total"
-          //fill="#003f86"
           barSize={20}
           isAnimationActive={false}
         >
