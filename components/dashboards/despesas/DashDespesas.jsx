@@ -18,7 +18,10 @@ import { formatarReal } from "@/helpers/utils";
 //Mui components
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
+
+//Icons
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 
 export default function DashDespesas({ label, data }) {
   const CustomTooltip = ({ active, payload, label }) => {
@@ -57,7 +60,7 @@ export default function DashDespesas({ label, data }) {
               fontSize: "14px",
             }}
           >
-            Despesa
+            Despesa {formatarReal(payload[0]?.payload?.despesa)}
           </Typography>
 
           <Typography
@@ -68,22 +71,37 @@ export default function DashDespesas({ label, data }) {
               fontSize: "14px",
             }}
           >
-            Comissão
+            Comissão {formatarReal(payload[0]?.payload?.comissao)}
           </Typography>
 
           <Box sx={{ width: "100%", borderTop: "1px solid #ccc" }} />
 
-          <Typography
-            variant="span"
+          <Box
             sx={{
-              color:
-                payload[0]?.payload?.vlr_total >= 0 ? "#35B117" : "#DE1414",
-              fontFamily: "Lato, sans-serif",
-              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Lucro: {formatarReal(payload[0]?.payload?.vlr_total)}
-          </Typography>
+            <Typography
+              variant="span"
+              sx={{
+                color: payload[0]?.payload?.lucro >= 0 ? "#35B117" : "#DE1414",
+                fontFamily: "Lato, sans-serif",
+                fontSize: "14px",
+              }}
+            >
+              Lucro: {formatarReal(payload[0]?.payload?.lucro)}
+            </Typography>
+
+            {payload[0]?.payload?.lucro >= 0 ? (
+              <ArrowUpwardIcon sx={{ color: "#35B117", ml: 1, fontSize: 18 }} />
+            ) : (
+              <ArrowDownwardIcon
+                sx={{ color: "#de1414", ml: 1, fontSize: 18 }}
+              />
+            )}
+          </Box>
         </Box>
       );
     }
@@ -119,13 +137,13 @@ export default function DashDespesas({ label, data }) {
         />
         <Tooltip content={CustomTooltip} cursor={{ fill: "#ececec" }} />
         <Bar
-          dataKey="vlr_total"
+          dataKey="lucro"
           name="Valor total"
           barSize={20}
           isAnimationActive={false}
         >
           <LabelList
-            dataKey={"vlr_total"}
+            dataKey={"lucro"}
             formatter={formatarReal}
             position="top"
             style={{

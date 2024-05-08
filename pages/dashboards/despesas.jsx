@@ -101,8 +101,10 @@ export default function DashboardDespesas() {
     return despesas?.map((row, index) => ({
       id: index,
       name: row.nome_mes_ano,
-      vlr_total: row.vlr_total,
-      fill: row.vlr_total >= 0 ? "#35B117" : "#DE1414",
+      despesa: row.vlr_total_despesas,
+      comissao: row.vlr_total_comissao,
+      lucro: row.vlr_total_lucro,
+      fill: row.vlr_total_lucro >= 0 ? "#35B117" : "#DE1414",
     }));
   }, [despesas]);
 
