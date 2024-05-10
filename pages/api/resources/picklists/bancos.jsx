@@ -1,33 +1,32 @@
-async function getEmprestimos(req, res) {
+async function create(req, res) {
   const token = req.headers.authorization;
+  const data = req.body;
 
-  const dt_inicio = req.query.dt_inicio ?? "";
-  const dt_final = req.query.dt_final ?? "";
-
-  const response = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/?dt_inicio=${dt_inicio}&dt_final=${dt_final}`,
+  const result = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/resources/bancos/`,
     {
-      method: "GET",
+      method: "POST",
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/json;charset=UTF-8",
         Authorization: `Bearer ${token}`,
       },
+      body: data,
     }
   );
 
-  const json = await response.json();
+  const json = await result.json();
 
-  return res.status(response.status).json(json);
+  return res.status(result.status).json(json);
 }
 
-async function editarEmprestimo(req, res) {
+async function update(req, res) {
   const token = req.headers.authorization;
   const data = req.body;
   const id = req.query.id ?? "";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/${id}/`,
+    `${process.env.NEXT_INTEGRATION_URL}/resources/bancos/${id}`,
     {
       method: "PUT",
       headers: {
@@ -44,14 +43,15 @@ async function editarEmprestimo(req, res) {
   return res.status(result.status).json(json);
 }
 
-async function excluirEmprestimo(req, res) {
+async function list(req, res) {
   const token = req.headers.authorization;
-  const id = req.query.id ?? "";
+
+  const ativas = req.query.ativas ?? "";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/emprestimos/${id}/`,
+    `${process.env.NEXT_INTEGRATION_URL}/resources/bancos/?ativas=${ativas}`,
     {
-      method: "DELETE",
+      method: "GET",
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/json;charset=UTF-8",
@@ -60,16 +60,18 @@ async function excluirEmprestimo(req, res) {
     }
   );
 
-  return res.status(result.status).json({ message: "deletado com sucesso" });
+  const json = await result.json();
+
+  return res.status(result.status).json(json);
 }
 
 export default async function handler(req, res) {
-  if (req.method == "GET") {
-    getEmprestimos(req, res);
+  if (req.method == "POST") {
+    create(req, res);
   } else if (req.method == "PUT") {
-    editarEmprestimo(req, res);
-  } else if (req.method == "DELETE") {
-    excluirEmprestimo(req, res);
+    update(req, res);
+  } else if (req.method == "GET") {
+    list(req, res);
   } else {
     res.status(405).send();
   }

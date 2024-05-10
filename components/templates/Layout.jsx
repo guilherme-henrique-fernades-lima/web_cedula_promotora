@@ -36,6 +36,8 @@ import EqualizerIcon from "@mui/icons-material/Equalizer";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
+import { ROUTES } from "@/helpers/routes";
+
 export default function Layout({ children }) {
   const { data: session } = useSession();
   const theme = useTheme();
@@ -108,6 +110,8 @@ export default function Layout({ children }) {
           >
             <DrawerHeader></DrawerHeader>
             <Divider />
+
+            {/* <MenuOptions /> */}
             <List>
               <ListItem
                 disablePadding
@@ -204,21 +208,6 @@ export default function Layout({ children }) {
                         </ListItemIcon>
                         <ListItemText
                           primary={<TitleTypography>Despesa</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/cadastros/emprestimo">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <TitleTypography>Empréstimo</TitleTypography>
-                          }
                         />
                       </ListItemButton>
                     </ListItem>
@@ -520,21 +509,6 @@ export default function Layout({ children }) {
                     </ListItem>
                   </Link>
 
-                  <Link href="/relatorios/emprestimos">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <TitleTypography>Empréstimos</TitleTypography>
-                          }
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
                   <Link href="/relatorios/vencimentos">
                     <ListItem disablePadding>
                       <ListItemButton>
@@ -657,5 +631,84 @@ function LogoCedulaPromotora() {
         priority
       />
     </Box>
+  );
+}
+
+function MenuOptions() {
+  const [dropDownOption, setDropdownOption] = useState(false);
+
+  const handleDropdownToggle = (index) => {
+    setDropdownOption((prevIndex) => (prevIndex === index ? null : index));
+  };
+
+  return (
+    <List>
+      {ROUTES.map((option, index) => (
+        <React.Fragment key={option.id}>
+          <ListItem
+            disablePadding
+            onClick={() => handleDropdownToggle(index)}
+            sx={{
+              transition: "all 0.3s ease",
+              backgroundColor:
+                dropDownOption === index ? "#1a3d74" : "transparent",
+            }}
+          >
+            <ListItemButton>
+              <ListItemIcon
+                sx={{ color: dropDownOption === index ? "#fff" : "#212121" }}
+              >
+                {option.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography
+                    variant="span"
+                    component="span"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                      color: dropDownOption === index ? "#fff" : "#212121",
+                    }}
+                  >
+                    {option.title}
+                  </Typography>
+                }
+              />
+              <ExpandLess
+                sx={{
+                  fontSize: "20px",
+                  transition: "all 0.3s ease",
+                  transform:
+                    dropDownOption === index ? "rotate(180deg)" : "none",
+                  color: dropDownOption === index ? "#fff" : "#212121",
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+
+          <Collapse in={dropDownOption === index} timeout="auto" unmountOnExit>
+            <List component="nav" disablePadding>
+              {option.routes.map((route, index) => (
+                <Link href={route.url} key={index}>
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemIcon sx={{ pl: 3 }}>
+                        <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <TitleTypography>{route.title} </TitleTypography>
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                </Link>
+              ))}
+            </List>
+          </Collapse>
+        </React.Fragment>
+      ))}
+    </List>
   );
 }
