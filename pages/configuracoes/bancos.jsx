@@ -6,14 +6,12 @@ import DataTable from "@/components/Datatable";
 
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
 
 //Mui components
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
@@ -21,15 +19,16 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 
 //Constants
 import { ACTIVE_OPTIONS } from "@/helpers/constants";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
+import EditIcon from "@mui/icons-material/Edit";
+import ClearIcon from "@mui/icons-material/Clear";
 
-import { despesaSchema } from "@/schemas/lojaSchema";
+import { bancoSchema } from "@/schemas/picklists/bancoSchema";
 
 export default function ConfiguracoesLojas() {
   const { data: session } = useSession();
@@ -43,23 +42,25 @@ export default function ConfiguracoesLojas() {
     reset,
   } = useForm({
     mode: "onChange",
-    resolver: yupResolver(despesaSchema),
+    resolver: yupResolver(bancoSchema),
   });
 
   const [id, setId] = useState("");
   const [dataset, setDataset] = useState([]);
-  const [sgLoja, setSgLoja] = useState("");
+  const [name, setName] = useState("");
   const [isActive, setIsActive] = useState("");
   const [loading, setLoading] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
 
   useEffect(() => {
-    getLojas();
+    if (session?.user?.token) {
+      getAllData();
+    }
   }, [session?.user]);
 
   function getPayload() {
     const payload = {
-      sg_loja: sgLoja.toUpperCase(),
+      name: name.toUpperCase(),
       is_active: isActive,
     };
 
@@ -70,18 +71,18 @@ export default function ConfiguracoesLojas() {
     clearErrors();
     reset();
     setId("");
-    setSgLoja("");
+    setName("");
     setIsActive("");
 
     setShowEditForm(false);
   }
 
-  async function salvarLoja() {
+  async function save() {
     try {
       setLoading(true);
       const payload = getPayload();
 
-      const response = await fetch("/api/configuracoes/lojas", {
+      const response = await fetch("/api/configuracoes/picklists/bancos", {
         method: "POST",
         headers: {
           Authorization: session?.user?.token,
@@ -90,12 +91,12 @@ export default function ConfiguracoesLojas() {
       });
 
       if (response.ok) {
-        toast.success("Loja cadastrado com sucesso!");
+        toast.success("Cadastrado com sucesso!");
         clearStatesAndErrors();
         setLoading(false);
-        getLojas();
+        getAllData();
       } else {
-        toast.error("Erro ao cadastrar Loja.");
+        toast.error("Erro ao cadastrar");
         setLoading(false);
       }
     } catch (error) {
@@ -103,26 +104,29 @@ export default function ConfiguracoesLojas() {
     }
   }
 
-  async function editarLoja() {
+  async function update() {
     try {
       setLoading(true);
       const payload = getPayload();
 
-      const response = await fetch(`/api/configuracoes/lojas/?id=${id}/`, {
-        method: "PUT",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `/api/configuracoes/picklists/bancos/?id=${id}/`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (response.ok) {
-        toast.success("Loja editada com sucesso!");
+        toast.success("Editado com sucesso!");
         clearStatesAndErrors();
         setLoading(false);
-        getLojas();
+        getAllData();
       } else {
-        toast.error("Erro ao editar dados da Loja.");
+        toast.error("Erro ao editar dados");
         setLoading(false);
       }
     } catch (error) {
@@ -130,9 +134,9 @@ export default function ConfiguracoesLojas() {
     }
   }
 
-  async function getLojas() {
+  async function getAllData() {
     try {
-      const response = await fetch("/api/configuracoes/lojas", {
+      const response = await fetch("/api/configuracoes/picklists/bancos", {
         method: "GET",
         headers: {
           Authorization: session?.user?.token,
@@ -150,11 +154,11 @@ export default function ConfiguracoesLojas() {
 
   function getDataForEdit(data) {
     clearErrors();
-    setValue("sgLoja", data.sg_loja);
+    setValue("name", data.name);
     setValue("isActive", data.is_active);
 
     setId(data.id);
-    setSgLoja(data.sg_loja);
+    setName(data.name);
     setIsActive(data.is_active);
   }
 
@@ -184,9 +188,9 @@ export default function ConfiguracoesLojas() {
       },
     },
     {
-      field: "sg_loja",
-      headerName: "NOME DA LOJA",
-      renderHeader: (params) => <strong>NOME DA LOJA</strong>,
+      field: "name",
+      headerName: "NOME DO BANCO",
+      renderHeader: (params) => <strong>NOME DO BANCO</strong>,
       minWidth: 150,
       align: "center",
       headerAlign: "center",
@@ -209,16 +213,16 @@ export default function ConfiguracoesLojas() {
   ];
 
   return (
-    <ContentWrapper title="Cadastro e manutenção de lojas">
+    <ContentWrapper title="Cadastro e manutenção de bancos">
       <Toaster position="bottom-center" reverseOrder={true} />
 
       <Box
         component="form"
         onSubmit={handleSubmit(() => {
           if (showEditForm) {
-            editarLoja();
+            update();
           } else {
-            salvarLoja();
+            save();
           }
         })}
         sx={{ width: "100%" }}
@@ -226,16 +230,16 @@ export default function ConfiguracoesLojas() {
         <Grid container spacing={1} sx={{ mt: 1 }}>
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("sgLoja")}
-              error={Boolean(errors.sgLoja)}
-              helperText={errors.sgLoja?.message}
-              value={sgLoja}
+              {...register("name")}
+              error={Boolean(errors.name)}
+              helperText={errors.name?.message}
+              value={name}
               onChange={(e) => {
-                setSgLoja(e.target.value);
+                setName(e.target.value);
               }}
               size="small"
               label="Nome"
-              placeholder="Insira o nome da loja"
+              placeholder="Insira o nome do banco"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth
@@ -244,9 +248,9 @@ export default function ConfiguracoesLojas() {
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
-              {...register("isActive")}
-              error={Boolean(errors.isActive)}
-              helperText={errors.isActive?.message}
+              {...register("is_active")}
+              error={Boolean(errors.is_active)}
+              helperText={errors.is_active?.message}
               select
               value={isActive}
               onChange={(e) => {
@@ -275,6 +279,16 @@ export default function ConfiguracoesLojas() {
             >
               {showEditForm ? "Atualizar" : "Cadastrar"}
             </LoadingButton>
+
+            <Tooltip title="Limpar todos os campos" placement="top">
+              <IconButton
+                sx={{ ml: 1 }}
+                onClick={clearStatesAndErrors}
+                color="error"
+              >
+                <ClearIcon />
+              </IconButton>
+            </Tooltip>
           </Grid>
         </Grid>
       </Box>
