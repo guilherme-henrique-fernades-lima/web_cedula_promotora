@@ -12,6 +12,7 @@ export default function CustomTextField({
   validateFieldName,
   errorFlag,
   maskFieldFlag,
+  numbersNotAllowed,
   ...props
 }) {
   return (
@@ -19,7 +20,11 @@ export default function CustomTextField({
       value={value}
       helperText={helperText}
       onChange={(e) => {
-        setValue(e.target.value.replace(/[^A-Za-z\s]/g, ""));
+        if (numbersNotAllowed) {
+          setValue(e.target.value.replace(/[^A-Za-z\s]/g, ""));
+        } else {
+          setValue(e.target.value);
+        }
       }}
       size="small"
       label={label}
@@ -28,7 +33,7 @@ export default function CustomTextField({
       autoComplete="off"
       fullWidth
       error={Boolean(errorFlag)}
-      {...register(`${validateFieldName}`)}
+      // {...register(`${validateFieldName}`)}
       {...props}
     />
   );
