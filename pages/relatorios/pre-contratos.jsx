@@ -9,7 +9,7 @@ export default function RelatorioPreContratos() {
   const { data: session } = useSession();
 
   return (
-    <ContentWrapper title="Relação de contratos">
+    <ContentWrapper title="Relação de pré contratos">
       <Toaster position="bottom-center" reverseOrder={true} />
     </ContentWrapper>
   );
