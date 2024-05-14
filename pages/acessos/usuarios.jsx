@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
@@ -14,14 +14,22 @@ import Backdrop from "@mui/material/Backdrop";
 import Modal from "@mui/material/Modal";
 import Fade from "@mui/material/Fade";
 import LoadingButton from "@mui/lab/LoadingButton";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Switch from "@mui/material/Switch";
 
-//Custom componentes
+//Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
 
 //Icons
 import LockPersonIcon from "@mui/icons-material/LockPerson";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
+import SaveIcon from "@mui/icons-material/Save";
+
+//Rotas da aplicacao
+import { ROUTES } from "@/helpers/routes";
 
 export default function Usuarios() {
   const { data: session } = useSession();
@@ -130,10 +138,50 @@ export default function Usuarios() {
         ))}
       </Box>
 
-      <ModalCreateUser
-        open={openDetailsUser}
-        setOpen={handleModalDetailsUser}
-      ></ModalCreateUser>
+      <ModalCreateUser open={openDetailsUser} setOpen={handleModalDetailsUser}>
+        <Typography sx={{ fontWeight: 700, mb: 2 }}>
+          Editar permissões do usuário
+        </Typography>
+
+        <FormGroup>
+          <FormControlLabel
+            control={<Switch defaultChecked />}
+            label="Ativo/Inativo"
+          />
+        </FormGroup>
+
+        {ROUTES?.map((route) => (
+          <React.Fragment key={route.id}>
+            <Typography sx={{ fontWeight: 700, mb: 1 }}>
+              {route.title}
+            </Typography>
+            <Box
+              sx={{ borderTop: "1px solid #ccc", width: "100%", mb: 1, mt: -1 }}
+            />
+
+            <FormGroup>
+              {route?.routes?.map((url) => (
+                <FormControlLabel
+                  control={<Checkbox />}
+                  label={url.title}
+                  key={url.id}
+                />
+              ))}
+            </FormGroup>
+          </React.Fragment>
+        ))}
+
+        <Button
+          disableElevation
+          variant="contained"
+          endIcon={<SaveIcon />}
+          fullWidth
+          sx={{ mt: 2 }}
+          onClick={() => {}}
+        >
+          Salvar
+        </Button>
+      </ModalCreateUser>
 
       <ModalCreateUser open={open} setOpen={setOpen}>
         <Typography sx={{ fontWeight: 700, mb: 2 }}>
@@ -272,9 +320,12 @@ function ModalCreateUser({ open, setOpen, children }) {
             transform: "translate(-50%, -50%)",
             width: "100%",
             maxWidth: 420,
+            //height: "100%",
+            maxHeight: 420,
             bgcolor: "background.paper",
             boxShadow: 24,
             p: 2,
+            overflowY: "auto",
           }}
         >
           {children}
