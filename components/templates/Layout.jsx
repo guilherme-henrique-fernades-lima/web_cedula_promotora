@@ -9,7 +9,6 @@ import { useSession, signOut } from "next-auth/react";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -25,33 +24,24 @@ import { useTheme } from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 
 //Icons
-import SubjectIcon from "@mui/icons-material/Subject";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import EqualizerIcon from "@mui/icons-material/Equalizer";
-import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 import { ROUTES } from "@/helpers/routes";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
+
   const theme = useTheme();
 
   const [open, setOpen] = useState(false);
-  const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
-  const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
-  const [openDropdownDashboards, setOpenDropdownDashboards] = useState(false);
-  const [openDropdownConfiguracoes, setOpenDropdownConfiguracoes] =
-    useState(false);
-  const [activeOption, setActiveOption] = useState("");
 
   const handleDrawerCloseOpen = () => {
-    setOpen(!open);
+    setOpen((open) => !open);
   };
 
   const handleLogout = async () => {
@@ -60,8 +50,6 @@ export default function Layout({ children }) {
 
   return (
     <>
-      <CssBaseline />
-
       {session?.user ? (
         <Box sx={{ display: "flex" }}>
           <AppBar position="fixed" open={open} elevation={0}>
@@ -110,7 +98,7 @@ export default function Layout({ children }) {
           >
             <DrawerHeader></DrawerHeader>
             <Divider />
-            <MenuOptions />
+            <MenuOptions perms={session?.user?.perms} />
             {/* <Divider /> */}
           </Drawer>
           <Main open={open}>
@@ -219,7 +207,7 @@ function LogoCedulaPromotora() {
   );
 }
 
-function MenuOptions() {
+function MenuOptions({ perms }) {
   const [dropDownOption, setDropdownOption] = useState(false);
 
   const handleDropdownToggle = (index) => {
@@ -274,21 +262,25 @@ function MenuOptions() {
 
           <Collapse in={dropDownOption === index} timeout="auto" unmountOnExit>
             <List component="nav" disablePadding>
-              {option.routes.map((route, index) => (
-                <Link href={route.url} key={index}>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon sx={{ pl: 3 }}>
-                        <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <TitleTypography>{route.title} </TitleTypography>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                </Link>
+              {option.routes.map((route) => (
+                <React.Fragment key={route.id}>
+                  {perms[route.perm] && (
+                    <Link href={route.url}>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon sx={{ pl: 3 }}>
+                            <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <TitleTypography>{route.title} </TitleTypography>
+                            }
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    </Link>
+                  )}
+                </React.Fragment>
               ))}
             </List>
           </Collapse>

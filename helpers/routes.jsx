@@ -148,7 +148,7 @@ export const ROUTES = [
         id: 4,
         title: "Pré-contratos",
         url: "/relatorios/pre-contratos",
-        perm: "",
+        perm: "app_relatorio_pre_contratos",
       },
     ],
     icon: <SubjectIcon />,

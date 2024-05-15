@@ -27,6 +27,7 @@ import CustomTextField from "@/components/CustomTextField";
 import LockPersonIcon from "@mui/icons-material/LockPerson";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
 
 //Rotas da aplicacao
 import { ROUTES } from "@/helpers/routes";
@@ -41,28 +42,33 @@ export default function Usuarios() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
+  //Estados para a atualização
   const [userSelected, setUserSelected] = useState({
     user_id: "",
-    is_active: "",
+    is_active: false,
+    perms: {},
   });
-
-  const [permissions, setPermissions] = useState({});
-  console.log("userSelected: ", userSelected);
-  console.log("permissions: ", permissions);
 
   const handleModal = () => setOpen((open) => !open);
 
   const handleModalDetailsUser = (user) => {
-    setUserSelected({ user_id: user.id, is_active: user.is_active });
+    setUserSelected({
+      user_id: user.id,
+      is_active: user.is_active,
+      perms: user.perms,
+    });
     if (openDetailsUser == true) {
-      setPermissions({});
-      setUserSelected("");
+      setUserSelected({
+        user_id: "",
+        is_active: false,
+        perms: {},
+      });
     }
     setOpenDetailsUser((openDetailsUser) => !openDetailsUser);
   };
 
   useEffect(() => {
-    if (session?.user?.token) {
+    if (session?.user) {
       getAllData();
     }
   }, [session?.user]);
@@ -125,7 +131,7 @@ export default function Usuarios() {
     const payload = {
       user_id: userSelected.user_id,
       is_active: userSelected.is_active,
-      permissions: permissions,
+      permissions: userSelected?.perms,
     };
 
     return payload;
@@ -165,10 +171,20 @@ export default function Usuarios() {
     handleModal();
   }
 
-  const handleCheckboxChange = (perm) => {
-    setPermissions((prevPermissions) => ({
+  const handleCheckBoxPermission = (perm) => {
+    setUserSelected((prevPermissions) => ({
       ...prevPermissions,
-      [`${perm}`]: !prevPermissions[`${perm}`],
+      perms: {
+        ...prevPermissions.perms,
+        [`${perm}`]: !prevPermissions.perms[perm],
+      },
+    }));
+  };
+
+  const handleActiveUserSwitch = (event) => {
+    setUserSelected((prevState) => ({
+      ...prevState,
+      is_active: event.target.checked,
     }));
   };
 
@@ -203,8 +219,13 @@ export default function Usuarios() {
 
         <FormGroup>
           <FormControlLabel
-            control={<Switch defaultChecked />}
-            label="Ativo/Inativo"
+            control={
+              <Switch
+                checked={userSelected.is_active}
+                onChange={handleActiveUserSwitch}
+              />
+            }
+            label={userSelected.is_active ? "Ativo" : "Inativo"}
           />
         </FormGroup>
 
@@ -222,28 +243,32 @@ export default function Usuarios() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      checked={permissions[`${url.perm}`] || false}
-                      onChange={() => handleCheckboxChange(url.perm)}
+                      //checked={userSelected?.perms[url?.perm] ? true : false}
+                      // checked={permissions[`${url.perm}`] || false}
+
+                      checked={userSelected?.perms[url?.perm] ? true : false}
+                      onChange={() => handleCheckBoxPermission(url?.perm)}
                     />
                   }
-                  label={url.title}
-                  key={url.id}
+                  label={url?.title}
+                  key={url?.id}
                 />
               ))}
             </FormGroup>
           </React.Fragment>
         ))}
 
-        <Button
+        <LoadingButton
           disableElevation
           variant="contained"
           endIcon={<SaveIcon />}
           fullWidth
           sx={{ mt: 2 }}
           onClick={updatePerms}
+          loading={loading}
         >
           Salvar
-        </Button>
+        </LoadingButton>
       </ModalCreateUser>
 
       <ModalCreateUser open={open} setOpen={setOpen}>
@@ -334,7 +359,7 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
             fontSize: "16px",
           }}
         >
-          Nome: {user?.username}
+          {user?.id} Nome: {user?.username}
         </Typography>
       </Box>
 
@@ -365,7 +390,6 @@ function ModalCreateUser({ open, setOpen, children }) {
       aria-labelledby="transition-modal-title"
       aria-describedby="transition-modal-description"
       open={open}
-      onClose={handleClose}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
@@ -377,7 +401,7 @@ function ModalCreateUser({ open, setOpen, children }) {
       <Fade in={open}>
         <Box
           sx={{
-            position: "absolute",
+            position: "relative",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
@@ -391,6 +415,13 @@ function ModalCreateUser({ open, setOpen, children }) {
             overflowY: "auto",
           }}
         >
+          <IconButton
+            color="error"
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 15, right: 15 }}
+          >
+            <CloseIcon />
+          </IconButton>
           {children}
         </Box>
       </Fade>
