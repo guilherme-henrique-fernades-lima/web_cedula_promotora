@@ -41,10 +41,23 @@ export default function Usuarios() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
+  const [userSelected, setUserSelected] = useState({
+    user_id: "",
+    is_active: "",
+  });
+
+  const [permissions, setPermissions] = useState({});
+  console.log("userSelected: ", userSelected);
+  console.log("permissions: ", permissions);
+
   const handleModal = () => setOpen((open) => !open);
 
   const handleModalDetailsUser = (user) => {
-    console.log(user);
+    setUserSelected({ user_id: user.id, is_active: user.is_active });
+    if (openDetailsUser == true) {
+      setPermissions({});
+      setUserSelected("");
+    }
     setOpenDetailsUser((openDetailsUser) => !openDetailsUser);
   };
 
@@ -108,11 +121,56 @@ export default function Usuarios() {
     }
   }
 
+  function getPayloadPermsUpdate() {
+    const payload = {
+      user_id: userSelected.user_id,
+      is_active: userSelected.is_active,
+      permissions: permissions,
+    };
+
+    return payload;
+  }
+
+  async function updatePerms() {
+    try {
+      setLoading(true);
+      const payload = getPayloadPermsUpdate();
+      console.log(payload);
+
+      const response = await fetch("/api/acessos/permissoes/", {
+        method: "POST",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        toast.success("Atualizado com sucesso!");
+        //clearStatesAndErrors();
+        setLoading(false);
+        getAllData();
+      } else {
+        toast.error("Erro");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   function clearStatesAndErrors() {
     setUsername("");
     setEmail("");
     handleModal();
   }
+
+  const handleCheckboxChange = (perm) => {
+    setPermissions((prevPermissions) => ({
+      ...prevPermissions,
+      [`${perm}`]: !prevPermissions[`${perm}`],
+    }));
+  };
 
   return (
     <ContentWrapper title="Controle de usuários">
@@ -162,7 +220,12 @@ export default function Usuarios() {
             <FormGroup>
               {route?.routes?.map((url) => (
                 <FormControlLabel
-                  control={<Checkbox />}
+                  control={
+                    <Checkbox
+                      checked={permissions[`${url.perm}`] || false}
+                      onChange={() => handleCheckboxChange(url.perm)}
+                    />
+                  }
                   label={url.title}
                   key={url.id}
                 />
@@ -177,7 +240,7 @@ export default function Usuarios() {
           endIcon={<SaveIcon />}
           fullWidth
           sx={{ mt: 2 }}
-          onClick={() => {}}
+          onClick={updatePerms}
         >
           Salvar
         </Button>

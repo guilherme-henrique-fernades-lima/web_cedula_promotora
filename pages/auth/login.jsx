@@ -46,7 +46,7 @@ export default function SingIn() {
       });
 
       if (result?.ok) {
-        router.push("/relatorios/emprestimos");
+        router.push("/");
       } else {
         console.log("error: ", result.error);
         setLoginError(true);
