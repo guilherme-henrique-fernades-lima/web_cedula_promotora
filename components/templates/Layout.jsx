@@ -21,13 +21,9 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
 import Tooltip from "@mui/material/Tooltip";
-import EditIcon from "@mui/icons-material/Edit";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import ArchiveIcon from "@mui/icons-material/Archive";
-import FileCopyIcon from "@mui/icons-material/FileCopy";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 //Icons
@@ -37,8 +33,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LockResetIcon from "@mui/icons-material/LockReset";
 
 import { ROUTES } from "@/helpers/routes";
+
+import { ProtectedRoute } from "@/components/templates/ProtectedRoute";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
@@ -130,11 +129,13 @@ export default function Layout({ children }) {
           </Drawer>
           <Main open={open}>
             <DrawerHeader />
-            {children}
+            <ProtectedRoute perms={session?.user?.perms}>
+              {children}
+            </ProtectedRoute>
           </Main>
         </Box>
       ) : (
-        <>{children}</>
+        <ProtectedRoute>{children}</ProtectedRoute>
       )}
     </>
   );
@@ -396,10 +397,12 @@ function DropdownMenu({ username }) {
         onClose={handleClose}
       >
         <MenuItem onClick={handleClose}>
-          <EditIcon />
+          <LockResetIcon />
           Alterar senha
         </MenuItem>
       </StyledMenu>
     </div>
   );
 }
+
+function ModalChangePassword() {}

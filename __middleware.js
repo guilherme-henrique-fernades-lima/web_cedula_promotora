@@ -14,11 +14,7 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ req, token }) => {
-        if (!token?.user) {
-          return false;
-        }
-      },
+      authorized: ({ req, token }) => {},
     },
     pages: {
       signIn: "/auth/login",
