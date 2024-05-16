@@ -141,7 +141,6 @@ export default function Usuarios() {
     try {
       setLoading(true);
       const payload = getPayloadPermsUpdate();
-      console.log(payload);
 
       const response = await fetch("/api/acessos/permissoes/", {
         method: "POST",
@@ -231,11 +230,25 @@ export default function Usuarios() {
 
         {ROUTES?.map((route) => (
           <React.Fragment key={route.id}>
-            <Typography sx={{ fontWeight: 700, mb: 1 }}>
-              {route.title}
-            </Typography>
+            <FormGroup sx={{ mt: 1 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={userSelected?.perms[route?.perm] ? true : false}
+                    onChange={() => handleCheckBoxPermission(route?.perm)}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontWeight: 700 }}>
+                    {route?.title.toUpperCase()}
+                  </Typography>
+                }
+                key={route?.id}
+              />
+            </FormGroup>
+
             <Box
-              sx={{ borderTop: "1px solid #ccc", width: "100%", mb: 1, mt: -1 }}
+              sx={{ borderTop: "1px solid #ccc", width: "100%", mb: 2, mt: -1 }}
             />
 
             <FormGroup>
@@ -243,9 +256,6 @@ export default function Usuarios() {
                 <FormControlLabel
                   control={
                     <Checkbox
-                      //checked={userSelected?.perms[url?.perm] ? true : false}
-                      // checked={permissions[`${url.perm}`] || false}
-
                       checked={userSelected?.perms[url?.perm] ? true : false}
                       onChange={() => handleCheckBoxPermission(url?.perm)}
                     />

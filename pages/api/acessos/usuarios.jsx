@@ -46,8 +46,6 @@ async function update(req, res) {
 async function list(req, res) {
   const token = req.headers.authorization;
 
-  const ativas = req.query.ativas ?? "";
-
   const result = await fetch(`${process.env.NEXT_INTEGRATION_URL}/auth/users`, {
     method: "GET",
     headers: {

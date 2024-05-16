@@ -218,47 +218,49 @@ function MenuOptions({ perms }) {
     <List>
       {ROUTES.map((option, index) => (
         <React.Fragment key={option.id}>
-          <ListItem
-            disablePadding
-            onClick={() => handleDropdownToggle(index)}
-            sx={{
-              transition: "all 0.3s ease",
-              backgroundColor:
-                dropDownOption === index ? "#1a3d74" : "transparent",
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{ color: dropDownOption === index ? "#fff" : "#747474" }}
-              >
-                {option.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Typography
-                    variant="span"
-                    component="span"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                      color: dropDownOption === index ? "#fff" : "#212121",
-                    }}
-                  >
-                    {option.title}
-                  </Typography>
-                }
-              />
-              <ExpandLess
-                sx={{
-                  fontSize: "20px",
-                  transition: "all 0.3s ease",
-                  transform:
-                    dropDownOption === index ? "rotate(180deg)" : "none",
-                  color: dropDownOption === index ? "#fff" : "#212121",
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
+          {perms[option?.perm] && (
+            <ListItem
+              disablePadding
+              onClick={() => handleDropdownToggle(index)}
+              sx={{
+                transition: "all 0.3s ease",
+                backgroundColor:
+                  dropDownOption === index ? "#1a3d74" : "transparent",
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon
+                  sx={{ color: dropDownOption === index ? "#fff" : "#747474" }}
+                >
+                  {option.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      variant="span"
+                      component="span"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                        color: dropDownOption === index ? "#fff" : "#212121",
+                      }}
+                    >
+                      {option.title}
+                    </Typography>
+                  }
+                />
+                <ExpandLess
+                  sx={{
+                    fontSize: "20px",
+                    transition: "all 0.3s ease",
+                    transform:
+                      dropDownOption === index ? "rotate(180deg)" : "none",
+                    color: dropDownOption === index ? "#fff" : "#212121",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
 
           <Collapse in={dropDownOption === index} timeout="auto" unmountOnExit>
             <List component="nav" disablePadding>
