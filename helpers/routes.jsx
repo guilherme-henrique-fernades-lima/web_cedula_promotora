@@ -5,7 +5,7 @@ import EqualizerIcon from "@mui/icons-material/Equalizer";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
-export const ROUTES = [
+const ROUTES = [
   {
     id: 1,
     title: "Acessos",
@@ -155,3 +155,18 @@ export const ROUTES = [
     perm: "menu_relatorios",
   },
 ];
+
+function permsApps(array) {
+  var perms = {};
+  for (var i = 0; i < array.length; i = i + 1) {
+    for (var j = 0; j < array[i].routes.length; j = j + 1) {
+      perms[array[i].routes[j].url] = array[i].routes[j].perm;
+    }
+  }
+
+  return perms;
+}
+
+const rotas = permsApps(ROUTES);
+
+export { ROUTES, rotas };
