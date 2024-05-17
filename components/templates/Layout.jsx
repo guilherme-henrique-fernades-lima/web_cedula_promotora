@@ -4,6 +4,7 @@ import Image from "next/image";
 
 //Third party libraries
 import { useSession, signOut } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
 
 //Mui components
 import { styled, alpha } from "@mui/material/styles";
@@ -25,6 +26,11 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Backdrop from "@mui/material/Backdrop";
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import LoadingButton from "@mui/lab/LoadingButton";
+import InputAdornment from "@mui/material/InputAdornment";
 
 //Icons
 import MenuIcon from "@mui/icons-material/Menu";
@@ -34,15 +40,21 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LockResetIcon from "@mui/icons-material/LockReset";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+//Custom components
 import { ROUTES } from "@/helpers/routes";
-
 import { ProtectedRoute } from "@/components/templates/ProtectedRoute";
+import CustomTextField from "@/components/CustomTextField";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
 
   const [open, setOpen] = useState(false);
+  const [openModalResetPassword, setOpenModalResetPassword] = useState(false);
 
   const handleDrawerCloseOpen = () => {
     setOpen((open) => !open);
@@ -57,6 +69,11 @@ export default function Layout({ children }) {
       return l.toUpperCase();
     });
   }
+
+  const handleModalResetPassword = () =>
+    setOpenModalResetPassword(
+      (openModalResetPassword) => !openModalResetPassword
+    );
 
   return (
     <>
@@ -84,29 +101,12 @@ export default function Layout({ children }) {
                 justifyContent: "center",
               }}
             >
-              {/* <Typography
-                variant="span"
-                component="span"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                  color: "#fff",
-                  mr: 1,
-                }}
-              >
-                {capitalizarPrimeirasLetras(session?.user.username)}
-              </Typography> */}
-
               <DropdownMenu
                 username={capitalizarPrimeirasLetras(session?.user.username)}
+                handleOpenModal={handleModalResetPassword}
+                handleLogout={handleLogout}
               />
-              <AccountCircleIcon sx={{ width: 44, height: 44 }} />
-
-              <Tooltip title="Sair" placement="bottom">
-                <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-                  <LogoutIcon sx={{ color: "#fff" }} />
-                </IconButton>
-              </Tooltip>
+              {/* <AccountCircleIcon sx={{ width: 44, height: 44 }} /> */}
             </Box>
           </AppBar>
           <Drawer
@@ -137,6 +137,17 @@ export default function Layout({ children }) {
       ) : (
         <ProtectedRoute>{children}</ProtectedRoute>
       )}
+
+      <ModalChangePassword
+        open={openModalResetPassword}
+        setOpen={handleModalResetPassword}
+      >
+        <ChangePasswordForm
+          user_id={session?.user?.id}
+          token={session?.user?.token}
+        />
+      </ModalChangePassword>
+      <Toaster position="bottom-center" reverseOrder={true} />
     </>
   );
 }
@@ -224,13 +235,15 @@ function LogoCedulaPromotora() {
         flexDirection: "column",
       }}
     >
-      <Image
-        src="/img/logotipo.png"
-        width={160}
-        height={56}
-        alt="Logo da Cédula Promotora"
-        priority
-      />
+      <Link href="/">
+        <Image
+          src="/img/logotipo.png"
+          width={160}
+          height={56}
+          alt="Logo da Cédula Promotora"
+          priority
+        />
+      </Link>
     </Box>
   );
 }
@@ -363,7 +376,7 @@ const StyledMenu = styled((props) => (
   },
 }));
 
-function DropdownMenu({ username }) {
+function DropdownMenu({ username, handleOpenModal, handleLogout }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -384,6 +397,7 @@ function DropdownMenu({ username }) {
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
+        sx={{ mr: 3 }}
       >
         {username}
       </Button>
@@ -396,13 +410,200 @@ function DropdownMenu({ username }) {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem
+          onClick={() => {
+            handleOpenModal();
+            handleClose();
+          }}
+        >
           <LockResetIcon />
           Alterar senha
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <LogoutIcon />
+          Sair
         </MenuItem>
       </StyledMenu>
     </div>
   );
 }
 
-function ModalChangePassword() {}
+function ModalChangePassword({ open, setOpen, children }) {
+  const handleClose = () => setOpen(false);
+
+  return (
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      open={open}
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 500,
+        },
+      }}
+    >
+      <Fade in={open}>
+        <Box
+          sx={{
+            position: "relative",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            maxWidth: 420,
+            //height: "100%",
+            maxHeight: 420,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 2,
+            overflowY: "auto",
+          }}
+        >
+          <IconButton
+            color="error"
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 15, right: 15 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          {children}
+        </Box>
+      </Fade>
+    </Modal>
+  );
+}
+
+function ChangePasswordForm({ user_id, token }) {
+  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+
+  const handleClickShowPassword = (passwordField) => {
+    if (passwordField === "password") {
+      setShowPassword((showPassword) => !showPassword);
+    } else {
+      setShowNewPassword((showNewPassword) => !showNewPassword);
+    }
+  };
+
+  function clearStatesAndErrors() {
+    setPassword("");
+    setNewPassword("");
+  }
+
+  async function alterarSenha() {
+    try {
+      setLoading(true);
+
+      const payload = {
+        user_id: user_id,
+        password: password,
+        newPassword: newPassword,
+      };
+
+      const response = await fetch("/api/acessos/change-password", {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        toast.success("Alterado com sucesso!");
+        clearStatesAndErrors();
+        setLoading(false);
+      } else {
+        toast.error("Erro ao alterar");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+    >
+      <Typography
+        sx={{ fontWeight: 700, mb: 2, textAlign: "left", width: "100%" }}
+      >
+        Alterar a senha
+      </Typography>
+
+      <Box sx={{ mt: 2 }} />
+
+      <CustomTextField
+        value={password}
+        setValue={setPassword}
+        label="Nova senha"
+        placeholder="Insira a nova senha"
+        // numbersNotAllowed
+        //helperText="O nome de usuário é obrigatório"
+        //validateFieldName={}
+        //errorFlag={}
+        //maskFieldFlag={}
+        type={showPassword ? "text" : "password"}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={() => handleClickShowPassword("password")}
+                size="small"
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <Box sx={{ mt: 2 }} />
+
+      <CustomTextField
+        value={newPassword}
+        setValue={setNewPassword}
+        label="Repita a senha"
+        placeholder="Repita a senha"
+        // numbersNotAllowed
+        //helperText="O nome de usuário é obrigatório"
+        //validateFieldName={}
+        //errorFlag={}
+        //maskFieldFlag={}
+        type={showNewPassword ? "text" : "password"}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleClickShowPassword} size="small">
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <LoadingButton
+        //type="submit"
+        variant="contained"
+        endIcon={<SaveIcon />}
+        disableElevation
+        loading={loading}
+        fullWidth
+        onClick={alterarSenha}
+        sx={{ mt: 2 }}
+      >
+        ALTERAR
+      </LoadingButton>
+    </Box>
+  );
+}

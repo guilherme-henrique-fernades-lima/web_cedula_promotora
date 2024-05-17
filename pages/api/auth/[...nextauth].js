@@ -44,6 +44,7 @@ export const authOptions = {
       session.user.token = token.user.token;
       session.user.perms = token.user.perms;
       session.user.id = token.user.id;
+      session.user.is_superuser = token.user.is_superuser;
 
       return session;
     },

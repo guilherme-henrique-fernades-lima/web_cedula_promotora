@@ -19,6 +19,8 @@ export function ProtectedRoute({ children, perms }) {
     if (perms && pathname) {
       const isAllowed = perms[rotas[pathname]] ? true : false;
       setAllowPage(isAllowed);
+    } else {
+      setAllowPage(true);
     }
   }, [perms, pathname]);
 
