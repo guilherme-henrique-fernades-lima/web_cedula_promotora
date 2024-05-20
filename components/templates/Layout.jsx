@@ -5,6 +5,8 @@ import Image from "next/image";
 //Third party libraries
 import { useSession, signOut } from "next-auth/react";
 import toast, { Toaster } from "react-hot-toast";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 //Mui components
 import { styled, alpha } from "@mui/material/styles";
@@ -21,7 +23,6 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
-import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -49,6 +50,9 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { ROUTES } from "@/helpers/routes";
 import { ProtectedRoute } from "@/components/templates/ProtectedRoute";
 import CustomTextField from "@/components/CustomTextField";
+
+//Schema
+import { resetPassword } from "@/schemas/resetPassword";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
@@ -476,23 +480,33 @@ function ModalChangePassword({ open, setOpen, children }) {
 }
 
 function ChangePasswordForm({ user_id, token }) {
-  const [password, setPassword] = useState("");
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(resetPassword),
+  });
+
   const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const handleClickShowPassword = (passwordField) => {
-    if (passwordField === "password") {
-      setShowPassword((showPassword) => !showPassword);
+    if (passwordField === "newPassword") {
+      setShowNewPassword((showPassword) => !showPassword);
     } else {
-      setShowNewPassword((showNewPassword) => !showNewPassword);
+      setShowConfirmNewPassword((showNewPassword) => !showNewPassword);
     }
   };
 
   function clearStatesAndErrors() {
-    setPassword("");
+    reset();
     setNewPassword("");
+    setConfirmNewPassword("");
   }
 
   async function alterarSenha() {
@@ -501,8 +515,7 @@ function ChangePasswordForm({ user_id, token }) {
 
       const payload = {
         user_id: user_id,
-        password: password,
-        newPassword: newPassword,
+        password: newPassword,
       };
 
       const response = await fetch("/api/acessos/change-password", {
@@ -528,6 +541,8 @@ function ChangePasswordForm({ user_id, token }) {
 
   return (
     <Box
+      component="form"
+      onSubmit={handleSubmit(alterarSenha)}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -544,24 +559,21 @@ function ChangePasswordForm({ user_id, token }) {
       <Box sx={{ mt: 2 }} />
 
       <CustomTextField
-        value={password}
-        setValue={setPassword}
+        value={newPassword}
+        setValue={setNewPassword}
         label="Nova senha"
         placeholder="Insira a nova senha"
-        // numbersNotAllowed
-        //helperText="O nome de usuário é obrigatório"
-        //validateFieldName={}
-        //errorFlag={}
-        //maskFieldFlag={}
-        type={showPassword ? "text" : "password"}
+        validateFieldName="newPassword"
+        type={showNewPassword ? "text" : "password"}
+        control={control}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <IconButton
-                onClick={() => handleClickShowPassword("password")}
+                onClick={() => handleClickShowPassword("newPassword")}
                 size="small"
               >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           ),
@@ -571,21 +583,18 @@ function ChangePasswordForm({ user_id, token }) {
       <Box sx={{ mt: 2 }} />
 
       <CustomTextField
-        value={newPassword}
-        setValue={setNewPassword}
+        value={confirmNewPassword}
+        setValue={setConfirmNewPassword}
         label="Repita a senha"
         placeholder="Repita a senha"
-        // numbersNotAllowed
-        //helperText="O nome de usuário é obrigatório"
-        //validateFieldName={}
-        //errorFlag={}
-        //maskFieldFlag={}
-        type={showNewPassword ? "text" : "password"}
+        validateFieldName="confirmNewPassword"
+        type={showConfirmNewPassword ? "text" : "password"}
+        control={control}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
               <IconButton onClick={handleClickShowPassword} size="small">
-                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </InputAdornment>
           ),
@@ -593,13 +602,13 @@ function ChangePasswordForm({ user_id, token }) {
       />
 
       <LoadingButton
-        //type="submit"
+        type="submit"
         variant="contained"
         endIcon={<SaveIcon />}
         disableElevation
         loading={loading}
         fullWidth
-        onClick={alterarSenha}
+        //onClick={alterarSenha}
         sx={{ mt: 2 }}
       >
         ALTERAR
