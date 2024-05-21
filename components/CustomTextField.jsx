@@ -13,12 +13,15 @@ export default function CustomTextField({
   validateFieldName,
   maskFieldFlag,
   numbersNotAllowed,
+  onlyNumbers,
   control,
   ...props
 }) {
   const handleChange = (e) => {
     if (numbersNotAllowed) {
       setValue(e.target.value.replace(/[^A-Za-z\s]/g, ""));
+    } else if (onlyNumbers) {
+      setValue(e.target.value.replace(/[^0-9]/g, ""));
     } else {
       setValue(e.target.value);
     }

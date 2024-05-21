@@ -60,9 +60,9 @@ export default function CadastrarContrato(props) {
   const [loadingButton, setLoadingButton] = useState(false);
 
   const [id, setId] = useState("");
+  const [nr_contrato, setNrContrato] = useState("");
   const [promotora, setPromotora] = useState("");
   const [dt_digitacao, setDtDigitacao] = useState(null);
-  const [nr_contrato, setNrContrato] = useState("");
   const [no_cliente, setNoCliente] = useState("");
   const [cpf, setCpf] = useState("");
   const [convenio, setConvenio] = useState("");
