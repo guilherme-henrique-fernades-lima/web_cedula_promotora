@@ -1,14 +1,14 @@
 import * as yup from "yup";
 
 export const preContratoSchema = yup.object().shape({
-  // cpf: yup
-  //   .string()
-  //   .required("Informe um CPF válido")
-  //   .min(14, "O CPF precisa ter pelo menos 11 digitos"),
-  // vl_parcela: yup.string().required("Insira o valor da parcela"),
-  // vl_comissao: yup.string().required("Insira o valor da comissão"),
-  // porcentagem: yup.string().required("Insira a porcentagem"),
-
+  cpf: yup
+    .string()
+    .required("Informe um CPF válido")
+    .min(14, "O CPF precisa ter pelo menos 11 digitos"),
+  tabela: yup.string().required("Insira o nome da tabela"),
+  porcentagem: yup.string().required("Insira a porcentagem"),
+  vl_comissao: yup.string().required("Insira o valor da comissão"),
+  vl_parcela: yup.string().required("Insira o valor da parcela"),
   vl_contrato: yup.string().required("Insira o valor do contrato"),
   nr_contrato: yup.string().required("O número do contrato é obrigatório"),
   no_cliente: yup.string().required("Insira o nome do cliente"),

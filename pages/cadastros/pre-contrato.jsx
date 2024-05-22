@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { NumericFormat } from "react-number-format";
+import InputMask from "react-input-mask";
+import moment from "moment";
 
 //Mui components
 import Grid from "@mui/material/Grid";
@@ -22,6 +24,7 @@ import MenuItem from "@mui/material/MenuItem";
 //Custom components
 import ContentWrapper from "@/components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
+import DatepickerField from "@/components/DatepickerField";
 
 //Schema
 import { preContratoSchema } from "@/schemas/preContratoSchema";
@@ -31,9 +34,17 @@ import SaveIcon from "@mui/icons-material/Save";
 
 export default function CadastrarPreContrato(props) {
   const { data: session } = useSession();
+  const {
+    register,
+    resetField,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(preContratoSchema),
+  });
 
   const [loadingButton, setLoadingButton] = useState(false);
-
   const [iletrado, setIletrado] = useState("");
   const [tipoContrato, setTipoContrato] = useState("");
   const [documentoSalvo, setDocumentoSalvo] = useState("");
@@ -42,12 +53,18 @@ export default function CadastrarPreContrato(props) {
   const [banco, setBanco] = useState("");
   const [corretor, setCorretor] = useState("");
   const [promotora, setPromotora] = useState("");
-
+  const [dt_digitacao, setDtDigitacao] = useState(null);
+  const [dt_pag_cliente, setDtPagCliente] = useState(null);
+  const [dt_pag_comissao, setDtPagComissao] = useState(null);
   const [nr_contrato, setNrContrato] = useState("");
   const [no_cliente, setNoCliente] = useState("");
+  const [cpf, setCpf] = useState("");
   const [vl_contrato, setVlContrato] = useState("");
   const [qt_parcelas, setQtParcelas] = useState("");
-
+  const [vl_parcela, setVlParcela] = useState("");
+  const [tabela, setTabela] = useState("");
+  const [vl_comissao, setVlComissao] = useState("");
+  const [porcentagem, setPorcentagem] = useState("");
   //const [statusComissao, setStatusComissao] = useState("");
   //States dos dados dos picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
@@ -55,23 +72,6 @@ export default function CadastrarPreContrato(props) {
   const [bancoPicklist, setBancoPicklist] = useState([]);
   const [corretorPicklist, setCorretorPicklist] = useState([]);
   const [promotoraPicklist, setPromotoraPicklist] = useState([]);
-
-  const payload = {
-    iletrado: iletrado,
-    tipoContrato: tipoContrato,
-    documentoSalvo: documentoSalvo,
-    convenio: convenio,
-    operacao: operacao,
-    banco: banco,
-    corretor: corretor,
-    promotora: promotora,
-    user_id_created: session?.user?.id,
-    nr_contrato: nr_contrato,
-    no_cliente: no_cliente,
-    vl_contrato: vl_contrato,
-  };
-
-  console.log(payload);
 
   useEffect(() => {
     if (session?.user?.token) {
@@ -83,27 +83,63 @@ export default function CadastrarPreContrato(props) {
     }
   }, [session?.user?.token]);
 
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
-    resolver: yupResolver(preContratoSchema),
-    defaultValues: {
-      iletrado: "nao", // Provide a default value for iletrado
-    },
-  });
-
-  const onSubmit = (data) => {
-    const payload = {
+  function getPayload() {
+    const data = {
+      promotora: promotora,
+      dt_digitacao: dt_digitacao
+        ? moment(dt_digitacao).format("YYYY-MM-DD")
+        : null,
+      nr_contrato: nr_contrato,
+      no_cliente: no_cliente.toUpperCase(),
+      cpf: cpf,
+      convenio: convenio,
+      tabela: tabela,
+      operacao: operacao,
+      banco: banco,
+      vl_contrato: parseFloat(vl_contrato),
+      qt_parcelas: qt_parcelas,
+      vl_parcela: parseFloat(vl_parcela),
+      dt_pag_cliente: dt_pag_cliente
+        ? moment(dt_pag_cliente).format("YYYY-MM-DD")
+        : null,
+      dt_pag_comissao: dt_pag_comissao
+        ? moment(dt_pag_comissao).format("YYYY-MM-DD")
+        : null,
+      vl_comissao: parseFloat(vl_comissao),
+      porcentagem: parseFloat(porcentagem),
+      corretor: corretor,
+      user_id_created: session?.user?.id,
       iletrado: iletrado,
       tipo_contrato: tipoContrato,
       documento_salvo: documentoSalvo,
     };
 
-    console.log(payload);
-  };
+    return data;
+  }
+
+  async function save() {
+    setLoadingButton(true);
+    const payload = getPayload();
+
+    const response = await fetch("/api/cadastros/pre-contrato", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Cadastrado com sucesso!");
+      //clearStatesAndErrors();
+    } else {
+      toast.error("Erro ao cadastrar");
+    }
+
+    setLoadingButton(false);
+  }
+
+  function clearStatesAndErrors() {}
 
   async function getConveniosPicklist() {
     try {
@@ -210,6 +246,30 @@ export default function CadastrarPreContrato(props) {
     }
   }
 
+  async function getCliente(cpfSearch) {
+    const response = await fetch(
+      `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const json = await response.json();
+      setNoCliente(json.nome);
+      setValue("no_cliente", json.nome);
+    } else {
+      setNoCliente("");
+      resetField("no_cliente");
+      toast.error(
+        "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+      );
+    }
+  }
+
   return (
     <ContentWrapper title="Cadastrar pré-contrato">
       <Toaster position="bottom-center" reverseOrder={true} />
@@ -219,8 +279,32 @@ export default function CadastrarPreContrato(props) {
         spacing={2}
         sx={{ mt: 1 }}
         component="form"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(save)}
       >
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de digitação"
+            value={dt_digitacao}
+            onChange={setDtDigitacao}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de pagamento ao cliente"
+            value={dt_pag_cliente}
+            onChange={setDtPagCliente}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de pagamento comissão"
+            value={dt_pag_comissao}
+            onChange={setDtPagComissao}
+          />
+        </Grid>
+
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <CustomTextField
             value={nr_contrato}
@@ -231,6 +315,53 @@ export default function CadastrarPreContrato(props) {
             control={control}
             onlyNumbers
           />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <CustomTextField
+            value={tabela}
+            setValue={setTabela}
+            label="Tabela"
+            placeholder="Insira o nome da tabela"
+            validateFieldName="tabela"
+            control={control}
+            onlyNumbers
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <InputMask
+            {...register("cpf")}
+            error={Boolean(errors.cpf)}
+            mask="999.999.999-99"
+            maskChar={null}
+            value={cpf}
+            onChange={(e) => {
+              setCpf(e.target.value);
+
+              if (e.target.value?.length === 14) {
+                getCliente(e.target.value);
+              }
+            }}
+          >
+            {(inputProps) => (
+              <TextField
+                {...inputProps}
+                variant="outlined"
+                size="small"
+                fullWidth
+                label="CPF"
+                placeholder="000.000.000-000"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+              />
+            )}
+          </InputMask>
+          <Typography
+            sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
+          >
+            {errors.cpf?.message}
+          </Typography>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -292,6 +423,114 @@ export default function CadastrarPreContrato(props) {
             onlyNumbers
             inputProps={{ maxLength: 5 }}
           />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <Controller
+            name="vl_parcela"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <NumericFormat
+                {...field}
+                customInput={TextField}
+                thousandSeparator="."
+                decimalSeparator=","
+                decimalScale={2}
+                fixedDecimalScale={true}
+                prefix="R$ "
+                onValueChange={(values) => {
+                  setVlParcela(values?.floatValue);
+                }}
+                error={Boolean(errors.vl_parcela)}
+                size="small"
+                label="Valor da parcela"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                inputProps={{ maxLength: 16 }}
+              />
+            )}
+          />
+
+          <Typography
+            sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
+          >
+            {errors.vl_parcela?.message}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <Controller
+            name="vl_comissao"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <NumericFormat
+                {...field}
+                customInput={TextField}
+                thousandSeparator="."
+                decimalSeparator=","
+                decimalScale={2}
+                fixedDecimalScale={true}
+                prefix="R$ "
+                onValueChange={(values) => {
+                  setVlComissao(values?.floatValue);
+                }}
+                error={Boolean(errors.vl_comissao)}
+                size="small"
+                label="Valor da comissão"
+                placeholder="R$ 0,00"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                inputProps={{ maxLength: 16 }}
+              />
+            )}
+          />
+          <Typography
+            sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
+          >
+            {errors.vl_comissao?.message}
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <Controller
+            name="porcentagem"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <NumericFormat
+                {...field}
+                customInput={TextField}
+                decimalScale={2}
+                fixedDecimalScale={true}
+                decimalSeparator=","
+                isNumericString
+                suffix="%"
+                allowEmptyFormatting
+                onValueChange={(values) => {
+                  setPorcentagem(values?.floatValue);
+                }}
+                //Aqui pra baixo textfield
+                error={Boolean(errors.porcentagem)}
+                size="small"
+                label="(%) Porcentagem"
+                placeholder="% de juros"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+                inputProps={{ maxLength: 16 }}
+              />
+            )}
+          />
+          <Typography
+            sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
+          >
+            {errors.porcentagem?.message}
+          </Typography>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -404,7 +643,9 @@ export default function CadastrarPreContrato(props) {
           </TextField>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <FormControl component="fieldset" error={Boolean(errors.iletrado)}>
             <FormLabel component="legend">Iletrado</FormLabel>
             <Controller
@@ -413,8 +654,8 @@ export default function CadastrarPreContrato(props) {
               render={({ field }) => (
                 <RadioGroup
                   {...field}
-                  value={iletrado}
                   row
+                  value={iletrado}
                   error={Boolean(errors.iletrado)}
                   onChange={(e) => {
                     field.onChange(e);
@@ -458,7 +699,7 @@ export default function CadastrarPreContrato(props) {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <FormControl
             component="fieldset"
             error={Boolean(errors.tipo_contrato)}
@@ -515,7 +756,7 @@ export default function CadastrarPreContrato(props) {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mt: 2 }}>
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <FormControl
             component="fieldset"
             error={Boolean(errors.documentacao_salva)}

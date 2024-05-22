@@ -6,18 +6,18 @@ import { ptBR } from "date-fns/locale";
 
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 
-export default function DatepickerField(props) {
+export default function DatepickerField({ label, value, onChange }) {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
       <DesktopDatePicker
         leftArrowButtonText="Mês anterior"
         rightArrowButtonText="Próximo mês"
-        label={props.textLabel}
+        label={label}
         onChange={(newValue) => {
-          props.onChange(newValue);
+          onChange(newValue);
         }}
         renderInput={(params) => (
-          <TextField {...params} fullWidth size="small" />
+          <TextField {...params} fullWidth size="small" autoComplete="off" />
         )}
         shouldDisableDate={(dateParam) => {
           // if (!props.value[1]) {
@@ -26,8 +26,7 @@ export default function DatepickerField(props) {
           //     return true;
           // }
         }}
-        value={props.value}
-        
+        value={value}
         disableHighlightToday
       />
     </LocalizationProvider>
