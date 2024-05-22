@@ -7,6 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { NumericFormat } from "react-number-format";
 import InputMask from "react-input-mask";
 import moment from "moment";
+import { useRouter } from "next/router";
 
 //Mui components
 import Grid from "@mui/material/Grid";
@@ -43,6 +44,15 @@ export default function CadastrarPreContrato(props) {
   } = useForm({
     resolver: yupResolver(preContratoSchema),
   });
+
+  const router = useRouter();
+  const { id } = router.query;
+
+  useEffect(() => {
+    if (id) {
+      retrievePreContrato(id);
+    }
+  }, [id]);
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [iletrado, setIletrado] = useState("");
@@ -109,9 +119,9 @@ export default function CadastrarPreContrato(props) {
       porcentagem: parseFloat(porcentagem),
       corretor: corretor,
       user_id_created: session?.user?.id,
-      iletrado: iletrado,
+      iletrado: Boolean(iletrado),
       tipo_contrato: tipoContrato,
-      documento_salvo: documentoSalvo,
+      documento_salvo: Boolean(documentoSalvo),
     };
 
     return data;
@@ -137,6 +147,24 @@ export default function CadastrarPreContrato(props) {
     }
 
     setLoadingButton(false);
+  }
+
+  async function retrievePreContrato(id) {
+    const response = await fetch(`/api/cadastros/pre-contrato/?id=${id}`, {
+      method: "GET",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+    });
+
+    console.log(response);
+
+    if (response.ok) {
+      const json = await response.json();
+      console.log(json);
+    } else {
+      // toast.error("Erro ao cadastrar");
+    }
   }
 
   function clearStatesAndErrors() {}
@@ -325,7 +353,6 @@ export default function CadastrarPreContrato(props) {
             placeholder="Insira o nome da tabela"
             validateFieldName="tabela"
             control={control}
-            onlyNumbers
           />
         </Grid>
 

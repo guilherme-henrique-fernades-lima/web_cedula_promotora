@@ -43,34 +43,35 @@ async function create(req, res) {
 //   return res.status(result.status).json(json);
 // }
 
-// async function list(req, res) {
-//   const token = req.headers.authorization;
+async function retrieve(req, res) {
+  const token = req.headers.authorization;
 
-//   const ativas = req.query.ativas ?? "";
+  const id = req.query.ativas ?? "";
 
-//   const result = await fetch(
-//     `${process.env.NEXT_INTEGRATION_URL}/resources/bancos/?ativas=${ativas}`,
-//     {
-//       method: "GET",
-//       headers: {
-//         "X-Requested-With": "XMLHttpRequest",
-//         "Content-Type": "application/json;charset=UTF-8",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     }
-//   );
+  const result = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/?id=${id}`,
+    {
+      method: "GET",
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
-//   const json = await result.json();
+  const json = await result.json();
 
-//   return res.status(result.status).json(json);
-// }
+  return res.status(result.status).json(json);
+}
 
 export default async function handler(req, res) {
   if (req.method == "POST") {
     create(req, res);
-    // } else if (req.method == "PUT") {
-    //   update(req, res);
-    // } else if (req.method == "GET") {
+  } else if (req.method == "GET") {
+    retrieve(req, res);
+
+    //  else if (req.method == "GET") {
     //   list(req, res);
   } else {
     res.status(405).send();
