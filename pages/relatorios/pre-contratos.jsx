@@ -35,6 +35,7 @@ import {
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 var DATA_HOJE = new Date();
 
@@ -120,6 +121,48 @@ export default function RelatorioPreContratos() {
     setIdPreContrato("");
   }
 
+  async function sendPreContrato(data) {
+    const payload = {
+      id: data.id,
+      promotora: data.promotora,
+      dt_digitacao: data.promotora,
+      nr_contrato: data.promotora,
+      no_cliente: data.promotora,
+      cpf: data.promotora,
+      convenio: data.promotora,
+      operacao: data.promotora,
+      banco: data.promotora,
+      vl_contrato: data.promotora,
+      qt_parcelas: data.promotora,
+      vl_parcela: data.promotora,
+      dt_pag_cliente: data.promotora,
+      porcentagem: data.promotora,
+      corretor: data.promotora,
+      contrato_criado: true,
+      // tabela: data.promotora, //Verificar
+      // tipo_contrato: data.promotora, //Verificar
+      // status_comissao: data.promotora, //Verificar
+      // iletrado: data.promotora, //Verificar
+      // documento_salvo: data.promotora, //Verificar
+    };
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/relatorios/pre-contratos`, {
+        method: "POST",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const columns = [
     {
       field: "id",
@@ -150,6 +193,16 @@ export default function RelatorioPreContratos() {
                 }}
               >
                 <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Transferir pré-contrato" placement="top">
+              <IconButton
+                color="success"
+                sx={{ ml: 1 }}
+                onClick={() => sendPreContrato(params.row)}
+              >
+                <FileUploadIcon />
               </IconButton>
             </Tooltip>
           </Stack>

@@ -3,7 +3,10 @@ import * as yup from "yup";
 export const contratoSchema = yup.object().shape({
   contrato: yup.string().required("O número do contrato é obrigatório"),
   promotora: yup.string().required("Selecione a promotora"),
-  no_cliente: yup.string().required("Insira o nome do cliente"),
+  no_cliente: yup
+    .string()
+    .required("Insira o nome do cliente")
+    .matches(/\S/, "O campo não pode conter apenas espaços em branco"),
   cpf: yup
     .string()
     .required("Informe um CPF válido")

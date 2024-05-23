@@ -27,16 +27,23 @@ import ContentWrapper from "@/components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
 import DatepickerField from "@/components/DatepickerField";
 
+//Utils
 import { formatarCPFSemAnonimidade } from "@/helpers/utils";
 
 //Schema
-import { preContratoSchema } from "@/schemas/preContratoSchema";
+import {
+  preContratoSchema,
+  updatePreContratoSchemaSuperUser,
+} from "@/schemas/preContratoSchema";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
-export default function CadastrarPreContrato(props) {
+export default function CadastrarPreContrato() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const { id } = router.query;
+
   const {
     register,
     setValue,
@@ -45,11 +52,12 @@ export default function CadastrarPreContrato(props) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(preContratoSchema),
+    resolver: yupResolver(
+      id && session?.user?.is_superuser
+        ? updatePreContratoSchemaSuperUser
+        : preContratoSchema
+    ),
   });
-
-  const router = useRouter();
-  const { id } = router.query;
 
   useEffect(() => {
     if (id) {
@@ -76,7 +84,8 @@ export default function CadastrarPreContrato(props) {
   const [vl_parcela, setVlParcela] = useState("");
   const [tabela, setTabela] = useState("");
   const [porcentagem, setPorcentagem] = useState("");
-  //const [statusComissao, setStatusComissao] = useState("");
+  const [statusComissao, setStatusComissao] = useState("");
+
   //States dos dados dos picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
   const [operacaoPicklist, setOperacaoPicklist] = useState([]);
@@ -94,7 +103,7 @@ export default function CadastrarPreContrato(props) {
     }
   }, [session?.user?.token]);
 
-  function getPayload() {
+  function getPayloadCadastrar() {
     const data = {
       promotora: promotora,
       dt_digitacao: dt_digitacao
@@ -124,9 +133,91 @@ export default function CadastrarPreContrato(props) {
     return data;
   }
 
-  async function save() {
+  function getPayloadUpdate(id, superuser) {
+    if (id && superuser) {
+      const data = {
+        promotora: promotora,
+        dt_digitacao: dt_digitacao
+          ? moment(dt_digitacao).format("YYYY-MM-DD")
+          : null,
+        nr_contrato: nr_contrato,
+        no_cliente: no_cliente.toUpperCase(),
+        cpf: cpf,
+        convenio: convenio,
+        tabela: tabela,
+        operacao: operacao,
+        banco: banco,
+        vl_contrato: parseFloat(vl_contrato),
+        qt_parcelas: qt_parcelas,
+        vl_parcela: parseFloat(vl_parcela),
+        dt_pag_cliente: dt_pag_cliente
+          ? moment(dt_pag_cliente).format("YYYY-MM-DD")
+          : null,
+        porcentagem: parseFloat(porcentagem),
+        corretor: corretor,
+        user_id_created: session?.user?.id,
+        iletrado: Boolean(iletrado),
+        tipo_contrato: tipoContrato,
+        documento_salvo: Boolean(documentoSalvo),
+        status_comissao: statusComissao,
+      };
+    } else {
+      const data = {
+        promotora: promotora,
+        dt_digitacao: dt_digitacao
+          ? moment(dt_digitacao).format("YYYY-MM-DD")
+          : null,
+        nr_contrato: nr_contrato,
+        no_cliente: no_cliente.toUpperCase(),
+        cpf: cpf,
+        convenio: convenio,
+        tabela: tabela,
+        operacao: operacao,
+        banco: banco,
+        vl_contrato: parseFloat(vl_contrato),
+        qt_parcelas: qt_parcelas,
+        vl_parcela: parseFloat(vl_parcela),
+        dt_pag_cliente: dt_pag_cliente
+          ? moment(dt_pag_cliente).format("YYYY-MM-DD")
+          : null,
+        porcentagem: parseFloat(porcentagem),
+        corretor: corretor,
+        user_id_created: session?.user?.id,
+        iletrado: Boolean(iletrado),
+        tipo_contrato: tipoContrato,
+        documento_salvo: Boolean(documentoSalvo),
+      };
+    }
+
+    return data;
+  }
+
+  async function updatePreContrato() {
+    console.log("Entrou no update");
     setLoadingButton(true);
-    const payload = getPayload();
+    const payload = getPayloadUpdate(id, session?.user?.is_superuser);
+
+    const response = await fetch(`/api/cadastros/pre-contrato/?id=${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Operação realizada com sucesso");
+    } else {
+      toast.error("Erro na operação");
+    }
+
+    setLoadingButton(false);
+  }
+
+  async function save() {
+    console.log("Entrou no save");
+    setLoadingButton(true);
+    const payload = getPayloadCadastrar();
 
     const response = await fetch("/api/cadastros/pre-contrato", {
       method: "POST",
@@ -137,10 +228,10 @@ export default function CadastrarPreContrato(props) {
     });
 
     if (response.ok) {
-      toast.success("Cadastrado com sucesso!");
+      toast.success("Operação realizada com sucesso");
       //clearStatesAndErrors();
     } else {
-      toast.error("Erro ao cadastrar");
+      toast.error("Erro na operação");
     }
 
     setLoadingButton(false);
@@ -158,7 +249,7 @@ export default function CadastrarPreContrato(props) {
       const json = await response.json();
       setDataForEdition(json);
     } else {
-      // toast.error("Erro ao cadastrar");
+      // toast.error("Erro na operação");
     }
   }
 
@@ -329,6 +420,11 @@ export default function CadastrarPreContrato(props) {
     setValue("tipo_contrato", data.tipo_contrato);
     setValue("documentacao_salva", data.documento_salvo);
 
+    if (session?.user?.is_superuser) {
+      setStatusComissao(data.status_comissao);
+      setValue("status_comissao", data.status_comissao);
+    }
+
     // setStatusComissao(data.statusComissao);
   }
 
@@ -341,7 +437,10 @@ export default function CadastrarPreContrato(props) {
         spacing={2}
         sx={{ mt: 1 }}
         component="form"
-        onSubmit={handleSubmit(save)}
+        // onSubmit={handleSubmit(updatePreContrato)}
+        onSubmit={handleSubmit(() => {
+          id ? updatePreContrato() : save();
+        })}
       >
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <DatepickerField
@@ -836,71 +935,70 @@ export default function CadastrarPreContrato(props) {
           </FormControl>
         </Grid>
 
-        {/* <Grid item xs={12} sm={12} md={12} lg={12} xl={12} sx={{ mt: 2 }}>
-          <FormControl
-            component="fieldset"
-            error={Boolean(errors.status_comissao)}
-          >
-            <FormLabel component="legend">Status da comissão</FormLabel>
-            <Controller
-              name="status_comissao"
-              control={control}
-              render={({ field }) => (
-                <RadioGroup
-                  {...field}
-                  row
-                  error={Boolean(errors.status_comissao)}
-                  value={statusComissao}
-                  onChange={(e) => {
-                    field.onChange(e);
-                    setStatusComissao(e.target.value);
-                  }}
-                >
-                  <FormControlLabel
-                    value="Paga"
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: errors.status_comissao ? "red" : "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: errors.status_comissao ? "red" : "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
-                    label="Paga"
-                  />
-                  <FormControlLabel
-                    value="Aguardando pagamento"
-                    control={<Radio />}
-                    label="Aguardando pagamento"
-                  />
-                  <FormControlLabel
-                    value="Aguardando fisco"
-                    control={<Radio />}
-                    label="Aguardando fisco"
-                  />
-                  <FormControlLabel
-                    value="Análise financeira"
-                    control={<Radio />}
-                    label="Análise financeira"
-                  />
-                </RadioGroup>
-              )}
-            />
-            {errors.status_comissao && (
-              <FormHelperText>{errors.status_comissao.message}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
+        {id && session?.user?.is_superuser && (
+          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <FormControl
+              component="fieldset"
+              error={Boolean(errors.status_comissao)}
+            >
+              <FormLabel component="legend">Status da comissão</FormLabel>
+              <Controller
+                name="status_comissao"
+                control={control}
+                render={({ field }) => (
+                  <RadioGroup
+                    {...field}
+                    row
+                    error={Boolean(errors.status_comissao)}
+                    value={statusComissao}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setStatusComissao(e.target.value);
+                    }}
+                  >
+                    <FormControlLabel
+                      value="paga"
+                      control={<Radio />}
+                      label="Paga"
+                    />
+                    <FormControlLabel
+                      value="aguardando_pagamento"
+                      control={<Radio />}
+                      label="Aguardando pagamento"
+                    />
+                    <FormControlLabel
+                      value="aguardando_fisco"
+                      control={<Radio />}
+                      label="Aguardando fisco"
+                    />
 
-        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+                    <FormControlLabel
+                      value="analise_financeira"
+                      control={<Radio />}
+                      label="Análise financeira"
+                    />
+                  </RadioGroup>
+                )}
+              />
+              {errors.status_comissao && (
+                <FormHelperText>
+                  {errors.status_comissao.message}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        )}
+
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />
+
+        <Grid item xs={12} sm={6} md={3} lg={2} xl={2}>
           <LoadingButton
             type="submit"
             variant="contained"
             endIcon={<SaveIcon />}
             disableElevation
             loading={loadingButton}
+            fullWidth
           >
             SALVAR
           </LoadingButton>
