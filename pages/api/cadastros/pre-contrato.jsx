@@ -44,12 +44,13 @@ async function create(req, res) {
 // }
 
 async function retrieve(req, res) {
+  console.log("retrieve");
   const token = req.headers.authorization;
 
-  const id = req.query.ativas ?? "";
+  const id = req.query.id ?? "";
 
-  const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/?id=${id}`,
+  const response = await fetch(
+    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/${id}`,
     {
       method: "GET",
       headers: {
@@ -60,9 +61,9 @@ async function retrieve(req, res) {
     }
   );
 
-  const json = await result.json();
+  const json = await response.json();
 
-  return res.status(result.status).json(json);
+  return res.status(response.status).json(json);
 }
 
 export default async function handler(req, res) {

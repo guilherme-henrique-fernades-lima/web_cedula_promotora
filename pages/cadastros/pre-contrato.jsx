@@ -27,6 +27,8 @@ import ContentWrapper from "@/components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
 import DatepickerField from "@/components/DatepickerField";
 
+import { formatarCPFSemAnonimidade } from "@/helpers/utils";
+
 //Schema
 import { preContratoSchema } from "@/schemas/preContratoSchema";
 
@@ -37,6 +39,7 @@ export default function CadastrarPreContrato(props) {
   const { data: session } = useSession();
   const {
     register,
+    setValue,
     resetField,
     control,
     handleSubmit,
@@ -65,7 +68,6 @@ export default function CadastrarPreContrato(props) {
   const [promotora, setPromotora] = useState("");
   const [dt_digitacao, setDtDigitacao] = useState(null);
   const [dt_pag_cliente, setDtPagCliente] = useState(null);
-  const [dt_pag_comissao, setDtPagComissao] = useState(null);
   const [nr_contrato, setNrContrato] = useState("");
   const [no_cliente, setNoCliente] = useState("");
   const [cpf, setCpf] = useState("");
@@ -73,7 +75,6 @@ export default function CadastrarPreContrato(props) {
   const [qt_parcelas, setQtParcelas] = useState("");
   const [vl_parcela, setVlParcela] = useState("");
   const [tabela, setTabela] = useState("");
-  const [vl_comissao, setVlComissao] = useState("");
   const [porcentagem, setPorcentagem] = useState("");
   //const [statusComissao, setStatusComissao] = useState("");
   //States dos dados dos picklists
@@ -112,10 +113,6 @@ export default function CadastrarPreContrato(props) {
       dt_pag_cliente: dt_pag_cliente
         ? moment(dt_pag_cliente).format("YYYY-MM-DD")
         : null,
-      dt_pag_comissao: dt_pag_comissao
-        ? moment(dt_pag_comissao).format("YYYY-MM-DD")
-        : null,
-      vl_comissao: parseFloat(vl_comissao),
       porcentagem: parseFloat(porcentagem),
       corretor: corretor,
       user_id_created: session?.user?.id,
@@ -157,11 +154,9 @@ export default function CadastrarPreContrato(props) {
       },
     });
 
-    console.log(response);
-
     if (response.ok) {
       const json = await response.json();
-      console.log(json);
+      setDataForEdition(json);
     } else {
       // toast.error("Erro ao cadastrar");
     }
@@ -298,6 +293,45 @@ export default function CadastrarPreContrato(props) {
     }
   }
 
+  function setDataForEdition(data) {
+    setIletrado(data.iletrado);
+    setTipoContrato(data.tipo_contrato);
+    setDocumentoSalvo(data.documento_salvo);
+    setConvenio(data.convenio);
+    setOperacao(data.operacao);
+    setBanco(data.banco);
+    setCorretor(data.corretor);
+    setPromotora(data.promotora);
+    setDtDigitacao(data.dt_digitacao);
+    setDtPagCliente(data.dt_pag_cliente);
+    setNrContrato(data.nr_contrato);
+    setNoCliente(data.no_cliente);
+    setCpf(data.cpf);
+    setVlContrato(parseFloat(data.vl_contrato));
+    setQtParcelas(data.qt_parcelas);
+    setVlParcela(parseFloat(data.vl_parcela));
+    setTabela(data.tabela);
+    setPorcentagem(data.porcentagem);
+
+    setValue("vl_contrato", parseFloat(data.vl_contrato));
+    setValue("vl_parcela", parseFloat(data.vl_parcela));
+    setValue("porcentagem", parseFloat(data.porcentagem));
+    setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
+    setValue("tabela", data.tabela);
+    setValue("nr_contrato", data.nr_contrato);
+    setValue("no_cliente", data.no_cliente);
+    setValue("promotora", data.promotora);
+    setValue("corretor", data.corretor);
+    setValue("banco", data.banco);
+    setValue("operacao", data.operacao);
+    setValue("convenio", data.convenio);
+    setValue("iletrado", data.iletrado);
+    setValue("tipo_contrato", data.tipo_contrato);
+    setValue("documentacao_salva", data.documento_salvo);
+
+    // setStatusComissao(data.statusComissao);
+  }
+
   return (
     <ContentWrapper title="Cadastrar pré-contrato">
       <Toaster position="bottom-center" reverseOrder={true} />
@@ -322,14 +356,6 @@ export default function CadastrarPreContrato(props) {
             label="Data de pagamento ao cliente"
             value={dt_pag_cliente}
             onChange={setDtPagCliente}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento comissão"
-            value={dt_pag_comissao}
-            onChange={setDtPagComissao}
           />
         </Grid>
 
@@ -419,7 +445,10 @@ export default function CadastrarPreContrato(props) {
                 fixedDecimalScale={true}
                 prefix="R$ "
                 onValueChange={(values) => {
-                  setVlContrato(values?.floatValue);
+                  // setVlContrato(values?.floatValue);
+
+                  setVlContrato(values.value); // Update the state with the formatted value
+                  field.onChange(values.floatValue);
                 }}
                 error={Boolean(errors.vl_contrato)}
                 size="small"
@@ -485,41 +514,6 @@ export default function CadastrarPreContrato(props) {
             sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
           >
             {errors.vl_parcela?.message}
-          </Typography>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
-            name="vl_comissao"
-            control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                thousandSeparator="."
-                decimalSeparator=","
-                decimalScale={2}
-                fixedDecimalScale={true}
-                prefix="R$ "
-                onValueChange={(values) => {
-                  setVlComissao(values?.floatValue);
-                }}
-                error={Boolean(errors.vl_comissao)}
-                size="small"
-                label="Valor da comissão"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
-          />
-          <Typography
-            sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
-          >
-            {errors.vl_comissao?.message}
           </Typography>
         </Grid>
 

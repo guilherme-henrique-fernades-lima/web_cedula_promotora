@@ -165,6 +165,22 @@ export default function RelatorioPreContratos() {
       headerAlign: "center",
     },
     {
+      field: "created_at",
+      headerName: "CRIADO EM",
+      renderHeader: (params) => <strong>CRIADO EM</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "updated_at",
+      headerName: "ATUALIZADO EM",
+      renderHeader: (params) => <strong>ATUALIZADO EM</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
       field: "nome_promotora",
       headerName: "PROMOTORA",
       renderHeader: (params) => <strong>PROMOTORA</strong>,
