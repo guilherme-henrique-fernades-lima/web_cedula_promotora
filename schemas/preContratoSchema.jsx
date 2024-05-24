@@ -25,7 +25,6 @@ export const preContratoSchema = yup.object().shape({
   iletrado: yup.string().required("Selecione uma opção"),
   tipo_contrato: yup.string().required("Selecione uma opção"),
   documentacao_salva: yup.string().required("Selecione uma opção"),
-  //status_comissao: yup.string().required("Selecione uma opção"),
 });
 
 export const updatePreContratoSchemaSuperUser = yup.object().shape({

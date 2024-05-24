@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import DataTable from "@/components/Datatable";
 import DatepickerField from "@/components/DatepickerField";
+import BackdropLoadingScreen from "@/components/BackdropLoadingScreen";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -44,6 +45,7 @@ export default function RelatorioPreContratos() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [openBackdrop, setOpenBackdrop] = useState(false);
   const [dataSet, setDataset] = useState([]);
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
@@ -118,7 +120,7 @@ export default function RelatorioPreContratos() {
     };
 
     try {
-      setLoading(true);
+      setOpenBackdrop(true);
       const response = await fetch(`/api/relatorios/pre-contratos`, {
         method: "POST",
         headers: {
@@ -128,9 +130,15 @@ export default function RelatorioPreContratos() {
       });
 
       if (response.ok) {
+        setOpenBackdrop(false);
+        toast.success("Enviado com sucesso");
+        list();
       }
     } catch (error) {
       console.log(error);
+      toast.success("Erro ao enviar");
+    } finally {
+      setOpenBackdrop(false);
     }
   }
 
@@ -167,15 +175,22 @@ export default function RelatorioPreContratos() {
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Transferir pré-contrato" placement="top">
-              <IconButton
-                color="success"
-                sx={{ ml: 1 }}
-                onClick={() => sendPreContrato(params.row)}
-              >
-                <FileUploadIcon />
-              </IconButton>
-            </Tooltip>
+            {params.row.contrato_criado ? (
+              <Tooltip title="Pré=contrato já transferido" placement="top">
+                <IconButton sx={{ ml: 1 }} color="success">
+                  <FileUploadIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Transferir pré-contrato" placement="top">
+                <IconButton
+                  sx={{ ml: 1 }}
+                  onClick={() => sendPreContrato(params.row)}
+                >
+                  <FileUploadIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         );
       },
@@ -347,6 +362,7 @@ export default function RelatorioPreContratos() {
   return (
     <ContentWrapper title="Relação de pré contratos">
       <Toaster position="bottom-center" reverseOrder={true} />
+      <BackdropLoadingScreen open={openBackdrop} />
 
       <Grid container spacing={1} sx={{ mt: 1, mb: 2 }}>
         <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 //Third party libraries
+import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { useForm, Controller } from "react-hook-form";
@@ -21,14 +22,19 @@ import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
 
 //Custom components
 import ContentWrapper from "@/components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
 import DatepickerField from "@/components/DatepickerField";
+import BackdropLoadingScreen from "@/components/BackdropLoadingScreen";
 
 //Utils
-import { formatarCPFSemAnonimidade } from "@/helpers/utils";
+import {
+  formatarCPFSemAnonimidade,
+  converterDataParaJS,
+} from "@/helpers/utils";
 
 //Schema
 import {
@@ -65,6 +71,7 @@ export default function CadastrarPreContrato() {
     }
   }, [id]);
 
+  const [openBackdrop, setOpenBackdrop] = useState(false);
   const [loadingButton, setLoadingButton] = useState(false);
   const [iletrado, setIletrado] = useState("");
   const [tipoContrato, setTipoContrato] = useState("");
@@ -253,6 +260,7 @@ export default function CadastrarPreContrato() {
   }
 
   async function retrievePreContrato(id) {
+    setOpenBackdrop(true);
     const response = await fetch(`/api/cadastros/pre-contrato/?id=${id}`, {
       method: "GET",
       headers: {
@@ -266,6 +274,8 @@ export default function CadastrarPreContrato() {
     } else {
       // toast.error("Erro na operação");
     }
+
+    setOpenBackdrop(false);
   }
 
   function clearStatesAndErrors() {}
@@ -400,9 +410,6 @@ export default function CadastrarPreContrato() {
   }
 
   function setDataForEdition(data) {
-    console.log(data);
-    // TODO: data ao descer volta um dia
-    // TODO: vl comissao nao preenche
     setIletrado(data.iletrado);
     setTipoContrato(data.tipo_contrato);
     setDocumentoSalvo(data.documento_salvo);
@@ -411,8 +418,12 @@ export default function CadastrarPreContrato() {
     setBanco(data.banco);
     setCorretor(data.corretor);
     setPromotora(data.promotora);
-    setDtDigitacao(data.dt_digitacao);
-    setDtPagCliente(data.dt_pag_cliente);
+    setDtDigitacao(
+      data.dt_digitacao ? converterDataParaJS(data.dt_digitacao) : null
+    );
+    setDtPagCliente(
+      data.dt_pag_cliente ? converterDataParaJS(data.dt_pag_cliente) : null
+    );
     setNrContrato(data.nr_contrato);
     setNoCliente(data.no_cliente);
     setCpf(data.cpf);
@@ -422,8 +433,9 @@ export default function CadastrarPreContrato() {
     setTabela(data.tabela);
     setPorcentagem(data.porcentagem);
     setVlComissao(parseFloat(data.vl_comissao));
-    setDtPagComissao(data.dt_pag_comissao);
-
+    setDtPagComissao(
+      data.dt_pag_comissao ? converterDataParaJS(data.dt_pag_comissao) : null
+    );
     setValue("vl_contrato", parseFloat(data.vl_contrato));
     setValue("vl_parcela", parseFloat(data.vl_parcela));
     setValue("porcentagem", parseFloat(data.porcentagem));
@@ -444,13 +456,22 @@ export default function CadastrarPreContrato() {
       setStatusComissao(data.status_comissao);
       setValue("status_comissao", data.status_comissao);
     }
-
-    // setStatusComissao(data.statusComissao);
   }
 
   return (
-    <ContentWrapper title="Cadastrar pré-contrato">
+    <ContentWrapper
+      title={id ? "Editar pré contrato" : "Cadastrar pré-contrato"}
+    >
       <Toaster position="bottom-center" reverseOrder={true} />
+      <BackdropLoadingScreen open={openBackdrop} />
+
+      {id && (
+        <Link href="/relatorios/pre-contratos">
+          <Button variant="outlined" sx={{ mt: 2 }}>
+            VOLTAR
+          </Button>
+        </Link>
+      )}
 
       <Grid
         container
@@ -616,6 +637,7 @@ export default function CadastrarPreContrato() {
             decimalScale={2}
             fixedDecimalScale={true}
             prefix="R$ "
+            value={vl_comissao}
             onValueChange={(values) => {
               setVlComissao(values?.floatValue);
             }}

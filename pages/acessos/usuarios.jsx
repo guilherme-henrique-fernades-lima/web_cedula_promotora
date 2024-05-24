@@ -22,6 +22,7 @@ import Switch from "@mui/material/Switch";
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
+import Spinner from "@/components/Spinner";
 
 //Icons
 import LockPersonIcon from "@mui/icons-material/LockPerson";
@@ -37,8 +38,9 @@ export default function Usuarios() {
 
   const [dataset, setDataset] = useState([]);
   const [open, setOpen] = useState(false);
-  const [openDetailsUser, setOpenDetailsUser] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [openDetailsUser, setOpenDetailsUser] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
@@ -83,6 +85,7 @@ export default function Usuarios() {
   }
 
   async function getAllData() {
+    setLoadingUsers(true);
     try {
       const response = await fetch("/api/acessos/usuarios", {
         method: "GET",
@@ -97,6 +100,8 @@ export default function Usuarios() {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingUsers(false);
     }
   }
 
@@ -201,14 +206,33 @@ export default function Usuarios() {
         Criar usuário
       </Button>
 
-      <Box sx={{ width: "100%", mt: 2 }}>
-        {dataset?.map((item, index) => (
-          <CardUser
-            key={index}
-            user={item}
-            handleOpenModalDetailsUser={() => handleModalDetailsUser(item)}
-          />
-        ))}
+      <Box
+        sx={{
+          width: "100%",
+          mt: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        {loadingUsers ? (
+          <>
+            <Box sx={{ mt: 3 }} />
+            <Spinner />
+            <Box sx={{ mb: 3 }} />
+          </>
+        ) : (
+          <>
+            {dataset?.map((item, index) => (
+              <CardUser
+                key={index}
+                user={item}
+                handleOpenModalDetailsUser={() => handleModalDetailsUser(item)}
+              />
+            ))}
+          </>
+        )}
       </Box>
 
       <ModalCreateUser open={openDetailsUser} setOpen={handleModalDetailsUser}>
