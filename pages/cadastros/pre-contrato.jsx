@@ -85,6 +85,8 @@ export default function CadastrarPreContrato() {
   const [tabela, setTabela] = useState("");
   const [porcentagem, setPorcentagem] = useState("");
   const [statusComissao, setStatusComissao] = useState("");
+  const [dt_pag_comissao, setDtPagComissao] = useState(null);
+  const [vl_comissao, setVlComissao] = useState("");
 
   //States dos dados dos picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
@@ -128,14 +130,19 @@ export default function CadastrarPreContrato() {
       iletrado: Boolean(iletrado),
       tipo_contrato: tipoContrato,
       documento_salvo: Boolean(documentoSalvo),
+      dt_pag_comissao: dt_pag_comissao
+        ? moment(dt_pag_comissao).format("YYYY-MM-DD")
+        : null,
+      vl_comissao: parseFloat(vl_comissao),
     };
 
     return data;
   }
 
   function getPayloadUpdate(id, superuser) {
+    var data = {};
     if (id && superuser) {
-      const data = {
+      data = {
         promotora: promotora,
         dt_digitacao: dt_digitacao
           ? moment(dt_digitacao).format("YYYY-MM-DD")
@@ -159,10 +166,14 @@ export default function CadastrarPreContrato() {
         iletrado: Boolean(iletrado),
         tipo_contrato: tipoContrato,
         documento_salvo: Boolean(documentoSalvo),
+        dt_pag_comissao: dt_pag_comissao
+          ? moment(dt_pag_comissao).format("YYYY-MM-DD")
+          : null,
+        vl_comissao: parseFloat(vl_comissao),
         status_comissao: statusComissao,
       };
     } else {
-      const data = {
+      data = {
         promotora: promotora,
         dt_digitacao: dt_digitacao
           ? moment(dt_digitacao).format("YYYY-MM-DD")
@@ -186,9 +197,13 @@ export default function CadastrarPreContrato() {
         iletrado: Boolean(iletrado),
         tipo_contrato: tipoContrato,
         documento_salvo: Boolean(documentoSalvo),
+        dt_pag_comissao: dt_pag_comissao
+          ? moment(dt_pag_comissao).format("YYYY-MM-DD")
+          : null,
+        vl_comissao: parseFloat(vl_comissao),
       };
     }
-
+    console.log(data);
     return data;
   }
 
@@ -385,6 +400,9 @@ export default function CadastrarPreContrato() {
   }
 
   function setDataForEdition(data) {
+    console.log(data);
+    // TODO: data ao descer volta um dia
+    // TODO: vl comissao nao preenche
     setIletrado(data.iletrado);
     setTipoContrato(data.tipo_contrato);
     setDocumentoSalvo(data.documento_salvo);
@@ -403,6 +421,8 @@ export default function CadastrarPreContrato() {
     setVlParcela(parseFloat(data.vl_parcela));
     setTabela(data.tabela);
     setPorcentagem(data.porcentagem);
+    setVlComissao(parseFloat(data.vl_comissao));
+    setDtPagComissao(data.dt_pag_comissao);
 
     setValue("vl_contrato", parseFloat(data.vl_contrato));
     setValue("vl_parcela", parseFloat(data.vl_parcela));
@@ -455,6 +475,14 @@ export default function CadastrarPreContrato() {
             label="Data de pagamento ao cliente"
             value={dt_pag_cliente}
             onChange={setDtPagCliente}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de pagamento da comissão"
+            value={dt_pag_comissao}
+            onChange={setDtPagComissao}
           />
         </Grid>
 
@@ -577,6 +605,27 @@ export default function CadastrarPreContrato() {
             validateFieldName="qt_parcelas"
             onlyNumbers
             inputProps={{ maxLength: 5 }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <NumericFormat
+            customInput={TextField}
+            thousandSeparator="."
+            decimalSeparator=","
+            decimalScale={2}
+            fixedDecimalScale={true}
+            prefix="R$ "
+            onValueChange={(values) => {
+              setVlComissao(values?.floatValue);
+            }}
+            size="small"
+            label="Valor da comissão"
+            placeholder="R$ 0,00"
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
+            fullWidth
+            inputProps={{ maxLength: 16 }}
           />
         </Grid>
 

@@ -84,37 +84,6 @@ export default function RelatorioPreContratos() {
     setLoading(false);
   }
 
-  //   {
-  //     "id": 1,
-  //     "nome_banco": "TES22",
-  //     "nome_promotora": "teste",
-  //     "nome_convenio": "TESTE DDDDDDD",
-  //     "nome_corretor": "CORRETOR 1",
-  //     "nome_operacao": "SS",
-  //     "promotora": "1",
-  //     "dt_digitacao": "2024-05-02",
-  //     "nr_contrato": "123123",
-  //     "no_cliente": "ASD",
-  //     "cpf": "123.123.123-12",
-  //     "convenio": "3",
-  //     "operacao": "1",
-  //     "banco": "2",
-  //     "vl_contrato": "123123.00",
-  //     "qt_parcelas": 123,
-  //     "vl_parcela": "123.00",
-  //     "dt_pag_cliente": "2024-05-15",
-  //     "porcentagem": "12.00",
-  //     "corretor": "1",
-  //     "tabela": null,
-  //     "tipo_contrato": "fisico",
-  //     "status_comissao": null,
-  //     "iletrado": true,
-  //     "documento_salvo": true,
-  //     "user_id_created": 19,
-  //     "created_at": "2024-05-21T21:56:27.517291-03:00",
-  //     "updated_at": "2024-05-21T21:56:27.517291-03:00"
-  // }
-
   function actionsAfterDelete() {
     setOpenDialogDelete(false);
     list();
@@ -138,12 +107,14 @@ export default function RelatorioPreContratos() {
       dt_pag_cliente: data.promotora,
       porcentagem: data.promotora,
       corretor: data.promotora,
-      contrato_criado: true,
-      // tabela: data.promotora, //Verificar
-      // tipo_contrato: data.promotora, //Verificar
-      // status_comissao: data.promotora, //Verificar
-      // iletrado: data.promotora, //Verificar
-      // documento_salvo: data.promotora, //Verificar
+
+      dt_digitacao: moment().format("YYYY-MM-DD"),
+      dt_pag_cliente: null,
+      tabela: data.tabela,
+      tipo_contrato: data.tipo_contrato,
+      status_comissao: data.status_comissao,
+      iletrado: data.iletrado,
+      documento_salvo: data.documento_salvo,
     };
 
     try {
