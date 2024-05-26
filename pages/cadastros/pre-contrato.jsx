@@ -67,7 +67,7 @@ export default function CadastrarPreContrato() {
 
   useEffect(() => {
     if (id) {
-      retrievePreContrato(id);
+      retrievePreContrato(id, session?.user?.id);
     }
   }, [id]);
 
@@ -261,18 +261,23 @@ export default function CadastrarPreContrato() {
 
   async function retrievePreContrato(id) {
     setOpenBackdrop(true);
-    const response = await fetch(`/api/cadastros/pre-contrato/?id=${id}`, {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
+    const response = await fetch(
+      `/api/cadastros/pre-contrato/?id=${id}&user_id=${session?.user?.id}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      }
+    );
 
-    if (response.ok) {
+    if (response.status == 200) {
       const json = await response.json();
       setDataForEdition(json);
+    } else if (response.status == 401) {
+      toast.error("O pré contrato não é de sua autoria para edição");
     } else {
-      // toast.error("Erro na operação");
+      toast.error("Aconteceu algum erro");
     }
 
     setOpenBackdrop(false);

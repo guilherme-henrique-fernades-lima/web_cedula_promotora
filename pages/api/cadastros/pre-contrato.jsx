@@ -44,13 +44,13 @@ async function update(req, res) {
 }
 
 async function retrieve(req, res) {
-  console.log("retrieve");
   const token = req.headers.authorization;
 
   const id = req.query.id ?? "";
+  const user_id = req.query.user_id ?? "";
 
   const response = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/${id}`,
+    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/${id}/?user_id=${user_id}`,
     {
       method: "GET",
       headers: {

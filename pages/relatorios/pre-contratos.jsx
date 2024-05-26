@@ -31,6 +31,7 @@ import {
   formatarData,
   formatarCPFSemAnonimidade,
   formatarValorBRL,
+  formatarDataComHora,
 } from "@/helpers/utils";
 
 //Icons
@@ -45,11 +46,14 @@ export default function RelatorioPreContratos() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-  const [openBackdrop, setOpenBackdrop] = useState(false);
   const [dataSet, setDataset] = useState([]);
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
+  const [preContratoToSendContratos, setPreContratoToSendContratos] =
+    useState("");
+  const [openDialogSendPreContrato, setOpenDialogSendPreContrato] =
+    useState(false);
   const [idPreContrato, setIdPreContrato] = useState("");
 
   useEffect(() => {
@@ -88,58 +92,10 @@ export default function RelatorioPreContratos() {
 
   function actionsAfterDelete() {
     setOpenDialogDelete(false);
+    setOpenDialogSendPreContrato(false);
     list();
     setIdPreContrato("");
-  }
-
-  async function sendPreContrato(data) {
-    const payload = {
-      id: data.id,
-      promotora: data.promotora,
-      dt_digitacao: data.promotora,
-      nr_contrato: data.promotora,
-      no_cliente: data.promotora,
-      cpf: data.promotora,
-      convenio: data.promotora,
-      operacao: data.promotora,
-      banco: data.promotora,
-      vl_contrato: data.promotora,
-      qt_parcelas: data.promotora,
-      vl_parcela: data.promotora,
-      dt_pag_cliente: data.promotora,
-      porcentagem: data.promotora,
-      corretor: data.promotora,
-
-      dt_digitacao: moment().format("YYYY-MM-DD"),
-      dt_pag_cliente: null,
-      tabela: data.tabela,
-      tipo_contrato: data.tipo_contrato,
-      status_comissao: data.status_comissao,
-      iletrado: data.iletrado,
-      documento_salvo: data.documento_salvo,
-    };
-
-    try {
-      setOpenBackdrop(true);
-      const response = await fetch(`/api/relatorios/pre-contratos`, {
-        method: "POST",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setOpenBackdrop(false);
-        toast.success("Enviado com sucesso");
-        list();
-      }
-    } catch (error) {
-      console.log(error);
-      toast.success("Erro ao enviar");
-    } finally {
-      setOpenBackdrop(false);
-    }
+    setPreContratoToSendContratos("");
   }
 
   const columns = [
@@ -153,43 +109,68 @@ export default function RelatorioPreContratos() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            <Tooltip title="Editar pré-contrato" placement="top">
-              <IconButton
-                onClick={() => {
-                  router.push(`/cadastros/pre-contrato/?id=${params.value}`);
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Deletar pré-contrato" placement="top">
-              <IconButton
-                color="error"
-                sx={{ ml: 1 }}
-                onClick={() => {
-                  setIdPreContrato(params.value);
-                  setOpenDialogDelete(true);
-                }}
-              >
-                <DeleteForeverIcon />
-              </IconButton>
-            </Tooltip>
-
             {params.row.contrato_criado ? (
-              <Tooltip title="Pré=contrato já transferido" placement="top">
-                <IconButton sx={{ ml: 1 }} color="success">
-                  <FileUploadIcon />
+              <Tooltip title="Edição não permitida" placement="top">
+                <IconButton>
+                  <EditIcon />
                 </IconButton>
               </Tooltip>
             ) : (
-              <Tooltip title="Transferir pré-contrato" placement="top">
+              <Tooltip title="Editar pré-contrato" placement="top">
                 <IconButton
-                  sx={{ ml: 1 }}
-                  onClick={() => sendPreContrato(params.row)}
+                  onClick={() => {
+                    router.push(`/cadastros/pre-contrato/?id=${params.value}`);
+                  }}
                 >
-                  <FileUploadIcon />
+                  <EditIcon />
                 </IconButton>
               </Tooltip>
+            )}
+
+            {params.row.contrato_criado ? (
+              <Tooltip title="Exclusão não permitida" placement="top">
+                <IconButton sx={{ ml: 1 }}>
+                  <DeleteForeverIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip title="Deletar pré-contrato" placement="top">
+                <IconButton
+                  color="error"
+                  sx={{ ml: 1 }}
+                  onClick={() => {
+                    setIdPreContrato(params.value);
+                    setOpenDialogDelete(true);
+                  }}
+                >
+                  <DeleteForeverIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {session?.user?.is_superuser && (
+              <>
+                {params.row.contrato_criado ? (
+                  <Tooltip title="Pré-contrato já transferido" placement="top">
+                    <IconButton sx={{ ml: 1 }}>
+                      <FileUploadIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Transferir pré-contrato" placement="top">
+                    <IconButton
+                      sx={{ ml: 1 }}
+                      color="success"
+                      onClick={() => {
+                        setOpenDialogSendPreContrato(true);
+                        setPreContratoToSendContratos(params.row);
+                      }}
+                    >
+                      <FileUploadIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </>
             )}
           </Stack>
         );
@@ -210,6 +191,11 @@ export default function RelatorioPreContratos() {
       minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarDataComHora(params.value);
+        }
+      },
     },
     {
       field: "updated_at",
@@ -218,6 +204,11 @@ export default function RelatorioPreContratos() {
       minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarDataComHora(params.value);
+        }
+      },
     },
     {
       field: "nome_promotora",
@@ -362,7 +353,6 @@ export default function RelatorioPreContratos() {
   return (
     <ContentWrapper title="Relação de pré contratos">
       <Toaster position="bottom-center" reverseOrder={true} />
-      <BackdropLoadingScreen open={openBackdrop} />
 
       <Grid container spacing={1} sx={{ mt: 1, mb: 2 }}>
         <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
@@ -392,6 +382,15 @@ export default function RelatorioPreContratos() {
         open={openDialogDelete}
         close={setOpenDialogDelete}
         id={idPreContrato}
+        token={session?.user.token}
+        onFinishDelete={actionsAfterDelete}
+      />
+
+      <DialogTransmitirPreContrato
+        open={openDialogSendPreContrato}
+        close={setOpenDialogSendPreContrato}
+        preContrato={preContratoToSendContratos}
+        clearPreContrato={setPreContratoToSendContratos}
         token={session?.user.token}
         onFinishDelete={actionsAfterDelete}
       />
@@ -450,6 +449,104 @@ function DialogExcluirPreContrato({ open, close, id, token, onFinishDelete }) {
           loading={loading}
         >
           EXCLUIR
+        </LoadingButton>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function DialogTransmitirPreContrato({
+  open,
+  close,
+  preContrato,
+  clearPreContrato,
+  token,
+  onFinishDelete,
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function sendPreContrato(data) {
+    const payload = {
+      id: data.id,
+      promotora: data.promotora,
+      nr_contrato: data.nr_contrato,
+      no_cliente: data.no_cliente,
+      cpf: data.cpf,
+      convenio: data.convenio,
+      operacao: data.operacao,
+      banco: data.banco,
+      vl_contrato: data.vl_contrato,
+      qt_parcelas: data.qt_parcelas,
+      vl_parcela: data.vl_parcela,
+      dt_pag_cliente: data.dt_pag_cliente,
+      porcentagem: data.porcentagem,
+      corretor: data.corretor,
+      dt_digitacao: data.dt_digitacao
+        ? data.dt_digitacao
+        : moment().format("YYYY-MM-DD"),
+      dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
+      tabela: data.tabela,
+      tipo_contrato: data.tipo_contrato,
+      status_comissao: data.status_comissao,
+      iletrado: data.iletrado,
+      documento_salvo: data.documento_salvo,
+    };
+
+    try {
+      setLoading(true);
+
+      const response = await fetch(`/api/relatorios/pre-contratos`, {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        setLoading(false);
+        toast.success("Enviado com sucesso");
+        onFinishDelete();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.success("Erro ao enviar");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700, mb: 1 }}>
+        Deseja transferir o pré-contrato para os contratos?
+      </DialogTitle>
+
+      <DialogActions>
+        <Button
+          onClick={() => {
+            close(false);
+            clearPreContrato("");
+          }}
+          color="error"
+        >
+          CANCELAR
+        </Button>
+
+        <LoadingButton
+          onClick={() => {
+            sendPreContrato(preContrato);
+          }}
+          color="success"
+          variant="contained"
+          disableElevation
+          loading={loading}
+        >
+          ENVIAR
         </LoadingButton>
       </DialogActions>
     </Dialog>
