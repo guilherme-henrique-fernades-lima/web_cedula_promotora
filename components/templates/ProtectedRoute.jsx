@@ -16,11 +16,13 @@ export function ProtectedRoute({ children, perms }) {
   const [allowPage, setAllowPage] = useState(null);
 
   useEffect(() => {
-    if (perms && pathname) {
+    if (pathname == "/") {
+      setAllowPage(true);
+    }
+
+    if (perms && pathname && pathname != "/") {
       const isAllowed = perms[rotas[pathname]] ? true : false;
       setAllowPage(isAllowed);
-    } else {
-      setAllowPage(true);
     }
   }, [perms, pathname]);
 
