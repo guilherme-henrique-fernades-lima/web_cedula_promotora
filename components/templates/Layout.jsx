@@ -320,7 +320,7 @@ function MenuOptions({ perms }) {
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <TitleTypography>{route.title} </TitleTypography>
+                              <TitleTypography>{route.title}</TitleTypography>
                             }
                           />
                         </ListItemButton>
