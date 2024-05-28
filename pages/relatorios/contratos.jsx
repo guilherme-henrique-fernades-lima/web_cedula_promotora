@@ -69,14 +69,10 @@ export default function RelatorioContratos() {
   const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
 
   const [id, setId] = useState("");
-  const [promotora, setPromotora] = useState("");
   const [dt_digitacao, setDtDigitacao] = useState(null);
   const [nr_contrato, setNrContrato] = useState("");
   const [no_cliente, setNoCliente] = useState("");
   const [cpf, setCpf] = useState("");
-  const [convenio, setConvenio] = useState("");
-  const [operacao, setOperacao] = useState("");
-  const [banco, setBanco] = useState("");
   const [vl_contrato, setVlContrato] = useState("");
   const [qt_parcelas, setQtParcelas] = useState("");
   const [vl_parcela, setVlParcela] = useState("");
@@ -84,7 +80,18 @@ export default function RelatorioContratos() {
   const [dt_pag_comissao, setDtPagComissao] = useState(null);
   const [vl_comissao, setVlComissao] = useState("");
   const [porcentagem, setPorcentagem] = useState("");
+  const [promotora, setPromotora] = useState("");
+  const [convenio, setConvenio] = useState("");
+  const [operacao, setOperacao] = useState("");
+  const [banco, setBanco] = useState("");
   const [corretor, setCorretor] = useState("");
+
+  //States dos dados dos picklists
+  const [convenioPicklist, setConvenioPicklist] = useState([]);
+  const [operacaoPicklist, setOperacaoPicklist] = useState([]);
+  const [bancoPicklist, setBancoPicklist] = useState([]);
+  const [corretorPicklist, setCorretorPicklist] = useState([]);
+  const [promotoraPicklist, setPromotoraPicklist] = useState([]);
 
   const {
     register,
@@ -98,6 +105,16 @@ export default function RelatorioContratos() {
     mode: "onChange",
     resolver: yupResolver(contratoSchema),
   });
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      getConveniosPicklist();
+      getOperacoesPicklist();
+      getCorretoresPicklist();
+      getPromotorasPicklist();
+      getBancosPicklist();
+    }
+  }, [session?.user?.token]);
 
   useEffect(() => {
     getContratos();
@@ -170,6 +187,111 @@ export default function RelatorioContratos() {
     }
 
     setLoadingButton(false);
+  }
+
+  async function getConveniosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/convenios/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setConvenioPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getOperacoesPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/operacoes/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setOperacaoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getCorretoresPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/corretores/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setCorretorPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getPromotorasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/promotoras/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setPromotoraPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getBancosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/bancos/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setBancoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   function getPayload() {
@@ -299,6 +421,14 @@ export default function RelatorioContratos() {
     },
     {
       field: "promotora",
+      headerName: "COD. PROMOTORA",
+      renderHeader: (params) => <strong>COD. PROMOTORA</strong>,
+      minWidth: 170,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_promotora",
       headerName: "PROMOTORA",
       renderHeader: (params) => <strong>PROMOTORA</strong>,
       minWidth: 170,
@@ -349,6 +479,14 @@ export default function RelatorioContratos() {
     },
     {
       field: "convenio",
+      headerName: "COD. CONVÊNIO",
+      renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
+      minWidth: 170,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_convenio",
       headerName: "CONVÊNIO",
       renderHeader: (params) => <strong>CONVÊNIO</strong>,
       minWidth: 170,
@@ -357,6 +495,14 @@ export default function RelatorioContratos() {
     },
     {
       field: "operacao",
+      headerName: "COD. OPERAÇÃO",
+      renderHeader: (params) => <strong>COD. OPERAÇÃO</strong>,
+      minWidth: 170,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_operacao",
       headerName: "OPERAÇÃO",
       renderHeader: (params) => <strong>OPERAÇÃO</strong>,
       minWidth: 170,
@@ -365,6 +511,14 @@ export default function RelatorioContratos() {
     },
     {
       field: "banco",
+      headerName: "COD. BANCO",
+      renderHeader: (params) => <strong>COD. BANCO</strong>,
+      minWidth: 220,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_banco",
       headerName: "BANCO",
       renderHeader: (params) => <strong>BANCO</strong>,
       minWidth: 220,
@@ -454,6 +608,14 @@ export default function RelatorioContratos() {
     },
     {
       field: "corretor",
+      headerName: "COD. CORRETOR",
+      renderHeader: (params) => <strong>COD. CORRETOR</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_corretor",
       headerName: "CORRETOR",
       renderHeader: (params) => <strong>CORRETOR</strong>,
       minWidth: 200,
@@ -482,6 +644,11 @@ export default function RelatorioContratos() {
         vl_comissao: row.vl_comissao,
         porcentagem: row.porcentagem,
         corretor: row.corretor,
+        nome_corretor: row.nome_corretor,
+        nome_banco: row.nome_banco,
+        nome_convenio: row.nome_convenio,
+        nome_operacao: row.nome_operacao,
+        nome_promotora: row.nome_promotora,
       };
     });
   } catch (err) {
@@ -531,7 +698,7 @@ export default function RelatorioContratos() {
                 {...register("promotora")}
                 error={Boolean(errors.promotora)}
                 fullWidth
-                label="Tipo de despesa"
+                label="Tipo de promotora (ANTIGO)"
                 size="small"
                 value={promotora}
                 onChange={(e) => {
@@ -542,6 +709,28 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.promotora?.message}
               </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("promotora")}
+                error={Boolean(errors.promotora)}
+                select
+                fullWidth
+                label="Promotora"
+                size="small"
+                value={promotora}
+                helperText={errors.promotora?.message}
+                onChange={(e) => {
+                  setPromotora(e.target.value);
+                }}
+              >
+                {promotoraPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -652,7 +841,7 @@ export default function RelatorioContratos() {
                 error={Boolean(errors.convenio)}
                 select
                 fullWidth
-                label="Convênio"
+                label="Convênio (ANTIGO)"
                 size="small"
                 value={convenio}
                 onChange={(e) => {
@@ -672,11 +861,33 @@ export default function RelatorioContratos() {
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
+                {...register("convenio")}
+                error={Boolean(errors.convenio)}
+                select
+                fullWidth
+                label="Convênio"
+                size="small"
+                value={convenio}
+                helperText={errors.convenio?.message}
+                onChange={(e) => {
+                  setConvenio(e.target.value);
+                }}
+              >
+                {convenioPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
                 {...register("operacao")}
                 error={Boolean(errors.operacao)}
                 select
                 fullWidth
-                label="Operação"
+                label="Operação (ANTIGO)"
                 size="small"
                 value={operacao}
                 onChange={(e) => {
@@ -696,6 +907,28 @@ export default function RelatorioContratos() {
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
+                {...register("operacao")}
+                error={Boolean(errors.operacao)}
+                select
+                fullWidth
+                label="Operação"
+                size="small"
+                value={operacao}
+                helperText={errors?.operacao?.message}
+                onChange={(e) => {
+                  setOperacao(e.target.value);
+                }}
+              >
+                {operacaoPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
                 {...register("banco")}
                 error={Boolean(errors.banco)}
                 value={banco}
@@ -703,7 +936,7 @@ export default function RelatorioContratos() {
                   setBanco(e.target.value);
                 }}
                 size="small"
-                label="Banco"
+                label="Banco (ANTIGO)"
                 placeholder="Insira o nome do banco"
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
@@ -713,6 +946,28 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.banco?.message}
               </Typography>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("banco")}
+                error={Boolean(errors.banco)}
+                select
+                fullWidth
+                label="Banco"
+                size="small"
+                value={banco}
+                helperText={errors.banco?.message}
+                onChange={(e) => {
+                  setBanco(e.target.value);
+                }}
+              >
+                {bancoPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -924,7 +1179,7 @@ export default function RelatorioContratos() {
                   setCorretor(e.target.value);
                 }}
                 size="small"
-                label="Correto"
+                label="Corretor (ANTIGO)"
                 placeholder="Insira o corretor"
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
@@ -936,6 +1191,28 @@ export default function RelatorioContratos() {
               </Typography>
             </Grid>
 
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("corretor")}
+                error={Boolean(errors.corretor)}
+                select
+                fullWidth
+                label="Corretor(a)"
+                size="small"
+                value={corretor}
+                helperText={errors.corretor?.message}
+                onChange={(e) => {
+                  setCorretor(e.target.value);
+                }}
+              >
+                {corretorPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <LoadingButton
                 type="submit"
@@ -943,8 +1220,6 @@ export default function RelatorioContratos() {
                 endIcon={<SaveIcon />}
                 disableElevation
                 loading={loadingButton}
-                //onClick={salvarContrato}
-                // fullWidth
               >
                 SALVAR
               </LoadingButton>

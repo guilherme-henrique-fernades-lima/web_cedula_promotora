@@ -489,26 +489,32 @@ export default function CadastrarPreContrato() {
         })}
       >
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <TextField
+            {...register("promotora")}
+            error={Boolean(errors.promotora)}
+            select
+            fullWidth
+            label="Promotora"
+            size="small"
+            value={promotora}
+            helperText={errors.promotora?.message}
+            onChange={(e) => {
+              setPromotora(e.target.value);
+            }}
+          >
+            {promotoraPicklist?.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <DatepickerField
             label="Data de digitação"
             value={dt_digitacao}
             onChange={setDtDigitacao}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento ao cliente"
-            value={dt_pag_cliente}
-            onChange={setDtPagCliente}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento da comissão"
-            value={dt_pag_comissao}
-            onChange={setDtPagComissao}
           />
         </Grid>
 
@@ -521,17 +527,6 @@ export default function CadastrarPreContrato() {
             validateFieldName="nr_contrato"
             control={control}
             onlyNumbers
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <CustomTextField
-            value={tabela}
-            setValue={setTabela}
-            label="Tabela"
-            placeholder="Insira o nome da tabela"
-            validateFieldName="tabela"
-            control={control}
           />
         </Grid>
 
@@ -581,6 +576,72 @@ export default function CadastrarPreContrato() {
             numbersNotAllowed
             inputProps={{ maxLength: 255 }}
           />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <TextField
+            {...register("convenio")}
+            error={Boolean(errors.convenio)}
+            select
+            fullWidth
+            label="Convênio"
+            size="small"
+            value={convenio}
+            helperText={errors.convenio?.message}
+            onChange={(e) => {
+              setConvenio(e.target.value);
+            }}
+          >
+            {convenioPicklist?.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <TextField
+            {...register("operacao")}
+            error={Boolean(errors.operacao)}
+            select
+            fullWidth
+            label="Operação"
+            size="small"
+            value={operacao}
+            helperText={errors.operacao?.message}
+            onChange={(e) => {
+              setOperacao(e.target.value);
+            }}
+          >
+            {operacaoPicklist?.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <TextField
+            {...register("banco")}
+            error={Boolean(errors.banco)}
+            select
+            fullWidth
+            label="Banco"
+            size="small"
+            value={banco}
+            helperText={errors.banco?.message}
+            onChange={(e) => {
+              setBanco(e.target.value);
+            }}
+          >
+            {bancoPicklist?.map((option) => (
+              <MenuItem key={option.id} value={option.id}>
+                {option.name}
+              </MenuItem>
+            ))}
+          </TextField>
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -635,28 +696,6 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <NumericFormat
-            customInput={TextField}
-            thousandSeparator="."
-            decimalSeparator=","
-            decimalScale={2}
-            fixedDecimalScale={true}
-            prefix="R$ "
-            value={vl_comissao}
-            onValueChange={(values) => {
-              setVlComissao(values?.floatValue);
-            }}
-            size="small"
-            label="Valor da comissão"
-            placeholder="R$ 0,00"
-            InputLabelProps={{ shrink: true }}
-            autoComplete="off"
-            fullWidth
-            inputProps={{ maxLength: 16 }}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <Controller
             name="vl_parcela"
             control={control}
@@ -690,6 +729,22 @@ export default function CadastrarPreContrato() {
           >
             {errors.vl_parcela?.message}
           </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de pagamento ao cliente"
+            value={dt_pag_cliente}
+            onChange={setDtPagCliente}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de pagamento da comissão"
+            value={dt_pag_comissao}
+            onChange={setDtPagComissao}
+          />
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -730,69 +785,25 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <TextField
-            {...register("convenio")}
-            error={Boolean(errors.convenio)}
-            select
-            fullWidth
-            label="Convênio"
-            size="small"
-            value={convenio}
-            helperText={errors.convenio?.message}
-            onChange={(e) => {
-              setConvenio(e.target.value);
+          <NumericFormat
+            customInput={TextField}
+            thousandSeparator="."
+            decimalSeparator=","
+            decimalScale={2}
+            fixedDecimalScale={true}
+            prefix="R$ "
+            value={vl_comissao}
+            onValueChange={(values) => {
+              setVlComissao(values?.floatValue);
             }}
-          >
-            {convenioPicklist?.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <TextField
-            {...register("operacao")}
-            error={Boolean(errors.operacao)}
-            select
-            fullWidth
-            label="Operação"
             size="small"
-            value={operacao}
-            helperText={errors.operacao?.message}
-            onChange={(e) => {
-              setOperacao(e.target.value);
-            }}
-          >
-            {operacaoPicklist?.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <TextField
-            {...register("promotora")}
-            error={Boolean(errors.promotora)}
-            select
+            label="Valor da comissão"
+            placeholder="R$ 0,00"
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
             fullWidth
-            label="Promotora"
-            size="small"
-            value={promotora}
-            helperText={errors.promotora?.message}
-            onChange={(e) => {
-              setPromotora(e.target.value);
-            }}
-          >
-            {promotoraPicklist?.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
+            inputProps={{ maxLength: 16 }}
+          />
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -818,25 +829,14 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <TextField
-            {...register("banco")}
-            error={Boolean(errors.banco)}
-            select
-            fullWidth
-            label="Banco"
-            size="small"
-            value={banco}
-            helperText={errors.banco?.message}
-            onChange={(e) => {
-              setBanco(e.target.value);
-            }}
-          >
-            {bancoPicklist?.map((option) => (
-              <MenuItem key={option.id} value={option.id}>
-                {option.name}
-              </MenuItem>
-            ))}
-          </TextField>
+          <CustomTextField
+            value={tabela}
+            setValue={setTabela}
+            label="Tabela"
+            placeholder="Insira o nome da tabela"
+            validateFieldName="tabela"
+            control={control}
+          />
         </Grid>
 
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />

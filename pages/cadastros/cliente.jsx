@@ -68,6 +68,7 @@ export default function CadastrarCliente() {
   const [observacao, setObservacao] = useState("");
   const [convenio, setConvenio] = useState("");
 
+  // Picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
 
   useEffect(() => {
@@ -347,8 +348,6 @@ export default function CadastrarCliente() {
               ))}
             </TextField>
           </Grid>
-
-          {console.log(errors)}
 
           {convenio == 5 && (
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>

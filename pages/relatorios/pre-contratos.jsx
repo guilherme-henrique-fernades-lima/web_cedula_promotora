@@ -10,7 +10,6 @@ import { useRouter } from "next/router";
 import ContentWrapper from "../../components/templates/ContentWrapper";
 import DataTable from "@/components/Datatable";
 import DatepickerField from "@/components/DatepickerField";
-import BackdropLoadingScreen from "@/components/BackdropLoadingScreen";
 
 //Mui components
 import Box from "@mui/material/Box";
