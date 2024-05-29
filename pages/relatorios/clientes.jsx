@@ -244,7 +244,9 @@ export default function CadastrarCliente() {
     setId(data.id);
     setCpf(formatarCPFSemAnonimidade(data.cpf));
     setNome(data.nome);
-    setDataNascimento(converterDataParaJS(data.dt_nascimento));
+    setDataNascimento(
+      data.dt_nascimento ? converterDataParaJS(data.dt_nascimento) : null
+    );
     setEspecieInss(
       data.especie
         ? {

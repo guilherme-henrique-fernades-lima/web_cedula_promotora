@@ -187,7 +187,7 @@ export default function ConfiguracoesLojas() {
       field: "sg_loja",
       headerName: "NOME DA LOJA",
       renderHeader: (params) => <strong>NOME DA LOJA</strong>,
-      minWidth: 150,
+      minWidth: 250,
       align: "center",
       headerAlign: "center",
     },

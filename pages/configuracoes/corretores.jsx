@@ -191,7 +191,7 @@ export default function ConfiguracoesLojas() {
       field: "name",
       headerName: "NOME DO CORRETOR",
       renderHeader: (params) => <strong>NOME DO CORRETOR</strong>,
-      minWidth: 150,
+      minWidth: 250,
       align: "center",
       headerAlign: "center",
     },

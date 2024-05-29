@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 
-//Next.js
-import { useRouter } from "next/router";
-
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";

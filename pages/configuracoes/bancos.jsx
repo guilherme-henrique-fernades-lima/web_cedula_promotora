@@ -191,7 +191,7 @@ export default function ConfiguracoesLojas() {
       field: "name",
       headerName: "NOME DO BANCO",
       renderHeader: (params) => <strong>NOME DO BANCO</strong>,
-      minWidth: 150,
+      minWidth: 250,
       align: "center",
       headerAlign: "center",
     },

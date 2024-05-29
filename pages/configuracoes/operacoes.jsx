@@ -191,7 +191,7 @@ export default function ConfiguracoesLojas() {
       field: "name",
       headerName: "NOME DA OPERAÇÃO",
       renderHeader: (params) => <strong>NOME DA OPERAÇÃO</strong>,
-      minWidth: 150,
+      minWidth: 250,
       align: "center",
       headerAlign: "center",
     },

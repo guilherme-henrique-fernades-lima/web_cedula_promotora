@@ -297,7 +297,7 @@ export default function RelatorioContratos() {
   function getPayload() {
     const data = {
       id: id,
-      promotora: promotora.toUpperCase(),
+      promotora: promotora,
       dt_digitacao: dt_digitacao
         ? moment(dt_digitacao).format("YYYY-MM-DD")
         : null,
@@ -306,7 +306,7 @@ export default function RelatorioContratos() {
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
-      banco: banco.toUpperCase(),
+      banco: banco,
       vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
@@ -365,7 +365,9 @@ export default function RelatorioContratos() {
 
     setId(data.id);
     setPromotora(data.promotora);
-    setDtDigitacao(converterDataParaJS(data.dt_digitacao));
+    setDtDigitacao(
+      data.dt_digitacao ? converterDataParaJS(data.dt_digitacao) : null
+    );
     setNrContrato(data.nr_contrato);
     setNoCliente(data.no_cliente);
     setCpf(formatarCPFSemAnonimidade(data.cpf));
@@ -375,8 +377,12 @@ export default function RelatorioContratos() {
     setVlContrato(data.vl_contrato);
     setQtParcelas(data.qt_parcelas);
     setVlParcela(data.vl_parcela);
-    setDtPagCliente(converterDataParaJS(data.dt_pag_cliente));
-    setDtPagComissao(converterDataParaJS(data.dt_pag_comissao));
+    setDtPagCliente(
+      data.dt_pag_cliente ? converterDataParaJS(data.dt_pag_cliente) : null
+    );
+    setDtPagComissao(
+      data.dt_pag_comissao ? converterDataParaJS(data.dt_pag_comissao) : null
+    );
     setVlComissao(data.vl_comissao);
     setPorcentagem(data.porcentagem);
     setCorretor(data.corretor);
@@ -693,7 +699,7 @@ export default function RelatorioContratos() {
           })}
         >
           <Grid container spacing={1}>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("promotora")}
                 error={Boolean(errors.promotora)}
@@ -709,7 +715,7 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.promotora?.message}
               </Typography>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
@@ -835,7 +841,7 @@ export default function RelatorioContratos() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("convenio")}
                 error={Boolean(errors.convenio)}
@@ -857,7 +863,7 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.convenio?.message}
               </Typography>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
@@ -881,7 +887,7 @@ export default function RelatorioContratos() {
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("operacao")}
                 error={Boolean(errors.operacao)}
@@ -903,7 +909,7 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.operacao?.message}
               </Typography>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
@@ -927,7 +933,7 @@ export default function RelatorioContratos() {
               </TextField>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("banco")}
                 error={Boolean(errors.banco)}
@@ -946,7 +952,7 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.banco?.message}
               </Typography>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
@@ -1170,7 +1176,7 @@ export default function RelatorioContratos() {
               </Typography>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("corretor")}
                 error={Boolean(errors.corretor)}
@@ -1189,7 +1195,7 @@ export default function RelatorioContratos() {
               <Typography sx={{ color: "#f00", fontSize: "12px" }}>
                 {errors.corretor?.message}
               </Typography>
-            </Grid>
+            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
