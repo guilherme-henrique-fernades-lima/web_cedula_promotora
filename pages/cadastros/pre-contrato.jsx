@@ -53,10 +53,12 @@ export default function CadastrarPreContrato() {
   const {
     register,
     setValue,
+    reset,
     resetField,
     control,
     handleSubmit,
     formState: { errors },
+    clearErrors,
   } = useForm({
     resolver: yupResolver(
       id && session?.user?.is_superuser
@@ -251,7 +253,7 @@ export default function CadastrarPreContrato() {
 
     if (response.ok) {
       toast.success("Operação realizada com sucesso");
-      //clearStatesAndErrors();
+      clearStatesAndErrors();
     } else {
       toast.error("Erro na operação");
     }
@@ -283,7 +285,32 @@ export default function CadastrarPreContrato() {
     setOpenBackdrop(false);
   }
 
-  function clearStatesAndErrors() {}
+  function clearStatesAndErrors() {
+    clearErrors();
+    reset();
+
+    setPromotora("");
+    setDtDigitacao(null);
+    setNrContrato("");
+    setNoCliente("");
+    setCpf("");
+    setConvenio("");
+    setOperacao("");
+    setBanco("");
+    setVlContrato("");
+    setQtParcelas("");
+    setVlParcela("");
+    setDtPagCliente(null);
+    setDtPagComissao(null);
+    setVlComissao("");
+    setPorcentagem("");
+    setCorretor("");
+    setIletrado("");
+    setDocumentoSalvo("");
+    setTipoContrato("");
+    setTabela("");
+    setStatusComissao("");
+  }
 
   async function getConveniosPicklist() {
     try {

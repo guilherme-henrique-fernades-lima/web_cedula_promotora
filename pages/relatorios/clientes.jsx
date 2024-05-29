@@ -234,9 +234,12 @@ export default function CadastrarCliente() {
   function getDataForEdit(data) {
     clearErrors();
 
+    console.log(data);
+
     setValue("nome", data.nome);
     setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
     setValue("telefoneUm", data.telefone1);
+    setValue("especieInss", data.especie);
 
     setId(data.id);
     setCpf(formatarCPFSemAnonimidade(data.cpf));
@@ -418,6 +421,8 @@ export default function CadastrarCliente() {
       headerAlign: "center",
     },
   ];
+
+  console.log(clientes);
 
   try {
     var rows = clientes?.map((row) => {
