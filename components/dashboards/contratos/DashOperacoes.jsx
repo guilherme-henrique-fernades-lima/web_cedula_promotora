@@ -14,10 +14,7 @@ import {
 } from "recharts";
 
 //Utils
-import { formatarReal, formatarLabelOperacoes } from "@/helpers/utils";
-
-//Constants
-import { TP_OPERACAO, TP_CONVENIO } from "@/helpers/constants";
+import { formatarReal } from "@/helpers/utils";
 
 //Mui components
 import Box from "@mui/material/Box";
@@ -25,20 +22,6 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 
 export default function DashOperacoes({ data, label, viewType }) {
-  const CustomXAxisTick = (value) => {
-    const TP_OPERACAO = {
-      "CARTAO BENEFICIO": "CARTÃO BENEFÍCIO",
-      "CARTAO CONSIGNADO": "CARTÃO CONSIGNADO",
-      NOVO: "NOVO",
-      PORTABILIDADE: "PORTABILIDADE",
-      PORTABILIDADE_REFINANCIAMENTO: "REFIN. DA PORTABILIDADE",
-      REFINANCIAMENTO: "REFINANCIAMENTO",
-      "SAQUE COMPLEMENTAR CARTAO": "SAQUE COMPLEMENTAR CARTÃO",
-    };
-
-    return TP_OPERACAO[value];
-  };
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload[0] !== undefined) {
       return (
@@ -112,7 +95,6 @@ export default function DashOperacoes({ data, label, viewType }) {
         <CartesianGrid strokeDasharray="0" />
         <XAxis
           dataKey="name"
-          tickFormatter={CustomXAxisTick}
           tick={{
             fontWeight: 400,
             fontSize: 14,

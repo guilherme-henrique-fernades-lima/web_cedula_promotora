@@ -208,7 +208,7 @@ export default function DashboardContratos() {
   const dataArrayConvenios = useMemo(() => {
     return contratos?.indicadores?.convenios.map((row, index) => ({
       id: index,
-      name: row.convenio,
+      name: row.nome_convenio,
       qtd: row.qtd,
       vlr_total: row.vlr_total,
       perc_qtd: row.perc_qtd,
@@ -218,7 +218,7 @@ export default function DashboardContratos() {
   const dataArrayCorretores = useMemo(() => {
     return contratos?.indicadores?.corretores.map((row, index) => ({
       id: index,
-      name: row.corretor,
+      name: row.nome_corretor,
       qtd: row.qtd,
       vlr_total: row.vlr_total,
       perc_qtd: row.perc_qtd,
@@ -228,7 +228,7 @@ export default function DashboardContratos() {
   const dataArrayBancos = useMemo(() => {
     return contratos?.indicadores?.bancos.map((row, index) => ({
       id: index,
-      name: row.banco,
+      name: row.nome_banco,
       qtd: row.qtd,
       vlr_total: row.vlr_total,
       perc_qtd: row.perc_qtd,
@@ -238,7 +238,7 @@ export default function DashboardContratos() {
   const dataArrayPromotoras = useMemo(() => {
     return contratos?.indicadores?.promotoras.map((row, index) => ({
       id: index,
-      name: row.promotora,
+      name: row.nome_promotora,
       qtd: row.qtd,
       vlr_total: row.vlr_total,
       perc_qtd: row.perc_qtd,
@@ -248,7 +248,7 @@ export default function DashboardContratos() {
   const dataArrayOperacoes = useMemo(() => {
     return contratos?.indicadores?.operacoes.map((row, index) => ({
       id: index,
-      name: row.operacao,
+      name: row.nome_operacao,
       qtd: row.qtd,
       vlr_total: row.vlr_total,
       perc_qtd: row.perc_qtd,
@@ -258,7 +258,7 @@ export default function DashboardContratos() {
   const columns = useMemo(
     () => [
       {
-        field: "promotora",
+        field: "nome_promotora",
         headerName: "PROMOTORA",
         renderHeader: (params) => <strong>PROMOTORA</strong>,
         minWidth: 170,
@@ -290,8 +290,8 @@ export default function DashboardContratos() {
         field: "no_cliente",
         headerName: "NOME CLIENTE",
         renderHeader: (params) => <strong>NOME CLIENTE</strong>,
-        minWidth: 300,
-        align: "center",
+        minWidth: 350,
+        align: "left",
         headerAlign: "center",
       },
       {
@@ -308,7 +308,7 @@ export default function DashboardContratos() {
         },
       },
       {
-        field: "convenio",
+        field: "nome_convenio",
         headerName: "CONVÊNIO",
         renderHeader: (params) => <strong>CONVÊNIO</strong>,
         minWidth: 170,
@@ -316,15 +316,15 @@ export default function DashboardContratos() {
         headerAlign: "center",
       },
       {
-        field: "operacao",
+        field: "nome_operacao",
         headerName: "OPERAÇÃO",
         renderHeader: (params) => <strong>OPERAÇÃO</strong>,
-        minWidth: 170,
+        minWidth: 250,
         align: "center",
         headerAlign: "center",
       },
       {
-        field: "banco",
+        field: "nome_banco",
         headerName: "BANCO",
         renderHeader: (params) => <strong>BANCO</strong>,
         minWidth: 220,
@@ -413,7 +413,7 @@ export default function DashboardContratos() {
         headerAlign: "center",
       },
       {
-        field: "corretor",
+        field: "nome_corretor",
         headerName: "CORRETOR",
         renderHeader: (params) => <strong>CORRETOR</strong>,
         minWidth: 200,
