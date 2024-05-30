@@ -1,8 +1,5 @@
 import { useState, useEffect } from "react";
 
-//Next.js
-import { useRouter } from "next/router";
-
 //Third party libraries
 import toast, { Toaster } from "react-hot-toast";
 import * as yup from "yup";
@@ -34,9 +31,6 @@ import SaveIcon from "@mui/icons-material/Save";
 //Constants
 import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
 
-//Formatters
-import { converterDataParaJS } from "@/helpers/utils";
-
 //Schema validation
 import { contratoSchema } from "@/schemas/contratoSchema";
 
@@ -57,12 +51,22 @@ export default function CadastrarContrato(props) {
     resolver: yupResolver(contratoSchema),
   });
 
+  useEffect(() => {
+    if (session?.user?.token) {
+      getConveniosPicklist();
+      getOperacoesPicklist();
+      getCorretoresPicklist();
+      getPromotorasPicklist();
+      getBancosPicklist();
+    }
+  }, [session?.user?.token]);
+
   const [loadingButton, setLoadingButton] = useState(false);
 
   const [id, setId] = useState("");
+  const [nr_contrato, setNrContrato] = useState("");
   const [promotora, setPromotora] = useState("");
   const [dt_digitacao, setDtDigitacao] = useState(null);
-  const [nr_contrato, setNrContrato] = useState("");
   const [no_cliente, setNoCliente] = useState("");
   const [cpf, setCpf] = useState("");
   const [convenio, setConvenio] = useState("");
@@ -77,10 +81,17 @@ export default function CadastrarContrato(props) {
   const [porcentagem, setPorcentagem] = useState("");
   const [corretor, setCorretor] = useState("");
 
+  //States dos dados dos picklists
+  const [convenioPicklist, setConvenioPicklist] = useState([]);
+  const [operacaoPicklist, setOperacaoPicklist] = useState([]);
+  const [bancoPicklist, setBancoPicklist] = useState([]);
+  const [corretorPicklist, setCorretorPicklist] = useState([]);
+  const [promotoraPicklist, setPromotoraPicklist] = useState([]);
+
   function getPayload() {
     const data = {
       //id: id,
-      promotora: promotora.toUpperCase(),
+      promotora: promotora,
       dt_digitacao: dt_digitacao
         ? moment(dt_digitacao).format("YYYY-MM-DD")
         : null,
@@ -89,7 +100,7 @@ export default function CadastrarContrato(props) {
       cpf: cpf,
       convenio: convenio,
       operacao: operacao,
-      banco: banco.toUpperCase(),
+      banco: banco,
       vl_contrato: parseFloat(vl_contrato),
       qt_parcelas: qt_parcelas,
       vl_parcela: parseFloat(vl_parcela),
@@ -101,10 +112,115 @@ export default function CadastrarContrato(props) {
         : null,
       vl_comissao: parseFloat(vl_comissao),
       porcentagem: parseFloat(porcentagem),
-      corretor: corretor.toUpperCase(),
+      corretor: corretor,
     };
 
     return data;
+  }
+
+  async function getConveniosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/convenios/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setConvenioPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getOperacoesPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/operacoes/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setOperacaoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getCorretoresPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/corretores/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setCorretorPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getPromotorasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/promotoras/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setPromotoraPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getBancosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/bancos/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setBancoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async function salvarContrato() {
@@ -188,12 +304,12 @@ export default function CadastrarContrato(props) {
         })}
       >
         <Grid container spacing={1} sx={{ mt: 1 }}>
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("promotora")}
               error={Boolean(errors.promotora)}
               fullWidth
-              label="Tipo de promotora"
+              label="Tipo de promotora (ANTIGO)"
               placeholder="Insira a promotora"
               size="small"
               value={promotora}
@@ -207,6 +323,28 @@ export default function CadastrarContrato(props) {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.promotora?.message}
             </Typography>
+          </Grid> */}
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("promotora")}
+              error={Boolean(errors.promotora)}
+              select
+              fullWidth
+              label="Promotora"
+              size="small"
+              value={promotora}
+              helperText={errors.promotora?.message}
+              onChange={(e) => {
+                setPromotora(e.target.value);
+              }}
+            >
+              {promotoraPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -287,7 +425,7 @@ export default function CadastrarContrato(props) {
               )}
             </InputMask>
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.cpf?.message}
+              {errors?.cpf?.message}
             </Typography>
           </Grid>
 
@@ -315,13 +453,13 @@ export default function CadastrarContrato(props) {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("convenio")}
               error={Boolean(errors.convenio)}
               select
               fullWidth
-              label="Convênio"
+              label="Convênio (ANTIGO)"
               size="small"
               value={convenio}
               onChange={(e) => {
@@ -337,15 +475,37 @@ export default function CadastrarContrato(props) {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.convenio?.message}
             </Typography>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("convenio")}
+              error={Boolean(errors.convenio)}
+              select
+              fullWidth
+              label="Convênio"
+              size="small"
+              value={convenio}
+              helperText={errors.convenio?.message}
+              onChange={(e) => {
+                setConvenio(e.target.value);
+              }}
+            >
+              {convenioPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+
+          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("operacao")}
               error={Boolean(errors.operacao)}
               select
               fullWidth
-              label="Operação"
+              label="Operação (ANTIGO)"
               size="small"
               value={operacao}
               onChange={(e) => {
@@ -361,9 +521,31 @@ export default function CadastrarContrato(props) {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.operacao?.message}
             </Typography>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("operacao")}
+              error={Boolean(errors.operacao)}
+              select
+              fullWidth
+              label="Operação"
+              size="small"
+              value={operacao}
+              helperText={errors?.operacao?.message}
+              onChange={(e) => {
+                setOperacao(e.target.value);
+              }}
+            >
+              {operacaoPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+
+          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("banco")}
               error={Boolean(errors.banco)}
@@ -372,7 +554,7 @@ export default function CadastrarContrato(props) {
                 setBanco(e.target.value);
               }}
               size="small"
-              label="Banco"
+              label="Banco (ANTIGO)"
               placeholder="Insira o nome do banco"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
@@ -382,6 +564,28 @@ export default function CadastrarContrato(props) {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.banco?.message}
             </Typography>
+          </Grid> */}
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("banco")}
+              error={Boolean(errors.banco)}
+              select
+              fullWidth
+              label="Banco"
+              size="small"
+              value={banco}
+              helperText={errors.banco?.message}
+              onChange={(e) => {
+                setBanco(e.target.value);
+              }}
+            >
+              {bancoPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -592,7 +796,7 @@ export default function CadastrarContrato(props) {
             </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("corretor")}
               error={Boolean(errors.corretor)}
@@ -601,7 +805,7 @@ export default function CadastrarContrato(props) {
                 setCorretor(e.target.value);
               }}
               size="small"
-              label="Corretor(a)"
+              label="Corretor(a) (ANTIGO)"
               placeholder="Insira o corretor"
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
@@ -611,6 +815,28 @@ export default function CadastrarContrato(props) {
             <Typography sx={{ color: "#f00", fontSize: "12px" }}>
               {errors.corretor?.message}
             </Typography>
+          </Grid> */}
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <TextField
+              {...register("corretor")}
+              error={Boolean(errors.corretor)}
+              select
+              fullWidth
+              label="Corretor(a)"
+              size="small"
+              value={corretor}
+              helperText={errors.corretor?.message}
+              onChange={(e) => {
+                setCorretor(e.target.value);
+              }}
+            >
+              {corretorPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>

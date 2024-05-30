@@ -3,7 +3,7 @@ async function create(req, res) {
   const data = req.body;
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/resources/convenios/`,
+    `${process.env.NEXT_INTEGRATION_URL}/auth/register/`,
     {
       method: "POST",
       headers: {
@@ -26,7 +26,7 @@ async function update(req, res) {
   const id = req.query.id ?? "";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/resources/convenios/${id}`,
+    `${process.env.NEXT_INTEGRATION_URL}/auth/users/${id}`,
     {
       method: "PUT",
       headers: {
@@ -46,19 +46,14 @@ async function update(req, res) {
 async function list(req, res) {
   const token = req.headers.authorization;
 
-  const ativas = req.query.ativas ?? "";
-
-  const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/resources/convenios/?ativas=${ativas}`,
-    {
-      method: "GET",
-      headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  const result = await fetch(`${process.env.NEXT_INTEGRATION_URL}/auth/users`, {
+    method: "GET",
+    headers: {
+      "X-Requested-With": "XMLHttpRequest",
+      "Content-Type": "application/json;charset=UTF-8",
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
   const json = await result.json();
 

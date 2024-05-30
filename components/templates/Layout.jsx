@@ -4,12 +4,14 @@ import Image from "next/image";
 
 //Third party libraries
 import { useSession, signOut } from "next-auth/react";
+import toast, { Toaster } from "react-hot-toast";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 //Mui components
-import { styled } from "@mui/material/styles";
+import { styled, alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
@@ -21,47 +23,64 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Collapse from "@mui/material/Collapse";
-import { useTheme } from "@mui/material/styles";
-import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Backdrop from "@mui/material/Backdrop";
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import LoadingButton from "@mui/lab/LoadingButton";
+import InputAdornment from "@mui/material/InputAdornment";
 
 //Icons
-import SubjectIcon from "@mui/icons-material/Subject";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LogoutIcon from "@mui/icons-material/Logout";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import ExpandLess from "@mui/icons-material/ExpandLess";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import EqualizerIcon from "@mui/icons-material/Equalizer";
-import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LockResetIcon from "@mui/icons-material/LockReset";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
+//Custom components
 import { ROUTES } from "@/helpers/routes";
+import { ProtectedRoute } from "@/components/templates/ProtectedRoute";
+import CustomTextField from "@/components/CustomTextField";
+
+//Schema
+import { resetPassword } from "@/schemas/resetPassword";
 
 export default function Layout({ children }) {
   const { data: session } = useSession();
-  const theme = useTheme();
 
   const [open, setOpen] = useState(false);
-  const [openDropdownRelatorios, setOpenDropdownRelatorios] = useState(false);
-  const [openDropdownCadastros, setOpenDropdownCadastros] = useState(false);
-  const [openDropdownDashboards, setOpenDropdownDashboards] = useState(false);
-  const [openDropdownConfiguracoes, setOpenDropdownConfiguracoes] =
-    useState(false);
-  const [activeOption, setActiveOption] = useState("");
+  const [openModalResetPassword, setOpenModalResetPassword] = useState(false);
 
   const handleDrawerCloseOpen = () => {
-    setOpen(!open);
+    setOpen((open) => !open);
   };
 
   const handleLogout = async () => {
     const data = await signOut({ redirect: true, callbackUrl: "/auth/login" });
   };
 
+  function capitalizarPrimeirasLetras(str) {
+    return str.toLowerCase().replace(/(^|\s)\S/g, function (l) {
+      return l.toUpperCase();
+    });
+  }
+
+  const handleModalResetPassword = () =>
+    setOpenModalResetPassword(
+      (openModalResetPassword) => !openModalResetPassword
+    );
+
   return (
     <>
-      <CssBaseline />
-
       {session?.user ? (
         <Box sx={{ display: "flex" }}>
           <AppBar position="fixed" open={open} elevation={0}>
@@ -86,13 +105,12 @@ export default function Layout({ children }) {
                 justifyContent: "center",
               }}
             >
+              <DropdownMenu
+                username={capitalizarPrimeirasLetras(session?.user.username)}
+                handleOpenModal={handleModalResetPassword}
+                handleLogout={handleLogout}
+              />
               {/* <AccountCircleIcon sx={{ width: 44, height: 44 }} /> */}
-
-              <Tooltip title="Sair" placement="bottom">
-                <IconButton onClick={handleLogout} sx={{ mr: 2 }}>
-                  <LogoutIcon sx={{ color: "#fff" }} />
-                </IconButton>
-              </Tooltip>
             </Box>
           </AppBar>
           <Drawer
@@ -110,432 +128,30 @@ export default function Layout({ children }) {
           >
             <DrawerHeader></DrawerHeader>
             <Divider />
-
-            {/* <MenuOptions /> */}
-            <List>
-              <ListItem
-                disablePadding
-                onClick={() => {
-                  setOpenDropdownCadastros(
-                    (openDropdownCadastros) => !openDropdownCadastros
-                  );
-                  setOpenDropdownRelatorios(false);
-                  setOpenDropdownDashboards(false);
-                  setOpenDropdownConfiguracoes(false);
-                  setActiveOption((activeOption) =>
-                    activeOption == "cadastros" ? "" : "cadastros"
-                  );
-                }}
-                sx={{
-                  transition: "all 0.3s ease",
-                  backgroundColor:
-                    activeOption == "cadastros"
-                      ? theme?.palette?.primary?.main
-                      : "transparent",
-                }}
-              >
-                <ListItemButton>
-                  <ListItemIcon>
-                    <AddCircleOutlineIcon
-                      sx={{
-                        color: `${activeOption == "cadastros" ? "#fff" : "#"}`,
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="span"
-                        component="span"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                          color: `${
-                            activeOption == "cadastros" ? "#fff" : "#292929"
-                          }`,
-                        }}
-                      >
-                        Cadastros
-                      </Typography>
-                    }
-                  />
-                  <ExpandLess
-                    sx={{
-                      fontSize: "20px",
-                      transition: "all 0.3s ease",
-                      transform: `${
-                        openDropdownCadastros ? "rotate(0)" : "rotate(180deg)"
-                      }`,
-                      color: `${activeOption == "cadastros" ? "#fff" : "#"}`,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-
-              <Collapse in={openDropdownCadastros} timeout="auto" unmountOnExit>
-                <List component="nav" disablePadding>
-                  <Link href="/cadastros/cliente">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Cliente</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/cadastros/contrato">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Contrato</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/cadastros/despesa">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Despesa</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-                </List>
-              </Collapse>
-
-              <ListItem
-                disablePadding
-                onClick={() => {
-                  setOpenDropdownDashboards(
-                    (openDropdownDashboards) => !openDropdownDashboards
-                  );
-                  setOpenDropdownCadastros(false);
-                  setOpenDropdownRelatorios(false);
-                  setOpenDropdownConfiguracoes(false);
-                  setActiveOption((activeOption) =>
-                    activeOption == "dashboards" ? "" : "dashboards"
-                  );
-                }}
-                sx={{
-                  transition: "all 0.3s ease",
-                  backgroundColor:
-                    activeOption == "dashboards"
-                      ? theme?.palette?.primary?.main
-                      : "transparent",
-                }}
-              >
-                <ListItemButton>
-                  <ListItemIcon>
-                    <EqualizerIcon
-                      sx={{
-                        color: `${activeOption == "dashboards" ? "#fff" : "#"}`,
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="span"
-                        component="span"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                          color: `${
-                            activeOption == "dashboards" ? "#fff" : "#292929"
-                          }`,
-                        }}
-                      >
-                        Dashboards
-                      </Typography>
-                    }
-                  />
-                  <ExpandLess
-                    sx={{
-                      fontSize: "20px",
-                      transition: "all 0.3s ease",
-                      transform: `${
-                        openDropdownDashboards ? "rotate(0)" : "rotate(180deg)"
-                      }`,
-                      color: `${activeOption == "dashboards" ? "#fff" : "#"}`,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-
-              <Collapse
-                in={openDropdownDashboards}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="nav" disablePadding>
-                  <Link href="/dashboards/clientes">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Clientes</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/dashboards/contratos">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Contratos</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/dashboards/despesas">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Despesas</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-                </List>
-              </Collapse>
-
-              <ListItem
-                disablePadding
-                onClick={() => {
-                  setOpenDropdownConfiguracoes(
-                    (openDropdownConfiguracoes) => !openDropdownConfiguracoes
-                  );
-                  setOpenDropdownRelatorios(false);
-                  setOpenDropdownDashboards(false);
-                  setOpenDropdownCadastros(false);
-                  setActiveOption((activeOption) =>
-                    activeOption == "configuracoes" ? "" : "configuracoes"
-                  );
-                }}
-                sx={{
-                  transition: "all 0.3s ease",
-                  backgroundColor:
-                    activeOption == "configuracoes"
-                      ? theme?.palette?.primary?.main
-                      : "transparent",
-                }}
-              >
-                <ListItemButton>
-                  <ListItemIcon>
-                    <SettingsIcon
-                      sx={{
-                        color: `${
-                          activeOption == "configuracoes" ? "#fff" : "#"
-                        }`,
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="span"
-                        component="span"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                          color: `${
-                            activeOption == "configuracoes" ? "#fff" : "#292929"
-                          }`,
-                        }}
-                      >
-                        Configurações
-                      </Typography>
-                    }
-                  />
-                  <ExpandLess
-                    sx={{
-                      fontSize: "20px",
-                      transition: "all 0.3s ease",
-                      transform: `${
-                        openDropdownConfiguracoes
-                          ? "rotate(0)"
-                          : "rotate(180deg)"
-                      }`,
-                      color: `${
-                        activeOption == "configuracoes" ? "#fff" : "#"
-                      }`,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-
-              <Collapse
-                in={openDropdownConfiguracoes}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="nav" disablePadding>
-                  <Link href="/configuracoes/lojas">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Lojas</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-                </List>
-              </Collapse>
-
-              <ListItem
-                disablePadding
-                onClick={() => {
-                  setOpenDropdownRelatorios(
-                    (openDropdownRelatorios) => !openDropdownRelatorios
-                  );
-                  setOpenDropdownCadastros(false);
-                  setOpenDropdownDashboards(false);
-                  setOpenDropdownConfiguracoes(false);
-                  setActiveOption((activeOption) =>
-                    activeOption == "relatorios" ? "" : "relatorios"
-                  );
-                }}
-                sx={{
-                  backgroundColor:
-                    activeOption == "relatorios"
-                      ? theme?.palette?.primary?.main
-                      : "transparent",
-                }}
-              >
-                <ListItemButton>
-                  <ListItemIcon>
-                    <SubjectIcon
-                      sx={{
-                        color: `${activeOption == "relatorios" ? "#fff" : "#"}`,
-                      }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography
-                        variant="span"
-                        component="span"
-                        sx={{
-                          fontWeight: 700,
-                          fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                          color: `${
-                            activeOption == "relatorios" ? "#fff" : "#292929"
-                          }`,
-                        }}
-                      >
-                        Relatórios
-                      </Typography>
-                    }
-                  />
-                  <ExpandLess
-                    sx={{
-                      fontSize: "20px",
-                      transition: "all 0.3s ease",
-                      transform: `${
-                        openDropdownRelatorios ? "rotate(0)" : "rotate(180deg)"
-                      }`,
-                      color: `${activeOption == "relatorios" ? "#fff" : "#"}`,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-              <Collapse
-                in={openDropdownRelatorios}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="nav" disablePadding>
-                  <Link href="/relatorios/clientes">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Clientes</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/relatorios/contratos">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Contratos</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/relatorios/despesas">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={<TitleTypography>Despesas</TitleTypography>}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-
-                  <Link href="/relatorios/vencimentos">
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemIcon sx={{ pl: 3 }}>
-                          <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={
-                            <TitleTypography>Vencimentos</TitleTypography>
-                          }
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  </Link>
-                </List>
-              </Collapse>
-            </List>
+            <MenuOptions perms={session?.user?.perms} />
             {/* <Divider /> */}
           </Drawer>
           <Main open={open}>
             <DrawerHeader />
-            {children}
+            <ProtectedRoute perms={session?.user?.perms}>
+              {children}
+            </ProtectedRoute>
           </Main>
         </Box>
       ) : (
-        <>{children}</>
+        <ProtectedRoute>{children}</ProtectedRoute>
       )}
+
+      <ModalChangePassword
+        open={openModalResetPassword}
+        setOpen={handleModalResetPassword}
+      >
+        <ChangePasswordForm
+          user_id={session?.user?.id}
+          token={session?.user?.token}
+        />
+      </ModalChangePassword>
+      <Toaster position="bottom-center" reverseOrder={true} />
     </>
   );
 }
@@ -623,18 +239,20 @@ function LogoCedulaPromotora() {
         flexDirection: "column",
       }}
     >
-      <Image
-        src="/img/logotipo.png"
-        width={160}
-        height={56}
-        alt="Logo da Cédula Promotora"
-        priority
-      />
+      <Link href="/">
+        <Image
+          src="/img/logotipo.png"
+          width={160}
+          height={56}
+          alt="Logo da Cédula Promotora"
+          priority
+        />
+      </Link>
     </Box>
   );
 }
 
-function MenuOptions() {
+function MenuOptions({ perms }) {
   const [dropDownOption, setDropdownOption] = useState(false);
 
   const handleDropdownToggle = (index) => {
@@ -645,70 +263,356 @@ function MenuOptions() {
     <List>
       {ROUTES.map((option, index) => (
         <React.Fragment key={option.id}>
-          <ListItem
-            disablePadding
-            onClick={() => handleDropdownToggle(index)}
-            sx={{
-              transition: "all 0.3s ease",
-              backgroundColor:
-                dropDownOption === index ? "#1a3d74" : "transparent",
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{ color: dropDownOption === index ? "#fff" : "#212121" }}
-              >
-                {option.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Typography
-                    variant="span"
-                    component="span"
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
-                      color: dropDownOption === index ? "#fff" : "#212121",
-                    }}
-                  >
-                    {option.title}
-                  </Typography>
-                }
-              />
-              <ExpandLess
-                sx={{
-                  fontSize: "20px",
-                  transition: "all 0.3s ease",
-                  transform:
-                    dropDownOption === index ? "rotate(180deg)" : "none",
-                  color: dropDownOption === index ? "#fff" : "#212121",
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
+          {perms[option?.perm] && (
+            <ListItem
+              disablePadding
+              onClick={() => handleDropdownToggle(index)}
+              sx={{
+                transition: "all 0.3s ease",
+                backgroundColor:
+                  dropDownOption === index ? "#1a3d74" : "transparent",
+              }}
+            >
+              <ListItemButton>
+                <ListItemIcon
+                  sx={{ color: dropDownOption === index ? "#fff" : "#747474" }}
+                >
+                  {option.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      variant="span"
+                      component="span"
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+                        color: dropDownOption === index ? "#fff" : "#212121",
+                      }}
+                    >
+                      {option.title}
+                    </Typography>
+                  }
+                />
+                <ExpandLess
+                  sx={{
+                    fontSize: "20px",
+                    transition: "all 0.3s ease",
+                    transform:
+                      dropDownOption === index ? "rotate(180deg)" : "none",
+                    color: dropDownOption === index ? "#fff" : "#212121",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          )}
 
           <Collapse in={dropDownOption === index} timeout="auto" unmountOnExit>
             <List component="nav" disablePadding>
-              {option.routes.map((route, index) => (
-                <Link href={route.url} key={index}>
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemIcon sx={{ pl: 3 }}>
-                        <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <TitleTypography>{route.title} </TitleTypography>
-                        }
-                      />
-                    </ListItemButton>
-                  </ListItem>
-                </Link>
+              {option.routes.map((route) => (
+                <React.Fragment key={route.id}>
+                  {perms[route.perm] && (
+                    <Link href={route.url}>
+                      <ListItem disablePadding>
+                        <ListItemButton>
+                          <ListItemIcon sx={{ pl: 3 }}>
+                            <FiberManualRecordIcon sx={{ fontSize: "8px" }} />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={
+                              <TitleTypography>{route.title}</TitleTypography>
+                            }
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    </Link>
+                  )}
+                </React.Fragment>
               ))}
             </List>
           </Collapse>
         </React.Fragment>
       ))}
     </List>
+  );
+}
+
+const StyledMenu = styled((props) => (
+  <Menu
+    elevation={0}
+    anchorOrigin={{
+      vertical: "bottom",
+      horizontal: "right",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "right",
+    }}
+    {...props}
+  />
+))(({ theme }) => ({
+  "& .MuiPaper-root": {
+    borderRadius: 6,
+    marginTop: theme.spacing(1),
+    minWidth: 180,
+    color:
+      theme.palette.mode === "light"
+        ? "rgb(55, 65, 81)"
+        : theme.palette.grey[300],
+    boxShadow:
+      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
+    "& .MuiMenu-list": {
+      padding: "4px 0",
+    },
+    "& .MuiMenuItem-root": {
+      "& .MuiSvgIcon-root": {
+        fontSize: 18,
+        color: theme.palette.text.secondary,
+        marginRight: theme.spacing(1.5),
+      },
+      "&:active": {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          theme.palette.action.selectedOpacity
+        ),
+      },
+    },
+  },
+}));
+
+function DropdownMenu({ username, handleOpenModal, handleLogout }) {
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <div>
+      <Button
+        id="demo-customized-button"
+        aria-controls={open ? "demo-customized-menu" : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        variant="contained"
+        disableElevation
+        onClick={handleClick}
+        endIcon={<KeyboardArrowDownIcon />}
+        sx={{ mr: 3 }}
+      >
+        {username}
+      </Button>
+      <StyledMenu
+        id="demo-customized-menu"
+        MenuListProps={{
+          "aria-labelledby": "demo-customized-button",
+        }}
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+      >
+        <MenuItem
+          onClick={() => {
+            handleOpenModal();
+            handleClose();
+          }}
+        >
+          <LockResetIcon />
+          Alterar senha
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <LogoutIcon />
+          Sair
+        </MenuItem>
+      </StyledMenu>
+    </div>
+  );
+}
+
+function ModalChangePassword({ open, setOpen, children }) {
+  const handleClose = () => setOpen(false);
+
+  return (
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      open={open}
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 500,
+        },
+      }}
+    >
+      <Fade in={open}>
+        <Box
+          sx={{
+            position: "relative",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            maxWidth: 420,
+            //height: "100%",
+            maxHeight: 420,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 2,
+            overflowY: "auto",
+          }}
+        >
+          <IconButton
+            color="error"
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 15, right: 15 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          {children}
+        </Box>
+      </Fade>
+    </Modal>
+  );
+}
+
+function ChangePasswordForm({ user_id, token }) {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(resetPassword),
+  });
+
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
+  const handleClickShowPassword = (passwordField) => {
+    if (passwordField === "newPassword") {
+      setShowNewPassword((showPassword) => !showPassword);
+    } else {
+      setShowConfirmNewPassword((showNewPassword) => !showNewPassword);
+    }
+  };
+
+  function clearStatesAndErrors() {
+    reset();
+    setNewPassword("");
+    setConfirmNewPassword("");
+  }
+
+  async function alterarSenha() {
+    try {
+      setLoading(true);
+
+      const payload = {
+        user_id: user_id,
+        password: newPassword,
+      };
+
+      const response = await fetch("/api/acessos/change-password", {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        toast.success("Alterado com sucesso!");
+        clearStatesAndErrors();
+        setLoading(false);
+      } else {
+        toast.error("Erro ao alterar");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return (
+    <Box
+      component="form"
+      onSubmit={handleSubmit(alterarSenha)}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+    >
+      <Typography
+        sx={{ fontWeight: 700, mb: 2, textAlign: "left", width: "100%" }}
+      >
+        Alterar a senha
+      </Typography>
+
+      <Box sx={{ mt: 2 }} />
+
+      <CustomTextField
+        value={newPassword}
+        setValue={setNewPassword}
+        label="Nova senha"
+        placeholder="Insira a nova senha"
+        validateFieldName="newPassword"
+        type={showNewPassword ? "text" : "password"}
+        control={control}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={() => handleClickShowPassword("newPassword")}
+                size="small"
+              >
+                {showNewPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <Box sx={{ mt: 2 }} />
+
+      <CustomTextField
+        value={confirmNewPassword}
+        setValue={setConfirmNewPassword}
+        label="Repita a senha"
+        placeholder="Repita a senha"
+        validateFieldName="confirmNewPassword"
+        type={showConfirmNewPassword ? "text" : "password"}
+        control={control}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleClickShowPassword} size="small">
+                {showConfirmNewPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+
+      <LoadingButton
+        type="submit"
+        variant="contained"
+        endIcon={<SaveIcon />}
+        disableElevation
+        loading={loading}
+        fullWidth
+        //onClick={alterarSenha}
+        sx={{ mt: 2 }}
+      >
+        ALTERAR
+      </LoadingButton>
+    </Box>
   );
 }

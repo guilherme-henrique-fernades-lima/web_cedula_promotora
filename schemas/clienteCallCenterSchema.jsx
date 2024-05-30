@@ -7,5 +7,18 @@ export const clienteCallCenterSchema = yup.object().shape({
     .min(14, "O CPF precisa ter pelo menos 11 digitos"),
   telefoneUm: yup.string().required("Informe um telefone válido"),
   nome: yup.string().required("O nome do cliente é obrigatório"),
-  //dataNascimento: yup.string().required("A data de nascimento é obrigatória"),
+  convenio: yup.string(),
+  especieInss: yup.string().test({
+    name: "required-if-convenio-is-5",
+    exclusive: true,
+    message: "Selecione uma espécie do INSS",
+    test: function (value) {
+      const { convenio } = this.parent;
+      console.log(convenio);
+      if (convenio === "5") {
+        return !!value;
+      }
+      return true;
+    },
+  }),
 });

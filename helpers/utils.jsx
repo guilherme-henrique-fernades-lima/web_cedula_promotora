@@ -4,6 +4,9 @@ import Chip from "@mui/material/Chip";
 //Constants
 import { ESPECIES_INSS_JSON } from "@/helpers/constants";
 
+//Third libs
+import moment from "moment";
+
 export function formatarData(data) {
   const partes = data.split("-");
   const ano = partes[0];
@@ -185,4 +188,8 @@ export function formatarEspecieInss(value) {
   } else {
     return value;
   }
+}
+
+export function formatarDataComHora(date) {
+  return moment(date).format("DD/MM/YYYY - HH:mm");
 }

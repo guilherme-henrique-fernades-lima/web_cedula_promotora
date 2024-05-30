@@ -231,7 +231,9 @@ export default function RelatorioDespesas() {
 
     setId(data.id);
     setDescricaoDespesa(data.descricao);
-    setDataVencimentoDespesa(converterDataParaJS(data.dt_vencimento));
+    setDataVencimentoDespesa(
+      data.dt_vencimento ? converterDataParaJS(data.dt_vencimento) : null
+    );
     setValorDespesa(data.valor);
     setSituacaoPagamentoDespesa(data.situacao);
     setNaturezaDespesa(data.natureza_despesa);

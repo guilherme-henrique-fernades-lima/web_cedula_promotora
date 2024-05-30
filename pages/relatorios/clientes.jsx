@@ -74,6 +74,10 @@ export default function CadastrarCliente() {
   const [telefoneDois, setTelefoneDois] = useState("");
   const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
+  const [convenio, setConvenio] = useState("");
+
+  // Picklists
+  const [convenioPicklist, setConvenioPicklist] = useState([]);
 
   const {
     register,
@@ -88,8 +92,37 @@ export default function CadastrarCliente() {
   });
 
   useEffect(() => {
-    getClientes();
-  }, [session?.user]);
+    if (session?.user?.token) {
+      getClientes();
+    }
+  }, [session?.user, showEditForm]);
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      getConveniosPicklist();
+    }
+  }, [session?.user?.token]);
+
+  async function getConveniosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/convenios/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setConvenioPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleOpenDialogExcluir = () => {
     setOpenDialogExcluir(!openDialogExcluir);
@@ -169,12 +202,13 @@ export default function CadastrarCliente() {
       dt_nascimento: dataNascimento
         ? moment(dataNascimento).format("YYYY-MM-DD")
         : null,
-      especie: especieInss ? especieInss?.especie : null,
+      especie: convenio == 5 && especieInss ? especieInss?.especie : null,
       matricula: matricula.toUpperCase(),
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
       telefone3: telefoneTres.replace(/\D/g, ""),
       observacoes: observacao,
+      convenio: convenio == "" ? null : convenio,
     };
 
     return payload;
@@ -194,19 +228,25 @@ export default function CadastrarCliente() {
     setTelefoneDois("");
     setTelefoneTres("");
     setObservacao("");
+    setConvenio("");
   }
 
   function getDataForEdit(data) {
     clearErrors();
 
+    console.log(data);
+
     setValue("nome", data.nome);
     setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
     setValue("telefoneUm", data.telefone1);
+    setValue("especieInss", data.especie);
 
     setId(data.id);
     setCpf(formatarCPFSemAnonimidade(data.cpf));
     setNome(data.nome);
-    setDataNascimento(converterDataParaJS(data.dt_nascimento));
+    setDataNascimento(
+      data.dt_nascimento ? converterDataParaJS(data.dt_nascimento) : null
+    );
     setEspecieInss(
       data.especie
         ? {
@@ -219,25 +259,7 @@ export default function CadastrarCliente() {
     setTelefoneDois(data.telefone2 ? data.telefone2 : "");
     setTelefoneTres(data.telefone3 ? data.telefone3 : "");
     setObservacao(data.observacoes);
-  }
-
-  async function getDespesas() {
-    const response = await fetch(
-      `/api/relatorios/despesas/?dt_inicio=${moment(dataInicio).format(
-        "YYYY-MM-DD"
-      )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      }
-    );
-
-    if (response.ok) {
-      const json = await response.json();
-      setDespesas(json);
-    }
+    setConvenio(data.convenio);
   }
 
   async function editarDadosCliente() {
@@ -384,7 +406,25 @@ export default function CadastrarCliente() {
       align: "center",
       headerAlign: "center",
     },
+    {
+      field: "convenio",
+      headerName: "COD. CONVÊNIO",
+      renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
+      minWidth: 450,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_convenio",
+      headerName: "CONVÊNIO",
+      renderHeader: (params) => <strong>CONVÊNIO</strong>,
+      minWidth: 450,
+      align: "center",
+      headerAlign: "center",
+    },
   ];
+
+  console.log(clientes);
 
   try {
     var rows = clientes?.map((row) => {
@@ -399,6 +439,8 @@ export default function CadastrarCliente() {
         telefone2: row.telefone2,
         telefone3: row.telefone3,
         observacoes: row.observacoes,
+        convenio: row.convenio,
+        nome_convenio: row.nome_convenio,
       };
     });
   } catch (err) {
@@ -517,7 +559,6 @@ export default function CadastrarCliente() {
                     />
                   )}
                   value={dataNascimento}
-                  
                   disableHighlightToday
                 />
               </LocalizationProvider>
@@ -626,6 +667,55 @@ export default function CadastrarCliente() {
                 )}
               </InputMask>
             </Grid>
+
+            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+              <TextField
+                {...register("convenio")}
+                select
+                fullWidth
+                label="Convênio"
+                size="small"
+                value={convenio}
+                onChange={(e) => {
+                  setConvenio(e.target.value);
+                }}
+              >
+                <MenuItem value="">
+                  <em>Nenhum convênio</em>
+                </MenuItem>
+                {convenioPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            {convenio == 5 && (
+              <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+                <Autocomplete
+                  options={ESPECIES_INSS}
+                  autoHighlight
+                  getOptionLabel={(option) => option?.especie}
+                  value={especieInss}
+                  onChange={(event, newValue) => {
+                    setEspecieInss(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      {...register("especieInss")}
+                      label="Espécie INSS"
+                      size="small"
+                      fullWidth
+                      error={Boolean(errors?.especieInss)}
+                      helperText={errors?.especieInss?.message}
+                    />
+                  )}
+                />
+              </Grid>
+            )}
+
             <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <TextField
                 multiline
