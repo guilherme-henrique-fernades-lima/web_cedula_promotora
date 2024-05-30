@@ -71,6 +71,8 @@ export default function DashboardDespesas() {
       if (response.ok) {
         const json = await response.json();
         setDespesas(json?.despesas);
+      } else {
+        setDespesas([]);
       }
     } catch (error) {
       console.error("Erro ao obter despesas:", error);
