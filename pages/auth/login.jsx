@@ -295,6 +295,18 @@ export default function SingIn() {
               )}
             </Box>
           </Box>
+
+          <Typography
+            sx={{
+              color: "#fff",
+              position: "absolute",
+              bottom: 20,
+              right: 20,
+              fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+            }}
+          >
+            Desenvolvido por: <strong>GTECH</strong>
+          </Typography>
         </Box>
       </>
     );

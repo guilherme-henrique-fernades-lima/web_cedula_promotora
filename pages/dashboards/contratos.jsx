@@ -62,20 +62,22 @@ export default function DashboardContratos() {
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
   const [viewType, setViewType] = useState("qtd");
+
   const [conveniosFilter, setConveniosFilter] = useState([]);
   const [operacoesFilter, setOperacoesFilter] = useState([]);
   const [bancosFilter, setBancosFilter] = useState([]);
   const [promotorasFilter, setPromotorasFilter] = useState([]);
   const [corretoresFilter, setCorretoresFilter] = useState([]);
 
+  //States dos dados dos picklists
+  const [convenioPicklist, setConvenioPicklist] = useState([]);
+  const [operacaoPicklist, setOperacaoPicklist] = useState([]);
+  const [bancoPicklist, setBancoPicklist] = useState([]);
+  const [corretorPicklist, setCorretorPicklist] = useState([]);
+  const [promotoraPicklist, setPromotoraPicklist] = useState([]);
+
   //Auxiliar para controlar o efeito do botao de pesquisar
   const [loadingButton, setLoadingButton] = useState(false);
-
-  //Dados para selects
-  const [bancos, setBancos] = useState([]);
-  const [promotoras, setPromotoras] = useState([]);
-  const [corretores, setCorretores] = useState([]);
-
   const [alignment, setAlignment] = useState("dash");
 
   const handleAlignment = (event, newAlignment) => {
@@ -85,11 +87,123 @@ export default function DashboardContratos() {
   useEffect(() => {
     if (session?.user?.token) {
       getContratos();
-      getBancos();
-      getCorretores();
-      getPromotoras();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (session?.user?.token) {
+      getConveniosPicklist();
+      getOperacoesPicklist();
+      getCorretoresPicklist();
+      getPromotorasPicklist();
+      getBancosPicklist();
     }
   }, [session?.user?.token]);
+
+  async function getConveniosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/convenios/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setConvenioPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getOperacoesPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/operacoes/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setOperacaoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getCorretoresPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/corretores/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setCorretorPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getPromotorasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/promotoras/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setPromotoraPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getBancosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/bancos/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setBancoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleViewTypeChange = (event) => {
     setViewType(event.target.value);
@@ -97,17 +211,10 @@ export default function DashboardContratos() {
 
   function handleQuery(array) {
     const arrayData = [];
-    for (var i = 0; i < array.length; i++) {
-      arrayData.push(array[i]["value"]);
+    for (var i = 0; i < array?.length; i++) {
+      arrayData.push(array[i]["id"]);
     }
-    return arrayData;
-  }
 
-  function handleQueryWithKey(array, key) {
-    const arrayData = [];
-    for (var i = 0; i < array.length; i++) {
-      arrayData.push(array[i][key]);
-    }
     return arrayData;
   }
 
@@ -120,17 +227,15 @@ export default function DashboardContratos() {
           "YYYY-MM-DD"
         )}&dt_final=${moment(dataFim).format(
           "YYYY-MM-DD"
-        )}&convenios=${handleQuery(
-          conveniosFilter
-        )}&promotoras=${handleQueryWithKey(
+        )}&convenios=${handleQuery(conveniosFilter)}&promotoras=${handleQuery(
           promotorasFilter,
           "promotora"
-        )}&corretores=${handleQueryWithKey(
+        )}&corretores=${handleQuery(
           corretoresFilter,
           "corretor"
-        )}&operacoes=${handleQuery(
-          operacoesFilter
-        )}&bancos=${handleQueryWithKey(bancosFilter, "banco")}`,
+        )}&operacoes=${handleQuery(operacoesFilter)}&bancos=${handleQuery(
+          bancosFilter
+        )}`,
         {
           method: "GET",
           headers: {
@@ -139,8 +244,10 @@ export default function DashboardContratos() {
         }
       );
 
-      const json = await response.json();
-      setContratos(json);
+      if (response.ok) {
+        const json = await response.json();
+        setContratos(json);
+      }
 
       setLoadingButton(false);
     } catch (error) {
@@ -156,54 +263,6 @@ export default function DashboardContratos() {
     promotorasFilter,
     operacoesFilter,
   ]);
-
-  const getBancos = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/filtros/bancos/`, {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      });
-
-      const json = await response.json();
-      setBancos(json);
-    } catch (error) {
-      console.error("Erro ao obter bancos:", error);
-    }
-  }, [session?.user?.token]);
-
-  const getPromotoras = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/filtros/promotoras/`, {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      });
-
-      const json = await response.json();
-      setPromotoras(json);
-    } catch (error) {
-      console.error("Erro ao obter promotoras:", error);
-    }
-  }, [session?.user?.token]);
-
-  const getCorretores = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/filtros/corretores/`, {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      });
-
-      const json = await response.json();
-      setCorretores(json);
-    } catch (error) {
-      console.error("Erro ao obter corretores:", error);
-    }
-  }, [session?.user?.token]);
 
   const dataArrayConvenios = useMemo(() => {
     return contratos?.indicadores?.convenios.map((row, index) => ({
@@ -519,8 +578,8 @@ export default function DashboardContratos() {
               setConveniosFilter(value);
             }}
             clearOnEscape
-            options={TP_CONVENIO}
-            getOptionLabel={(option) => option.label}
+            options={convenioPicklist}
+            getOptionLabel={(option) => option.name}
             value={conveniosFilter}
             renderInput={(params) => (
               <TextField {...params} label="Convênios" />
@@ -530,9 +589,9 @@ export default function DashboardContratos() {
             renderTags={(tagValue, getTagProps) => {
               return tagValue.map((option, index) => (
                 <Chip
-                  key={index}
+                  key={option.id}
                   {...getTagProps({ index })}
-                  label={option.label}
+                  label={option.name}
                   size="small"
                 />
               ));
@@ -551,8 +610,8 @@ export default function DashboardContratos() {
               setOperacoesFilter(value);
             }}
             clearOnEscape
-            options={TP_OPERACAO}
-            getOptionLabel={(option) => option.label}
+            options={operacaoPicklist}
+            getOptionLabel={(option) => option.name}
             value={operacoesFilter}
             renderInput={(params) => (
               <TextField {...params} label="Operações" />
@@ -562,9 +621,9 @@ export default function DashboardContratos() {
             renderTags={(tagValue, getTagProps) => {
               return tagValue.map((option, index) => (
                 <Chip
-                  key={index}
+                  key={option.id}
                   {...getTagProps({ index })}
-                  label={option.label}
+                  label={option.name}
                   size="small"
                 />
               ));
@@ -583,8 +642,8 @@ export default function DashboardContratos() {
               setBancosFilter(value);
             }}
             clearOnEscape
-            options={bancos}
-            getOptionLabel={(option) => option.banco}
+            options={bancoPicklist}
+            getOptionLabel={(option) => option.name}
             value={bancosFilter}
             renderInput={(params) => <TextField {...params} label="Bancos" />}
             clearText="Resetar opções"
@@ -592,9 +651,9 @@ export default function DashboardContratos() {
             renderTags={(tagValue, getTagProps) => {
               return tagValue.map((option, index) => (
                 <Chip
-                  key={index}
+                  key={option.id}
                   {...getTagProps({ index })}
-                  label={option.banco}
+                  label={option.name}
                   size="small"
                 />
               ));
@@ -613,8 +672,8 @@ export default function DashboardContratos() {
               setPromotorasFilter(value);
             }}
             clearOnEscape
-            options={promotoras}
-            getOptionLabel={(option) => option.promotora}
+            options={promotoraPicklist}
+            getOptionLabel={(option) => option.name}
             value={promotorasFilter}
             renderInput={(params) => (
               <TextField {...params} label="Promotoras" />
@@ -624,9 +683,9 @@ export default function DashboardContratos() {
             renderTags={(tagValue, getTagProps) => {
               return tagValue.map((option, index) => (
                 <Chip
-                  key={index}
+                  key={option.id}
                   {...getTagProps({ index })}
-                  label={option.promotora}
+                  label={option.name}
                   size="small"
                 />
               ));
@@ -645,8 +704,8 @@ export default function DashboardContratos() {
               setCorretoresFilter(value);
             }}
             clearOnEscape
-            options={corretores}
-            getOptionLabel={(option) => option.corretor}
+            options={corretorPicklist}
+            getOptionLabel={(option) => option.name}
             value={corretoresFilter}
             renderInput={(params) => (
               <TextField {...params} label="Corretores" />
@@ -656,9 +715,9 @@ export default function DashboardContratos() {
             renderTags={(tagValue, getTagProps) => {
               return tagValue.map((option, index) => (
                 <Chip
-                  key={index}
+                  key={option.id}
                   {...getTagProps({ index })}
-                  label={option.corretor}
+                  label={option.name}
                   size="small"
                 />
               ));
