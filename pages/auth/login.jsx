@@ -303,9 +303,20 @@ export default function SingIn() {
               bottom: 20,
               right: 20,
               fontSize: { xs: 12, sm: 14, md: 14, lg: 16, xl: 16 },
+
+              a: {
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              },
             }}
           >
-            Desenvolvido por: <strong>GTECH</strong>
+            Desenvolvido por:{" "}
+            <strong>
+              <a href="https://linktr.ee/gtech.servicos" target="_blank">
+                GTECH
+              </a>
+            </strong>
           </Typography>
         </Box>
       </>
