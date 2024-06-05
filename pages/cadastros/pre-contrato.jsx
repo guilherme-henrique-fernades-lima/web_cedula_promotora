@@ -37,10 +37,7 @@ import {
 } from "@/helpers/utils";
 
 //Schema
-import {
-  preContratoSchema,
-  updatePreContratoSchemaSuperUser,
-} from "@/schemas/preContratoSchema";
+import { preContratoSchema } from "@/schemas/preContratoSchema";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
@@ -60,11 +57,7 @@ export default function CadastrarPreContrato() {
     formState: { errors },
     clearErrors,
   } = useForm({
-    resolver: yupResolver(
-      id && session?.user?.is_superuser
-        ? updatePreContratoSchemaSuperUser
-        : preContratoSchema
-    ),
+    resolver: yupResolver(preContratoSchema),
   });
 
   useEffect(() => {
@@ -96,6 +89,7 @@ export default function CadastrarPreContrato() {
   const [statusComissao, setStatusComissao] = useState("");
   const [dt_pag_comissao, setDtPagComissao] = useState(null);
   const [vl_comissao, setVlComissao] = useState("");
+  const [representanteLegal, setRepresentanteLegal] = useState("");
 
   //States dos dados dos picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
@@ -136,9 +130,10 @@ export default function CadastrarPreContrato() {
       porcentagem: parseFloat(porcentagem),
       corretor: corretor,
       user_id_created: session?.user?.id,
-      iletrado: Boolean(iletrado),
+      representante_legal: representanteLegal,
       tipo_contrato: tipoContrato,
-      documento_salvo: Boolean(documentoSalvo),
+      iletrado: iletrado,
+      documento_salvo: documentoSalvo,
       dt_pag_comissao: dt_pag_comissao
         ? moment(dt_pag_comissao).format("YYYY-MM-DD")
         : null,
@@ -172,9 +167,10 @@ export default function CadastrarPreContrato() {
         porcentagem: parseFloat(porcentagem),
         corretor: corretor,
         user_id_created: session?.user?.id,
-        iletrado: Boolean(iletrado),
+        iletrado: iletrado,
+        representante_legal: representanteLegal,
         tipo_contrato: tipoContrato,
-        documento_salvo: Boolean(documentoSalvo),
+        documento_salvo: documentoSalvo,
         dt_pag_comissao: dt_pag_comissao
           ? moment(dt_pag_comissao).format("YYYY-MM-DD")
           : null,
@@ -203,21 +199,21 @@ export default function CadastrarPreContrato() {
         porcentagem: parseFloat(porcentagem),
         corretor: corretor,
         user_id_created: session?.user?.id,
-        iletrado: Boolean(iletrado),
+        iletrado: iletrado,
+        representante_legal: representanteLegal,
         tipo_contrato: tipoContrato,
-        documento_salvo: Boolean(documentoSalvo),
+        documento_salvo: documentoSalvo,
         dt_pag_comissao: dt_pag_comissao
           ? moment(dt_pag_comissao).format("YYYY-MM-DD")
           : null,
         vl_comissao: parseFloat(vl_comissao),
       };
     }
-    console.log(data);
+
     return data;
   }
 
   async function updatePreContrato() {
-    console.log("Entrou no update");
     setLoadingButton(true);
     const payload = getPayloadUpdate(id, session?.user?.is_superuser);
 
@@ -239,7 +235,6 @@ export default function CadastrarPreContrato() {
   }
 
   async function save() {
-    console.log("Entrou no save");
     setLoadingButton(true);
     const payload = getPayloadCadastrar();
 
@@ -306,6 +301,7 @@ export default function CadastrarPreContrato() {
     setPorcentagem("");
     setCorretor("");
     setIletrado("");
+    setRepresentanteLegal("");
     setDocumentoSalvo("");
     setTipoContrato("");
     setTabela("");
@@ -442,7 +438,10 @@ export default function CadastrarPreContrato() {
   }
 
   function setDataForEdition(data) {
+    console.log(data);
+
     setIletrado(data.iletrado);
+    setRepresentanteLegal(data.representante_legal);
     setTipoContrato(data.tipo_contrato);
     setDocumentoSalvo(data.documento_salvo);
     setConvenio(data.convenio);
@@ -483,10 +482,10 @@ export default function CadastrarPreContrato() {
     setValue("iletrado", data.iletrado);
     setValue("tipo_contrato", data.tipo_contrato);
     setValue("documentacao_salva", data.documento_salvo);
+    setValue("representante_legal", data.representante_legal);
 
     if (session?.user?.is_superuser) {
       setStatusComissao(data.status_comissao);
-      setValue("status_comissao", data.status_comissao);
     }
   }
 
@@ -868,7 +867,7 @@ export default function CadastrarPreContrato() {
 
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />
 
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
           <FormControl component="fieldset" error={Boolean(errors.iletrado)}>
             <FormLabel component="legend">Iletrado</FormLabel>
             <Controller
@@ -882,35 +881,21 @@ export default function CadastrarPreContrato() {
                   error={Boolean(errors.iletrado)}
                   onChange={(e) => {
                     field.onChange(e);
-                    setIletrado(e.target.value);
+                    if (e.target.value == "true") {
+                      setIletrado(true);
+                    } else if (e.target.value == "false") {
+                      setIletrado(false);
+                    }
                   }}
                 >
                   <FormControlLabel
-                    value={true}
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    value="true"
+                    control={<Radio />}
                     label="Sim"
                   />
                   <FormControlLabel
-                    value={false}
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    value="false"
+                    control={<Radio />}
                     label="Não"
                   />
                 </RadioGroup>
@@ -922,7 +907,7 @@ export default function CadastrarPreContrato() {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
           <FormControl
             component="fieldset"
             error={Boolean(errors.tipo_contrato)}
@@ -944,30 +929,12 @@ export default function CadastrarPreContrato() {
                 >
                   <FormControlLabel
                     value="fisico"
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    control={<Radio />}
                     label="Físico"
                   />
                   <FormControlLabel
                     value="digital"
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    control={<Radio />}
                     label="Digital"
                   />
                 </RadioGroup>
@@ -979,7 +946,7 @@ export default function CadastrarPreContrato() {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
           <FormControl
             component="fieldset"
             error={Boolean(errors.documentacao_salva)}
@@ -996,35 +963,21 @@ export default function CadastrarPreContrato() {
                   value={documentoSalvo}
                   onChange={(e) => {
                     field.onChange(e);
-                    setDocumentoSalvo(e.target.value);
+                    if (e.target.value == "true") {
+                      setDocumentoSalvo(true);
+                    } else if (e.target.value == "false") {
+                      setDocumentoSalvo(false);
+                    }
                   }}
                 >
                   <FormControlLabel
-                    value={true}
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    value="true"
+                    control={<Radio />}
                     label="Sim"
                   />
                   <FormControlLabel
-                    value={false}
-                    control={
-                      <Radio
-                      // sx={{
-                      //   color: "#1a3d74",
-                      //   "&.Mui-checked": {
-                      //     color: "#1a3d74",
-                      //   },
-                      // }}
-                      />
-                    }
+                    value="false"
+                    control={<Radio />}
                     label="Não"
                   />
                 </RadioGroup>
@@ -1033,6 +986,51 @@ export default function CadastrarPreContrato() {
             {errors.documentacao_salva && (
               <FormHelperText>
                 {errors.documentacao_salva.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+          <FormControl
+            component="fieldset"
+            error={Boolean(errors.representante_legal)}
+          >
+            <FormLabel component="legend">Representante legal?</FormLabel>
+            <Controller
+              name="representante_legal"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  {...field}
+                  row
+                  value={representanteLegal?.toString()}
+                  error={Boolean(errors.representante_legal)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    if (e.target.value == "true") {
+                      setRepresentanteLegal(true);
+                    } else if (e.target.value == "false") {
+                      setRepresentanteLegal(false);
+                    }
+                  }}
+                >
+                  <FormControlLabel
+                    value="true"
+                    control={<Radio />}
+                    label="Sim"
+                  />
+                  <FormControlLabel
+                    value="false"
+                    control={<Radio />}
+                    label="Não"
+                  />
+                </RadioGroup>
+              )}
+            />
+            {errors.representante_legal && (
+              <FormHelperText>
+                {errors.representante_legal.message}
               </FormHelperText>
             )}
           </FormControl>
