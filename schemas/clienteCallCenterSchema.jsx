@@ -8,17 +8,19 @@ export const clienteCallCenterSchema = yup.object().shape({
   telefoneUm: yup.string().required("Informe um telefone válido"),
   nome: yup.string().required("O nome do cliente é obrigatório"),
   convenio: yup.string(),
-  especieInss: yup.string().test({
-    name: "required-if-convenio-is-5",
-    exclusive: true,
-    message: "Selecione uma espécie do INSS",
-    test: function (value) {
-      const { convenio } = this.parent;
-      console.log(convenio);
-      if (convenio === "5") {
-        return !!value;
-      }
-      return true;
-    },
-  }),
+  especieInss: yup
+    .string()
+    .nullable()
+    .test({
+      name: "required-if-convenio-is-5",
+      exclusive: true,
+      message: "Selecione uma espécie do INSS",
+      test: function (value) {
+        const { convenio } = this.parent;
+        if (convenio === "5") {
+          return !!value;
+        }
+        return true;
+      },
+    }),
 });
