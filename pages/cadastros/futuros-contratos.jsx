@@ -49,32 +49,25 @@ export default function FuturosContratos() {
     }
   }, [id]);
 
-  const [openBackdrop, setOpenBackdrop] = useState(false);
-  const [loadingButton, setLoadingButton] = useState(false);
-  const [iletrado, setIletrado] = useState("");
-  const [tipoContrato, setTipoContrato] = useState("");
-  const [documentoSalvo, setDocumentoSalvo] = useState("");
+  const [nomeCliente, setNomeCliente] = useState("");
+  const [cpfCliente, setCpfCliente] = useState("");
+  const [nomeRepLegal, setNomeRepLegal] = useState("");
+  const [cpfRepLegal, setCpfRepLegal] = useState("");
   const [convenio, setConvenio] = useState("");
   const [operacao, setOperacao] = useState("");
   const [banco, setBanco] = useState("");
-  const [corretor, setCorretor] = useState("");
-  const [promotora, setPromotora] = useState("");
-  const [dt_digitacao, setDtDigitacao] = useState(null);
-  const [dt_pag_cliente, setDtPagCliente] = useState(null);
-  const [nr_contrato, setNrContrato] = useState("");
-  const [no_cliente, setNoCliente] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [vl_contrato, setVlContrato] = useState("");
-  const [qt_parcelas, setQtParcelas] = useState("");
-  const [vl_parcela, setVlParcela] = useState("");
-  const [tabela, setTabela] = useState("");
-  const [porcentagem, setPorcentagem] = useState("");
-  const [statusComissao, setStatusComissao] = useState("");
-  const [dt_pag_comissao, setDtPagComissao] = useState(null);
-  const [vl_comissao, setVlComissao] = useState("");
+  const [vl_contrato, setVlContrato] = useState(0);
+  const [observacao, setObservacao] = useState("");
+  const [dtConcessaoBeneficio, setDtConcessaoBeneficio] = useState(null);
+  const [dtEfetivacaoBeneficio, setDtEfetivacaoBeneficio] = useState(null);
   const [representanteLegal, setRepresentanteLegal] = useState("");
+  const [iletrado, setIletrado] = useState("");
+  const [tipoContrato, setTipoContrato] = useState("");
 
-  //States dos dados dos picklists
+  const [openBackdrop, setOpenBackdrop] = useState(false);
+  const [loadingButton, setLoadingButton] = useState(false);
+
+  // States dos dados dos picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
   const [operacaoPicklist, setOperacaoPicklist] = useState([]);
   const [bancoPicklist, setBancoPicklist] = useState([]);
@@ -89,34 +82,24 @@ export default function FuturosContratos() {
 
   function getPayload() {
     const data = {
-      promotora: promotora,
-      dt_digitacao: dt_digitacao
-        ? moment(dt_digitacao).format("YYYY-MM-DD")
-        : null,
-      nr_contrato: nr_contrato,
-      no_cliente: no_cliente.toUpperCase(),
-      cpf: cpf,
+      nome_cliente: nomeCliente,
+      cpf_cliente: cpfCliente,
+      nome_rep_legal: nomeRepLegal,
+      cpf_rep_legal: cpfRepLegal,
       convenio: convenio,
-      tabela: tabela,
       operacao: operacao,
       banco: banco,
       vl_contrato: parseFloat(vl_contrato),
-      qt_parcelas: qt_parcelas,
-      vl_parcela: parseFloat(vl_parcela),
-      dt_pag_cliente: dt_pag_cliente
-        ? moment(dt_pag_cliente).format("YYYY-MM-DD")
+      observacoes: observacao,
+      dt_concessao_beneficio: dtConcessaoBeneficio
+        ? moment(dtConcessaoBeneficio).format("YYYY-MM-DD")
         : null,
-      porcentagem: parseFloat(porcentagem),
-      corretor: corretor,
-      user_id_created: session?.user?.id,
+      dt_efetivacao_emprestimo: dtEfetivacaoBeneficio
+        ? moment(dtEfetivacaoBeneficio).format("YYYY-MM-DD")
+        : null,
       representante_legal: representanteLegal,
-      tipo_contrato: tipoContrato,
       iletrado: iletrado,
-      documento_salvo: documentoSalvo,
-      dt_pag_comissao: dt_pag_comissao
-        ? moment(dt_pag_comissao).format("YYYY-MM-DD")
-        : null,
-      vl_comissao: parseFloat(vl_comissao),
+      tipo_contrato: tipoContrato,
     };
 
     return data;
@@ -146,6 +129,7 @@ export default function FuturosContratos() {
   async function save() {
     setLoadingButton(true);
     const payload = getPayload();
+    console.log(payload);
 
     const response = await fetch("/api/cadastros/futuros-contratos", {
       method: "POST",
@@ -185,31 +169,20 @@ export default function FuturosContratos() {
   }
 
   function clearStatesAndErrors() {
-    clearErrors();
-    reset();
-
-    setPromotora("");
-    setDtDigitacao(null);
-    setNrContrato("");
-    setNoCliente("");
-    setCpf("");
+    setNomeCliente("");
+    setCpfCliente("");
+    setNomeRepLegal("");
+    setCpfRepLegal("");
     setConvenio("");
     setOperacao("");
     setBanco("");
     setVlContrato("");
-    setQtParcelas("");
-    setVlParcela("");
-    setDtPagCliente(null);
-    setDtPagComissao(null);
-    setVlComissao("");
-    setPorcentagem("");
-    setCorretor("");
-    setIletrado("");
+    setObservacao("");
+    setDtConcessaoBeneficio(null);
+    setDtEfetivacaoBeneficio(null);
     setRepresentanteLegal("");
-    setDocumentoSalvo("");
+    setIletrado("");
     setTipoContrato("");
-    setTabela("");
-    setStatusComissao("");
   }
 
   async function getConveniosPicklist() {
@@ -277,54 +250,28 @@ export default function FuturosContratos() {
 
   function setDataForEdition(data) {
     console.log(data);
-
-    setIletrado(data.iletrado);
-    setRepresentanteLegal(data.representante_legal);
-    setTipoContrato(data.tipo_contrato);
-    setDocumentoSalvo(data.documento_salvo);
+    setNomeCliente(data.nome_cliente);
+    setCpfCliente(data.cpf_cliente);
+    setNomeRepLegal(data.nome_rep_legal);
+    setCpfRepLegal(data.cpf_rep_legal);
     setConvenio(data.convenio);
     setOperacao(data.operacao);
     setBanco(data.banco);
-    setCorretor(data.corretor);
-    setPromotora(data.promotora);
-    setDtDigitacao(
-      data.dt_digitacao ? converterDataParaJS(data.dt_digitacao) : null
-    );
-    setDtPagCliente(
-      data.dt_pag_cliente ? converterDataParaJS(data.dt_pag_cliente) : null
-    );
-    setNrContrato(data.nr_contrato);
-    setNoCliente(data.no_cliente);
-    setCpf(data.cpf);
     setVlContrato(parseFloat(data.vl_contrato));
-    setQtParcelas(data.qt_parcelas);
-    setVlParcela(parseFloat(data.vl_parcela));
-    setTabela(data.tabela);
-    setPorcentagem(data.porcentagem);
-    setVlComissao(parseFloat(data.vl_comissao));
-    setDtPagComissao(
-      data.dt_pag_comissao ? converterDataParaJS(data.dt_pag_comissao) : null
+    setObservacao(data.observacoes);
+    setDtConcessaoBeneficio(
+      data.dt_concessao_beneficio
+        ? converterDataParaJS(data.dt_concessao_beneficio)
+        : null
     );
-    setValue("vl_contrato", parseFloat(data.vl_contrato));
-    setValue("vl_parcela", parseFloat(data.vl_parcela));
-    setValue("porcentagem", parseFloat(data.porcentagem));
-    setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
-    setValue("tabela", data.tabela);
-    setValue("nr_contrato", data.nr_contrato);
-    setValue("no_cliente", data.no_cliente);
-    setValue("promotora", data.promotora);
-    setValue("corretor", data.corretor);
-    setValue("banco", data.banco);
-    setValue("operacao", data.operacao);
-    setValue("convenio", data.convenio);
-    setValue("iletrado", data.iletrado);
-    setValue("tipo_contrato", data.tipo_contrato);
-    setValue("documentacao_salva", data.documento_salvo);
-    setValue("representante_legal", data.representante_legal);
-
-    if (session?.user?.is_superuser) {
-      setStatusComissao(data.status_comissao);
-    }
+    setDtEfetivacaoBeneficio(
+      data.dt_efetivacao_emprestimo
+        ? converterDataParaJS(data.dt_efetivacao_emprestimo)
+        : null
+    );
+    setRepresentanteLegal(data.representante_legal);
+    setIletrado(data.iletrado);
+    setTipoContrato(data.tipo_contrato);
   }
 
   return (
@@ -342,42 +289,24 @@ export default function FuturosContratos() {
         </Link>
       )}
 
-      <Grid container spacing={2} sx={{ mt: 1 }} component="form">
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de concessão do benefício"
-            value={dt_digitacao}
-            onChange={setDtDigitacao}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de efetivação do empréstimo"
-            value={dt_digitacao}
-            onChange={setDtDigitacao}
-          />
-        </Grid>
-
+      <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <CustomTextField
-            value={nr_contrato}
-            setValue={setNrContrato}
-            label="Número do contrato"
-            placeholder="Insira o contrato"
-            validateFieldName="nr_contrato"
-            //control={control}
-            onlyNumbers
+            value={nomeCliente}
+            setValue={setNomeCliente}
+            label="Cliente"
+            placeholder="Insira o nome do cliente"
+            numbersNotAllowed
           />
         </Grid>
 
-        {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <InputMask
             mask="999.999.999-99"
             maskChar={null}
-            value={cpf}
+            value={cpfCliente}
             onChange={(e) => {
-              setCpf(e.target.value);
+              setCpfCliente(e.target.value);
             }}
           >
             {(inputProps) => (
@@ -386,7 +315,7 @@ export default function FuturosContratos() {
                 variant="outlined"
                 size="small"
                 fullWidth
-                label="CPF"
+                label="CPF cliente"
                 placeholder="000.000.000-000"
                 InputLabelProps={{ shrink: true }}
                 autoComplete="off"
@@ -397,13 +326,51 @@ export default function FuturosContratos() {
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <CustomTextField
-            value={no_cliente}
-            setValue={setNoCliente}
-            label="Nome do cliente"
-            placeholder="Insira o nome completo do cliente"
-            validateFieldName="no_cliente"
+            value={nomeRepLegal}
+            setValue={setNomeRepLegal}
+            label="Representante legal"
+            placeholder="Insira o nome do representante legal"
             numbersNotAllowed
-            inputProps={{ maxLength: 255 }}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <InputMask
+            mask="999.999.999-99"
+            maskChar={null}
+            value={cpfRepLegal}
+            onChange={(e) => {
+              setCpfRepLegal(e.target.value);
+            }}
+          >
+            {(inputProps) => (
+              <TextField
+                {...inputProps}
+                variant="outlined"
+                size="small"
+                fullWidth
+                label="CPF representante legal"
+                placeholder="000.000.000-000"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+              />
+            )}
+          </InputMask>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de concessão do benefício"
+            value={dtConcessaoBeneficio}
+            onChange={setDtConcessaoBeneficio}
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+          <DatepickerField
+            label="Data de efetivação do empréstimo"
+            value={dtEfetivacaoBeneficio}
+            onChange={setDtEfetivacaoBeneficio}
           />
         </Grid>
 
@@ -465,116 +432,6 @@ export default function FuturosContratos() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
-            name="vl_contrato"
-            // control={control}
-            defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                thousandSeparator="."
-                decimalSeparator=","
-                decimalScale={2}
-                fixedDecimalScale={true}
-                prefix="R$ "
-                onValueChange={(values) => {
-                  // setVlContrato(values?.floatValue);
-
-                  setVlContrato(values.value); // Update the state with the formatted value
-                  field.onChange(values.floatValue);
-                }}
-                error={Boolean(errors.vl_contrato)}
-                size="small"
-                label="Valor do contrato"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
-          />
-        </Grid>
-
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
-            name="vl_parcela"
-            defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                thousandSeparator="."
-                decimalSeparator=","
-                decimalScale={2}
-                fixedDecimalScale={true}
-                prefix="R$ "
-                onValueChange={(values) => {
-                  setVlParcela(values?.floatValue);
-                }}
-                error={Boolean(errors.vl_parcela)}
-                size="small"
-                label="Valor da parcela"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento ao cliente"
-            value={dt_pag_cliente}
-            onChange={setDtPagCliente}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento da comissão"
-            value={dt_pag_comissao}
-            onChange={setDtPagComissao}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
-            name="porcentagem"
-            defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                decimalScale={2}
-                fixedDecimalScale={true}
-                decimalSeparator=","
-                isNumericString
-                suffix="%"
-                allowEmptyFormatting
-                onValueChange={(values) => {
-                  setPorcentagem(values?.floatValue);
-                }}
-                //Aqui pra baixo textfield
-                error={Boolean(errors.porcentagem)}
-                size="small"
-                label="(%) Porcentagem"
-                placeholder="% de juros"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <NumericFormat
             customInput={TextField}
             thousandSeparator="."
@@ -582,30 +439,112 @@ export default function FuturosContratos() {
             decimalScale={2}
             fixedDecimalScale={true}
             prefix="R$ "
-            value={vl_comissao}
             onValueChange={(values) => {
-              setVlComissao(values?.floatValue);
+              //setVlContrato(values?.floatValue);
+              setVlContrato(values.value); // Update the state with the formatted value
             }}
             size="small"
-            label="Valor da comissão"
+            label="Valor do contrato"
             placeholder="R$ 0,00"
             InputLabelProps={{ shrink: true }}
             autoComplete="off"
             fullWidth
             inputProps={{ maxLength: 16 }}
           />
-        </Grid> */}
+        </Grid>
 
         <Grid item xs={12} sm={12} md={12} lg={12} xl={12} />
 
-        <Grid item xs={12} sm={6} md={3} lg={2} xl={2}>
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <TextField
+            multiline
+            rows={3}
+            size="small"
+            label="Observações"
+            value={observacao}
+            onChange={(e) => {
+              setObservacao(e.target.value);
+            }}
+            placeholder="Insira observações se necessário..."
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
+            fullWidth
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Iletrado</FormLabel>
+
+            <RadioGroup
+              row
+              value={iletrado}
+              onChange={(e) => {
+                if (e.target.value == "true") {
+                  setIletrado(true);
+                } else if (e.target.value == "false") {
+                  setIletrado(false);
+                }
+              }}
+            >
+              <FormControlLabel value="true" control={<Radio />} label="Sim" />
+              <FormControlLabel value="false" control={<Radio />} label="Não" />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Tipo de contrato</FormLabel>
+
+            <RadioGroup
+              row
+              value={tipoContrato}
+              onChange={(e) => {
+                setTipoContrato(e.target.value);
+              }}
+            >
+              <FormControlLabel
+                value="fisico"
+                control={<Radio />}
+                label="Físico"
+              />
+              <FormControlLabel
+                value="digital"
+                control={<Radio />}
+                label="Digital"
+              />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={3}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend">Representante legal?</FormLabel>
+            <RadioGroup
+              row
+              value={representanteLegal?.toString()}
+              onChange={(e) => {
+                if (e.target.value == "true") {
+                  setRepresentanteLegal(true);
+                } else if (e.target.value == "false") {
+                  setRepresentanteLegal(false);
+                }
+              }}
+            >
+              <FormControlLabel value="true" control={<Radio />} label="Sim" />
+              <FormControlLabel value="false" control={<Radio />} label="Não" />
+            </RadioGroup>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
           <LoadingButton
-            type="submit"
             variant="contained"
             endIcon={<SaveIcon />}
             disableElevation
             loading={loadingButton}
-            fullWidth
+            onClick={save}
           >
             SALVAR
           </LoadingButton>
@@ -614,12 +553,3 @@ export default function FuturosContratos() {
     </ContentWrapper>
   );
 }
-
-/**
- * /Novos campos solicitados:
- * tipo promotora, data de digitacao, numero do contrato, cpf, nome do cliente, convenio, operacao,banco,valor contrato, tabela, percentual, iletrado
- * qtd. parcelas, valor da parc. , data pag. cliente, documentacao salva (sim ou não), contrato (digital ou fisico), corretor,observacao
- *
- * Campos somente para edição do Felipe
- * Comissão (Paga, aguardando pagamento, aguardando fisco, análise financeira)
- */

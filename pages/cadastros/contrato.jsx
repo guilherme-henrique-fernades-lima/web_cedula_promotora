@@ -304,27 +304,6 @@ export default function CadastrarContrato(props) {
         })}
       >
         <Grid container spacing={1} sx={{ mt: 1 }}>
-          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("promotora")}
-              error={Boolean(errors.promotora)}
-              fullWidth
-              label="Tipo de promotora (ANTIGO)"
-              placeholder="Insira a promotora"
-              size="small"
-              value={promotora}
-              autoComplete="off"
-              InputLabelProps={{ shrink: true }}
-              onChange={(e) => {
-                setPromotora(e.target.value);
-              }}
-            />
-
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.promotora?.message}
-            </Typography>
-          </Grid> */}
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("promotora")}
@@ -453,30 +432,6 @@ export default function CadastrarContrato(props) {
             </Typography>
           </Grid>
 
-          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("convenio")}
-              error={Boolean(errors.convenio)}
-              select
-              fullWidth
-              label="Convênio (ANTIGO)"
-              size="small"
-              value={convenio}
-              onChange={(e) => {
-                setConvenio(e.target.value);
-              }}
-            >
-              {TP_CONVENIO.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.convenio?.message}
-            </Typography>
-          </Grid> */}
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("convenio")}
@@ -499,30 +454,6 @@ export default function CadastrarContrato(props) {
             </TextField>
           </Grid>
 
-          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("operacao")}
-              error={Boolean(errors.operacao)}
-              select
-              fullWidth
-              label="Operação (ANTIGO)"
-              size="small"
-              value={operacao}
-              onChange={(e) => {
-                setOperacao(e.target.value);
-              }}
-            >
-              {TP_OPERACAO.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.operacao?.message}
-            </Typography>
-          </Grid> */}
-
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
               {...register("operacao")}
@@ -544,27 +475,6 @@ export default function CadastrarContrato(props) {
               ))}
             </TextField>
           </Grid>
-
-          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("banco")}
-              error={Boolean(errors.banco)}
-              value={banco}
-              onChange={(e) => {
-                setBanco(e.target.value);
-              }}
-              size="small"
-              label="Banco (ANTIGO)"
-              placeholder="Insira o nome do banco"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              inputProps={{ maxLength: 255 }}
-            />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.banco?.message}
-            </Typography>
-          </Grid> */}
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
@@ -795,27 +705,6 @@ export default function CadastrarContrato(props) {
               {errors.vl_comissao?.message}
             </Typography>
           </Grid>
-
-          {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <TextField
-              {...register("corretor")}
-              error={Boolean(errors.corretor)}
-              value={corretor}
-              onChange={(e) => {
-                setCorretor(e.target.value);
-              }}
-              size="small"
-              label="Corretor(a) (ANTIGO)"
-              placeholder="Insira o corretor"
-              InputLabelProps={{ shrink: true }}
-              autoComplete="off"
-              fullWidth
-              inputProps={{ maxLength: 50 }}
-            />
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.corretor?.message}
-            </Typography>
-          </Grid> */}
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
             <TextField
