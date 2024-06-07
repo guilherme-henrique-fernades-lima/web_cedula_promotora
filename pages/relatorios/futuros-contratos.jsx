@@ -5,6 +5,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import moment from "moment";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -31,6 +32,7 @@ import {
   formatarCPFSemAnonimidade,
   formatarValorBRL,
   formatarDataComHora,
+  formatarReal,
 } from "@/helpers/utils";
 
 //Icons
@@ -42,18 +44,12 @@ var DATA_HOJE = new Date();
 
 export default function RelatorioFuturosContratos() {
   const { data: session } = useSession();
-  const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
   const [dataSet, setDataset] = useState([]);
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
-  const [preContratoToSendContratos, setPreContratoToSendContratos] =
-    useState("");
-  const [openDialogSendPreContrato, setOpenDialogSendPreContrato] =
-    useState(false);
-  const [idPreContrato, setIdPreContrato] = useState("");
+  const [idFuturoContrato, setIdFuturoContrato] = useState("");
 
   useEffect(() => {
     if (session?.user.token) {
@@ -63,13 +59,12 @@ export default function RelatorioFuturosContratos() {
 
   async function list() {
     try {
-      setLoading(true);
       const response = await fetch(
-        `/api/relatorios/pre-contratos/?dt_inicio=${moment(dataInicio).format(
+        `/api/relatorios/futuros-contratos/?dt_inicio=${moment(
+          dataInicio
+        ).format("YYYY-MM-DD")}&dt_final=${moment(dataFim).format(
           "YYYY-MM-DD"
-        )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&user_id=${
-          session?.user.id
-        }`,
+        )}&user_id=${session?.user.id}`,
         {
           method: "GET",
           headers: {
@@ -85,16 +80,12 @@ export default function RelatorioFuturosContratos() {
     } catch (error) {
       console.error("Erro ao obter dados", error);
     }
-
-    setLoading(false);
   }
 
   function actionsAfterDelete() {
     setOpenDialogDelete(false);
-    setOpenDialogSendPreContrato(false);
     list();
-    setIdPreContrato("");
-    setPreContratoToSendContratos("");
+    setIdFuturoContrato("");
   }
 
   const columns = [
@@ -108,185 +99,91 @@ export default function RelatorioFuturosContratos() {
       renderCell: (params) => {
         return (
           <Stack direction="row">
-            {params.row.contrato_criado ? (
-              <Tooltip title="Edição não permitida" placement="top">
+            <Tooltip title="Editar futuro-contrato" placement="top">
+              <Link href={`/cadastros/futuros-contratos/?id=${params.value}`}>
                 <IconButton>
                   <EditIcon />
                 </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Editar pré-contrato" placement="top">
-                <IconButton
-                  onClick={() => {
-                    router.push(`/cadastros/pre-contrato/?id=${params.value}`);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+              </Link>
+            </Tooltip>
 
-            {params.row.contrato_criado ? (
-              <Tooltip title="Exclusão não permitida" placement="top">
-                <IconButton sx={{ ml: 1 }}>
-                  <DeleteForeverIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Tooltip title="Deletar pré-contrato" placement="top">
-                <IconButton
-                  color="error"
-                  sx={{ ml: 1 }}
-                  onClick={() => {
-                    setIdPreContrato(params.value);
-                    setOpenDialogDelete(true);
-                  }}
-                >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-
-            {session?.user?.is_superuser && (
-              <>
-                {params.row.contrato_criado ? (
-                  <Tooltip title="Pré-contrato já transferido" placement="top">
-                    <IconButton sx={{ ml: 1 }}>
-                      <FileUploadIcon />
-                    </IconButton>
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="Transferir pré-contrato" placement="top">
-                    <IconButton
-                      sx={{ ml: 1 }}
-                      color="success"
-                      onClick={() => {
-                        setOpenDialogSendPreContrato(true);
-                        setPreContratoToSendContratos(params.row);
-                      }}
-                    >
-                      <FileUploadIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </>
-            )}
+            <Tooltip title="Deletar futuro-contrato" placement="top">
+              <IconButton
+                color="error"
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setIdFuturoContrato(params.value);
+                  setOpenDialogDelete(true);
+                }}
+              >
+                <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
         );
       },
     },
-    // {
-    //   field: "user_id_created",
-    //   headerName: "USER ID",
-    //   renderHeader: (params) => <strong>USER ID</strong>,
-    //   minWidth: 170,
-    //   align: "center",
-    //   headerAlign: "center",
-    // },
+
     {
-      field: "created_at",
-      headerName: "CRIADO EM",
-      renderHeader: (params) => <strong>CRIADO EM</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarDataComHora(params.value);
-        }
-      },
-    },
-    {
-      field: "updated_at",
-      headerName: "ATUALIZADO EM",
-      renderHeader: (params) => <strong>ATUALIZADO EM</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarDataComHora(params.value);
-        }
-      },
-    },
-    {
-      field: "nome_promotora",
-      headerName: "PROMOTORA",
-      renderHeader: (params) => <strong>PROMOTORA</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "dt_digitacao",
-      headerName: "DATA DIGITAÇÃO",
-      renderHeader: (params) => <strong>DATA DIGITAÇÃO</strong>,
-      minWidth: 170,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarData(params.value);
-        }
-      },
-    },
-    {
-      field: "nr_contrato",
-      headerName: "NR. CONTRATO",
-      renderHeader: (params) => <strong>NR. CONTRATO</strong>,
-      minWidth: 170,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "no_cliente",
+      field: "nome_cliente",
       headerName: "NOME CLIENTE",
       renderHeader: (params) => <strong>NOME CLIENTE</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "cpf_cliente",
+      headerName: "CPF CLIENTE",
+      renderHeader: (params) => <strong>CPF CLIENTE</strong>,
+      minWidth: 300,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_rep_legal",
+      headerName: "NOME REPRESENTANTE LEGAL",
+      renderHeader: (params) => <strong>NOME REPRESENTANTE LEGAL</strong>,
       minWidth: 350,
       align: "left",
       headerAlign: "center",
     },
     {
-      field: "cpf",
-      headerName: "CPF CLIENTE",
-      renderHeader: (params) => <strong>CPF CLIENTE</strong>,
-      minWidth: 170,
-      align: "center",
+      field: "cpf_rep_legal",
+      headerName: "CPF REPRESENTANTE LEGAL",
+      renderHeader: (params) => <strong>CPF REPRESENTANTE LEGAL</strong>,
+      minWidth: 300,
+      align: "left",
       headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarCPFSemAnonimidade(params.value);
-        }
-      },
     },
     {
-      field: "nome_convenio",
+      field: "convenio",
       headerName: "CONVÊNIO",
       renderHeader: (params) => <strong>CONVÊNIO</strong>,
-      minWidth: 220,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },
     {
-      field: "nome_operacao",
+      field: "operacao",
       headerName: "OPERAÇÃO",
       renderHeader: (params) => <strong>OPERAÇÃO</strong>,
-      minWidth: 250,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },
     {
-      field: "nome_banco",
+      field: "banco",
       headerName: "BANCO",
       renderHeader: (params) => <strong>BANCO</strong>,
-      minWidth: 220,
+      minWidth: 200,
       align: "center",
       headerAlign: "center",
     },
     {
       field: "vl_contrato",
-      headerName: "VLR. CONTRATO",
-      renderHeader: (params) => <strong>VLR. CONTRATO</strong>,
+      headerName: "VLR. DO CONTRATO",
+      renderHeader: (params) => <strong>VLR. DO CONTRATO</strong>,
       minWidth: 200,
       align: "center",
       headerAlign: "center",
@@ -297,31 +194,10 @@ export default function RelatorioFuturosContratos() {
       },
     },
     {
-      field: "qt_parcelas",
-      headerName: "QTD. PARCELAS",
-      renderHeader: (params) => <strong>QTD. PARCELAS</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "vl_parcela",
-      headerName: "VLR. PARCELA",
-      renderHeader: (params) => <strong>VLR. PARCELA</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return formatarValorBRL(parseFloat(params.value));
-        }
-      },
-    },
-    {
-      field: "dt_pag_cliente",
-      headerName: "DT. PAG. CLIENTE",
-      renderHeader: (params) => <strong>DT. PAG. CLIENTE</strong>,
-      minWidth: 230,
+      field: "dt_concessao_beneficio",
+      headerName: "DATA CONCESSÃO DO BENEFÍCIO",
+      renderHeader: (params) => <strong>DATA CONCESSÃO DO BENEFÍCIO</strong>,
+      minWidth: 350,
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
@@ -330,20 +206,69 @@ export default function RelatorioFuturosContratos() {
         }
       },
     },
-
     {
-      field: "porcentagem",
-      headerName: "(%) PORCENTAGEM",
-      renderHeader: (params) => <strong>(%) PORCENTAGEM</strong>,
+      field: "dt_efetivacao_emprestimo",
+      headerName: "DATA EFETIVAÇÃO DO BENEFÍCIO",
+      renderHeader: (params) => <strong>DATA EFETIVAÇÃO DO BENEFÍCIO</strong>,
+      minWidth: 350,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarData(params.value);
+        }
+      },
+    },
+    {
+      field: "representante_legal",
+      headerName: "REPRESENTANTE LEGAL?",
+      renderHeader: (params) => <strong>REPRESENTANTE LEGAL?</strong>,
       minWidth: 200,
       align: "center",
       headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value === true) {
+          return "SIM";
+        } else if (params.value === false) {
+          return "NÃO";
+        }
+      },
     },
     {
-      field: "nome_corretor",
-      headerName: "CORRETOR",
-      renderHeader: (params) => <strong>CORRETOR</strong>,
+      field: "iletrado",
+      headerName: "ILETRADO?",
+      renderHeader: (params) => <strong>ILETRADO?</strong>,
       minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value === true) {
+          return "SIM";
+        } else if (params.value === false) {
+          return "NÃO";
+        }
+      },
+    },
+    {
+      field: "tipo_contrato",
+      headerName: "TIPO DO CONTRATO",
+      renderHeader: (params) => <strong>TIPO DO CONTRATO</strong>,
+      minWidth: 200,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params) => {
+        if (params.value == "fisico") {
+          return "FÍSICO";
+        } else if (params.value == "digital") {
+          return "DIGITAL";
+        }
+      },
+    },
+    {
+      field: "observacoes",
+      headerName: "OBSERVAÇÕES",
+      renderHeader: (params) => <strong>OBSERVAÇÕES</strong>,
+      minWidth: 350,
       align: "center",
       headerAlign: "center",
     },
@@ -377,19 +302,10 @@ export default function RelatorioFuturosContratos() {
         <DataTable rows={dataSet} columns={columns} />
       </Box>
 
-      <DialogExcluirPreContrato
+      <DialogExcluirFuturoContrato
         open={openDialogDelete}
         close={setOpenDialogDelete}
-        id={idPreContrato}
-        token={session?.user.token}
-        onFinishDelete={actionsAfterDelete}
-      />
-
-      <DialogTransmitirPreContrato
-        open={openDialogSendPreContrato}
-        close={setOpenDialogSendPreContrato}
-        preContrato={preContratoToSendContratos}
-        clearPreContrato={setPreContratoToSendContratos}
+        id={idFuturoContrato}
         token={session?.user.token}
         onFinishDelete={actionsAfterDelete}
       />
@@ -397,18 +313,27 @@ export default function RelatorioFuturosContratos() {
   );
 }
 
-function DialogExcluirPreContrato({ open, close, id, token, onFinishDelete }) {
+function DialogExcluirFuturoContrato({
+  open,
+  close,
+  id,
+  token,
+  onFinishDelete,
+}) {
   const [loading, setLoading] = useState(false);
 
   async function deletarPreContrato() {
     try {
       setLoading(true);
-      const response = await fetch(`/api/relatorios/pre-contratos/?id=${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: token,
-        },
-      });
+      const response = await fetch(
+        `/api/relatorios/futuros-contratos/?id=${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: token,
+          },
+        }
+      );
 
       if (response.ok) {
         toast.success("Excluído");
@@ -428,7 +353,7 @@ function DialogExcluirPreContrato({ open, close, id, token, onFinishDelete }) {
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700, mb: 1 }}>
-        Deseja deletar o pré-contrato?
+        Deseja deletar o futuro contrato?
       </DialogTitle>
 
       <DialogActions>
@@ -448,104 +373,6 @@ function DialogExcluirPreContrato({ open, close, id, token, onFinishDelete }) {
           loading={loading}
         >
           EXCLUIR
-        </LoadingButton>
-      </DialogActions>
-    </Dialog>
-  );
-}
-
-function DialogTransmitirPreContrato({
-  open,
-  close,
-  preContrato,
-  clearPreContrato,
-  token,
-  onFinishDelete,
-}) {
-  const [loading, setLoading] = useState(false);
-
-  async function sendPreContrato(data) {
-    const payload = {
-      id: data.id,
-      promotora: data.promotora,
-      nr_contrato: data.nr_contrato,
-      no_cliente: data.no_cliente,
-      cpf: data.cpf,
-      convenio: data.convenio,
-      operacao: data.operacao,
-      banco: data.banco,
-      vl_contrato: data.vl_contrato,
-      qt_parcelas: data.qt_parcelas,
-      vl_parcela: data.vl_parcela,
-      dt_pag_cliente: data.dt_pag_cliente,
-      porcentagem: data.porcentagem,
-      corretor: data.corretor,
-      dt_digitacao: data.dt_digitacao
-        ? data.dt_digitacao
-        : moment().format("YYYY-MM-DD"),
-      dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
-      tabela: data.tabela,
-      tipo_contrato: data.tipo_contrato,
-      status_comissao: data.status_comissao,
-      iletrado: data.iletrado,
-      documento_salvo: data.documento_salvo,
-    };
-
-    try {
-      setLoading(true);
-
-      const response = await fetch(`/api/relatorios/pre-contratos`, {
-        method: "POST",
-        headers: {
-          Authorization: token,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setLoading(false);
-        toast.success("Enviado com sucesso");
-        onFinishDelete();
-      }
-    } catch (error) {
-      console.log(error);
-      toast.success("Erro ao enviar");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <Dialog
-      open={open}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title" sx={{ fontWeight: 700, mb: 1 }}>
-        Deseja transferir o pré-contrato para os contratos?
-      </DialogTitle>
-
-      <DialogActions>
-        <Button
-          onClick={() => {
-            close(false);
-            clearPreContrato("");
-          }}
-          color="error"
-        >
-          CANCELAR
-        </Button>
-
-        <LoadingButton
-          onClick={() => {
-            sendPreContrato(preContrato);
-          }}
-          color="success"
-          variant="contained"
-          disableElevation
-          loading={loading}
-        >
-          ENVIAR
         </LoadingButton>
       </DialogActions>
     </Dialog>

@@ -28,9 +28,6 @@ import MenuItem from "@mui/material/MenuItem";
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
-//Constants
-import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
-
 //Schema validation
 import { contratoSchema } from "@/schemas/contratoSchema";
 

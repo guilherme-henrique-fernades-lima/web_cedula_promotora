@@ -40,7 +40,7 @@ export default function FuturosContratos() {
 
   useEffect(() => {
     if (id) {
-      retrieveData(id, session?.user?.id);
+      retrieveData(id);
     }
   }, [id]);
 

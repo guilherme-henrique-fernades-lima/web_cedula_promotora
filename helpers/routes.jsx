@@ -98,6 +98,12 @@ const ROUTES = [
         url: "/configuracoes/promotoras",
         perm: "app_config_promotoras",
       },
+      {
+        id: 7,
+        title: "Natureza das despesas",
+        url: "/configuracoes/natureza-despesas",
+        perm: "app_config_natureza_despesas",
+      },
     ],
     icon: <SettingsIcon />,
     perm: "menu_configuracoes",

@@ -33,9 +33,6 @@ import FormControl from "@mui/material/FormControl";
 import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 
-//Constants
-import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
-
 // Dashboards
 import DashConvenios from "@/components/dashboards/contratos/DashConvenios";
 import DashCorretores from "@/components/dashboards/contratos/DashCorretores";
