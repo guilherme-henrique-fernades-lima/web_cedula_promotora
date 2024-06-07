@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+
 //Third party libraries
 import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { useForm, Controller } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
 import InputMask from "react-input-mask";
 import moment from "moment";
@@ -16,8 +16,6 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import Typography from "@mui/material/Typography";
-import FormHelperText from "@mui/material/FormHelperText";
 import LoadingButton from "@mui/lab/LoadingButton";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
@@ -30,10 +28,7 @@ import DatepickerField from "@/components/DatepickerField";
 import BackdropLoadingScreen from "@/components/BackdropLoadingScreen";
 
 //Utils
-import {
-  formatarCPFSemAnonimidade,
-  converterDataParaJS,
-} from "@/helpers/utils";
+import { converterDataParaJS } from "@/helpers/utils";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
@@ -56,7 +51,7 @@ export default function FuturosContratos() {
   const [convenio, setConvenio] = useState("");
   const [operacao, setOperacao] = useState("");
   const [banco, setBanco] = useState("");
-  const [vl_contrato, setVlContrato] = useState(0);
+  const [vl_contrato, setVlContrato] = useState("");
   const [observacao, setObservacao] = useState("");
   const [dtConcessaoBeneficio, setDtConcessaoBeneficio] = useState(null);
   const [dtEfetivacaoBeneficio, setDtEfetivacaoBeneficio] = useState(null);
@@ -105,7 +100,7 @@ export default function FuturosContratos() {
     return data;
   }
 
-  async function updatePreContrato() {
+  async function update() {
     setLoadingButton(true);
     const payload = getPayload();
 
@@ -249,7 +244,6 @@ export default function FuturosContratos() {
   }
 
   function setDataForEdition(data) {
-    console.log(data);
     setNomeCliente(data.nome_cliente);
     setCpfCliente(data.cpf_cliente);
     setNomeRepLegal(data.nome_rep_legal);
@@ -258,6 +252,7 @@ export default function FuturosContratos() {
     setOperacao(data.operacao);
     setBanco(data.banco);
     setVlContrato(parseFloat(data.vl_contrato));
+
     setObservacao(data.observacoes);
     setDtConcessaoBeneficio(
       data.dt_concessao_beneficio
@@ -433,6 +428,7 @@ export default function FuturosContratos() {
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
           <NumericFormat
+            value={vl_contrato}
             customInput={TextField}
             thousandSeparator="."
             decimalSeparator=","
@@ -440,8 +436,7 @@ export default function FuturosContratos() {
             fixedDecimalScale={true}
             prefix="R$ "
             onValueChange={(values) => {
-              //setVlContrato(values?.floatValue);
-              setVlContrato(values.value); // Update the state with the formatted value
+              setVlContrato(parseFloat(values.value));
             }}
             size="small"
             label="Valor do contrato"
@@ -544,9 +539,11 @@ export default function FuturosContratos() {
             endIcon={<SaveIcon />}
             disableElevation
             loading={loadingButton}
-            onClick={save}
+            onClick={() => {
+              id ? update() : save();
+            }}
           >
-            SALVAR
+            {id ? "SALVAR" : "CADASTRAR"}
           </LoadingButton>
         </Grid>
       </Grid>
