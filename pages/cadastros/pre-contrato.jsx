@@ -1108,12 +1108,3 @@ export default function CadastrarPreContrato() {
     </ContentWrapper>
   );
 }
-
-/**
- * /Novos campos solicitados:
- * tipo promotora, data de digitacao, numero do contrato, cpf, nome do cliente, convenio, operacao,banco,valor contrato, tabela, percentual, iletrado
- * qtd. parcelas, valor da parc. , data pag. cliente, documentacao salva (sim ou não), contrato (digital ou fisico), corretor,observacao
- *
- * Campos somente para edição do Felipe
- * Comissão (Paga, aguardando pagamento, aguardando fisco, análise financeira)
- */

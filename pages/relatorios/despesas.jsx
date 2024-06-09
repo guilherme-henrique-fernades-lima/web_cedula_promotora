@@ -36,18 +36,12 @@ import {
   formatarData,
   formatarValorBRL,
   converterDataParaJS,
-  renderNaturezaDespesa,
   renderTipoDespesa,
-  renderLoja,
 } from "@/helpers/utils";
 import Spinner from "@/components/Spinner";
 
 //Constants
-import {
-  SITUACAO_PAGAMENTO,
-  NATUREZA_DESPESA,
-  TIPO_DESPESA,
-} from "@/helpers/constants";
+import { SITUACAO_PAGAMENTO, TIPO_DESPESA } from "@/helpers/constants";
 
 //Icons
 import EditIcon from "@mui/icons-material/Edit";
@@ -81,32 +75,18 @@ export default function RelatorioDespesas() {
   const [naturezaDespesa, setNaturezaDespesa] = useState("");
   const [tipoDespesa, setTipoDespesa] = useState("");
   const [tipoLoja, setTipoLoja] = useState("");
+
+  //Estados dos pickslists
+  const [naturezaDespesasPicklist, setNaturezaDespesasPicklist] = useState([]);
   const [picklist, setPicklistLojas] = useState([]);
 
   useEffect(() => {
     if (session?.user?.token) {
-      getLojas();
       getDespesas();
+      getLojas();
+      getNaturezaDespesasPicklist();
     }
   }, [session?.user?.token]);
-
-  async function getLojas() {
-    try {
-      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      });
-
-      if (response.ok) {
-        const json = await response.json();
-        setPicklistLojas(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   const {
     register,
@@ -170,6 +150,45 @@ export default function RelatorioDespesas() {
     setLoadingButton(false);
   }
 
+  async function getLojas() {
+    try {
+      const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
+        method: "GET",
+        headers: {
+          Authorization: session?.user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const json = await response.json();
+        setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getNaturezaDespesasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/natureza-despesas/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setNaturezaDespesasPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   function getPayload() {
     const payload = {
       id: id,
@@ -215,7 +234,6 @@ export default function RelatorioDespesas() {
 
     const json = await response.json();
     setDespesas(json);
-
     setLoadingDataFetch(false);
   }
 
@@ -336,19 +354,15 @@ export default function RelatorioDespesas() {
         }
       },
     },
+
     {
-      field: "natureza_despesa",
-      headerName: "NATUREZA DA DESPESA",
-      renderHeader: (params) => <strong>NATUREZA DA DESPESA</strong>,
-      minWidth: 220,
+      field: "nome_natureza_despesa",
+      headerName: "NOME DA NATUREZA DA DESPESA",
+      renderHeader: (params) => <strong>NOME DA NATUREZA DA DESPESA</strong>,
+      minWidth: 350,
       align: "center",
       headerAlign: "center",
       flex: 1,
-      renderCell: (params) => {
-        if (params.value) {
-          return renderNaturezaDespesa(params.value);
-        }
-      },
     },
     {
       field: "nome_loja",
@@ -358,21 +372,16 @@ export default function RelatorioDespesas() {
       align: "center",
       headerAlign: "center",
       flex: 1,
-      // renderCell: (params) => {
-      //   if (params.value) {
-      //     return renderLoja(params.value);
-      //   }
-      // },
     },
-    {
-      field: "tipo_loja",
-      headerName: "CÓD. DA LOJA",
-      renderHeader: (params) => <strong>CÓD. DA LOJA</strong>,
-      minWidth: 180,
-      align: "center",
-      headerAlign: "center",
-      flex: 1,
-    },
+    // {
+    //   field: "tipo_loja",
+    //   headerName: "CÓD. DA LOJA",
+    //   renderHeader: (params) => <strong>CÓD. DA LOJA</strong>,
+    //   minWidth: 180,
+    //   align: "center",
+    //   headerAlign: "center",
+    //   flex: 1,
+    // },
   ];
 
   try {
@@ -387,6 +396,7 @@ export default function RelatorioDespesas() {
         natureza_despesa: row.natureza_despesa,
         tipo_loja: row.id_loja,
         nome_loja: row.sg_loja,
+        nome_natureza_despesa: row.nome_natureza_despesa,
       };
     });
   } catch (err) {
@@ -555,19 +565,17 @@ export default function RelatorioDespesas() {
                 label="Natureza da despesa"
                 size="small"
                 value={naturezaDespesa}
+                helperText={errors.naturezaDespesa?.message}
                 onChange={(e) => {
                   setNaturezaDespesa(e.target.value);
                 }}
               >
-                {NATUREZA_DESPESA.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                {naturezaDespesasPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
                   </MenuItem>
                 ))}
               </TextField>
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.naturezaDespesa?.message}
-              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>

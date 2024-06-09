@@ -26,19 +26,13 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { ptBR } from "date-fns/locale";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import Backdrop from "@mui/material/Backdrop";
-import CircularProgress from "@mui/material/CircularProgress";
 import MenuItem from "@mui/material/MenuItem";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
 
 //Constants
-import {
-  SITUACAO_PAGAMENTO,
-  NATUREZA_DESPESA,
-  TIPO_DESPESA,
-} from "@/helpers/constants";
+import { SITUACAO_PAGAMENTO, TIPO_DESPESA } from "@/helpers/constants";
 
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
@@ -62,6 +56,7 @@ export default function CadastrarDespesa() {
   useEffect(() => {
     if (session?.user?.token) {
       getLojas();
+      getNaturezaDespesasPicklist();
     }
   }, [session?.user?.token]);
 
@@ -75,6 +70,9 @@ export default function CadastrarDespesa() {
   const [tipoLoja, setTipoLoja] = useState("");
   const [picklist, setPicklistLojas] = useState([]);
 
+  //Estados dos pickslists
+  const [naturezaDespesasPicklist, setNaturezaDespesasPicklist] = useState([]);
+
   async function getLojas() {
     try {
       const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
@@ -87,6 +85,27 @@ export default function CadastrarDespesa() {
       if (response.ok) {
         const json = await response.json();
         setPicklistLojas(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getNaturezaDespesasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/natureza-despesas/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setNaturezaDespesasPicklist(json);
       }
     } catch (error) {
       console.log(error);
@@ -263,19 +282,17 @@ export default function CadastrarDespesa() {
               label="Natureza da despesa"
               size="small"
               value={naturezaDespesa}
+              helperText={errors.naturezaDespesa?.message}
               onChange={(e) => {
                 setNaturezaDespesa(e.target.value);
               }}
             >
-              {NATUREZA_DESPESA.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
+              {naturezaDespesasPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
                 </MenuItem>
               ))}
             </TextField>
-            <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.naturezaDespesa?.message}
-            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
