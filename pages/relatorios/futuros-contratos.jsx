@@ -157,7 +157,7 @@ export default function RelatorioFuturosContratos() {
       headerAlign: "center",
     },
     {
-      field: "convenio",
+      field: "nome_convenio",
       headerName: "CONVÊNIO",
       renderHeader: (params) => <strong>CONVÊNIO</strong>,
       minWidth: 200,
@@ -165,7 +165,7 @@ export default function RelatorioFuturosContratos() {
       headerAlign: "center",
     },
     {
-      field: "operacao",
+      field: "nome_operacao",
       headerName: "OPERAÇÃO",
       renderHeader: (params) => <strong>OPERAÇÃO</strong>,
       minWidth: 200,
@@ -173,7 +173,7 @@ export default function RelatorioFuturosContratos() {
       headerAlign: "center",
     },
     {
-      field: "banco",
+      field: "nome_banco",
       headerName: "BANCO",
       renderHeader: (params) => <strong>BANCO</strong>,
       minWidth: 200,
@@ -275,7 +275,7 @@ export default function RelatorioFuturosContratos() {
   ];
 
   return (
-    <ContentWrapper title="Relação de pré contratos">
+    <ContentWrapper title="Relação de futuros contratos">
       <Toaster position="bottom-center" reverseOrder={true} />
 
       <Grid container spacing={1} sx={{ mt: 1, mb: 2 }}>

@@ -373,15 +373,15 @@ export default function RelatorioDespesas() {
       headerAlign: "center",
       flex: 1,
     },
-    {
-      field: "tipo_loja",
-      headerName: "CÓD. DA LOJA",
-      renderHeader: (params) => <strong>CÓD. DA LOJA</strong>,
-      minWidth: 180,
-      align: "center",
-      headerAlign: "center",
-      flex: 1,
-    },
+    // {
+    //   field: "tipo_loja",
+    //   headerName: "CÓD. DA LOJA",
+    //   renderHeader: (params) => <strong>CÓD. DA LOJA</strong>,
+    //   minWidth: 180,
+    //   align: "center",
+    //   headerAlign: "center",
+    //   flex: 1,
+    // },
   ];
 
   try {
