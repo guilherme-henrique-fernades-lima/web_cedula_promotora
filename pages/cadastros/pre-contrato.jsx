@@ -63,6 +63,8 @@ export default function CadastrarPreContrato() {
   useEffect(() => {
     if (id) {
       retrievePreContrato(id, session?.user?.id);
+    } else {
+      clearStatesAndErrors();
     }
   }, [id]);
 
