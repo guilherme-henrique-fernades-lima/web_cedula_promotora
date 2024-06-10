@@ -225,11 +225,17 @@ export default function Usuarios() {
         ) : (
           <>
             {dataset?.map((item, index) => (
-              <CardUser
-                key={index}
-                user={item}
-                handleOpenModalDetailsUser={() => handleModalDetailsUser(item)}
-              />
+              <>
+                {item?.id != 23 && (
+                  <CardUser
+                    key={index}
+                    user={item}
+                    handleOpenModalDetailsUser={() =>
+                      handleModalDetailsUser(item)
+                    }
+                  />
+                )}
+              </>
             ))}
           </>
         )}
@@ -359,10 +365,11 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
         justifyContent: "space-between",
         flexDirection: "row",
         width: "100%",
-        height: 70,
+        minHeight: 70,
         backgroundColor: "#f6f6f6",
         mt: 1,
         borderRadius: 2,
+        padding: 2,
       }}
     >
       <Box
@@ -383,7 +390,7 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
             fontWeight: 700,
           }}
         >
-          Email: {user?.email}
+          <strong>Email:</strong> {user?.email}
         </Typography>
         <Typography
           variant="span"
@@ -393,8 +400,42 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
             fontSize: "16px",
           }}
         >
-          {user?.id} Nome: {user?.username}
+          <strong>Nome de usuário:</strong> {user?.username?.toUpperCase()}{" "}
         </Typography>
+
+        {user.is_active ? (
+          <Typography
+            variant="span"
+            sx={{
+              color: "#155e03",
+              fontFamily: "Lato, sans-serif",
+              fontSize: "12px",
+              border: "2px solid #155e03",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              padding: "3px 5px",
+              mt: 1,
+            }}
+          >
+            ATIVO
+          </Typography>
+        ) : (
+          <Typography
+            variant="span"
+            sx={{
+              color: "#970b06",
+              fontFamily: "Lato, sans-serif",
+              fontSize: "12px",
+              border: "2px solid #970b06",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              padding: "3px 5px",
+              mt: 1,
+            }}
+          >
+            INATIVO
+          </Typography>
+        )}
       </Box>
 
       <Box

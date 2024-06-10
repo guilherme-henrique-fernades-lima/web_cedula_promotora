@@ -384,7 +384,7 @@ export default function CadastrarCliente() {
               onChange={(e) => {
                 setObservacao(e.target.value);
               }}
-              placeholder="Insira a matrícula"
+              placeholder="Insira observações se necessário..."
               InputLabelProps={{ shrink: true }}
               autoComplete="off"
               fullWidth

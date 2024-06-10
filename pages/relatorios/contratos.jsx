@@ -36,9 +36,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 
-//Constants
-import { TP_CONVENIO, TP_OPERACAO } from "@/helpers/constants";
-
 //Formatters
 import {
   converterDataParaJS,
@@ -348,6 +345,7 @@ export default function RelatorioContratos() {
   }
 
   function getDataForEdit(data) {
+    console.log(data);
     clearErrors();
 
     setValue("contrato", data.nr_contrato);
@@ -425,14 +423,14 @@ export default function RelatorioContratos() {
         );
       },
     },
-    {
-      field: "promotora",
-      headerName: "COD. PROMOTORA",
-      renderHeader: (params) => <strong>COD. PROMOTORA</strong>,
-      minWidth: 170,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "promotora",
+    //   headerName: "COD. PROMOTORA",
+    //   renderHeader: (params) => <strong>COD. PROMOTORA</strong>,
+    //   minWidth: 170,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_promotora",
       headerName: "PROMOTORA",
@@ -483,14 +481,14 @@ export default function RelatorioContratos() {
         }
       },
     },
-    {
-      field: "convenio",
-      headerName: "COD. CONVÊNIO",
-      renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
-      minWidth: 170,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "convenio",
+    //   headerName: "COD. CONVÊNIO",
+    //   renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
+    //   minWidth: 170,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_convenio",
       headerName: "CONVÊNIO",
@@ -499,14 +497,14 @@ export default function RelatorioContratos() {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "operacao",
-      headerName: "COD. OPERAÇÃO",
-      renderHeader: (params) => <strong>COD. OPERAÇÃO</strong>,
-      minWidth: 170,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "operacao",
+    //   headerName: "COD. OPERAÇÃO",
+    //   renderHeader: (params) => <strong>COD. OPERAÇÃO</strong>,
+    //   minWidth: 170,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_operacao",
       headerName: "OPERAÇÃO",
@@ -515,14 +513,14 @@ export default function RelatorioContratos() {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "banco",
-      headerName: "COD. BANCO",
-      renderHeader: (params) => <strong>COD. BANCO</strong>,
-      minWidth: 220,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "banco",
+    //   headerName: "COD. BANCO",
+    //   renderHeader: (params) => <strong>COD. BANCO</strong>,
+    //   minWidth: 220,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_banco",
       headerName: "BANCO",
@@ -612,14 +610,14 @@ export default function RelatorioContratos() {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "corretor",
-      headerName: "COD. CORRETOR",
-      renderHeader: (params) => <strong>COD. CORRETOR</strong>,
-      minWidth: 200,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "corretor",
+    //   headerName: "COD. CORRETOR",
+    //   renderHeader: (params) => <strong>COD. CORRETOR</strong>,
+    //   minWidth: 200,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_corretor",
       headerName: "CORRETOR",
@@ -699,24 +697,6 @@ export default function RelatorioContratos() {
           })}
         >
           <Grid container spacing={1}>
-            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("promotora")}
-                error={Boolean(errors.promotora)}
-                fullWidth
-                label="Tipo de promotora (ANTIGO)"
-                size="small"
-                value={promotora}
-                onChange={(e) => {
-                  setPromotora(e.target.value);
-                }}
-              />
-
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.promotora?.message}
-              </Typography>
-            </Grid> */}
-
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("promotora")}
@@ -841,30 +821,6 @@ export default function RelatorioContratos() {
               </Typography>
             </Grid>
 
-            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("convenio")}
-                error={Boolean(errors.convenio)}
-                select
-                fullWidth
-                label="Convênio (ANTIGO)"
-                size="small"
-                value={convenio}
-                onChange={(e) => {
-                  setConvenio(e.target.value);
-                }}
-              >
-                {TP_CONVENIO.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.convenio?.message}
-              </Typography>
-            </Grid> */}
-
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("convenio")}
@@ -887,30 +843,6 @@ export default function RelatorioContratos() {
               </TextField>
             </Grid>
 
-            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("operacao")}
-                error={Boolean(errors.operacao)}
-                select
-                fullWidth
-                label="Operação (ANTIGO)"
-                size="small"
-                value={operacao}
-                onChange={(e) => {
-                  setOperacao(e.target.value);
-                }}
-              >
-                {TP_OPERACAO.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.operacao?.message}
-              </Typography>
-            </Grid> */}
-
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 {...register("operacao")}
@@ -932,27 +864,6 @@ export default function RelatorioContratos() {
                 ))}
               </TextField>
             </Grid>
-
-            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("banco")}
-                error={Boolean(errors.banco)}
-                value={banco}
-                onChange={(e) => {
-                  setBanco(e.target.value);
-                }}
-                size="small"
-                label="Banco (ANTIGO)"
-                placeholder="Insira o nome do banco"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 255 }}
-              />
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.banco?.message}
-              </Typography>
-            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
@@ -1012,8 +923,6 @@ export default function RelatorioContratos() {
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
-                // {...register("qt_parcelas")}
-                // error={Boolean(errors.qt_parcelas)}
                 value={qt_parcelas}
                 onChange={(e) => {
                   setQtParcelas(e.target.value);
@@ -1031,9 +940,6 @@ export default function RelatorioContratos() {
                 }
                 inputProps={{ maxLength: 5 }}
               />
-              {/* <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-              {errors.qt_parcelas?.message}
-            </Typography> */}
             </Grid>
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -1175,27 +1081,6 @@ export default function RelatorioContratos() {
                 {errors.porcentagem?.message}
               </Typography>
             </Grid>
-
-            {/* <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                {...register("corretor")}
-                error={Boolean(errors.corretor)}
-                value={corretor}
-                onChange={(e) => {
-                  setCorretor(e.target.value);
-                }}
-                size="small"
-                label="Corretor (ANTIGO)"
-                placeholder="Insira o corretor"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 50 }}
-              />
-              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
-                {errors.corretor?.message}
-              </Typography>
-            </Grid> */}
 
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField

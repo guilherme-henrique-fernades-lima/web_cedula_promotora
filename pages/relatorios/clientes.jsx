@@ -233,9 +233,6 @@ export default function CadastrarCliente() {
 
   function getDataForEdit(data) {
     clearErrors();
-
-    console.log(data);
-
     setValue("nome", data.nome);
     setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
     setValue("telefoneUm", data.telefone1);

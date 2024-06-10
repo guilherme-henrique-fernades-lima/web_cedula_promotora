@@ -486,65 +486,9 @@ export const TIPO_LOJA = [
   { value: "filial", label: "FILIAL" },
 ];
 
-export const NATUREZA_DESPESA = [
-  { value: "acessoria_redes_sociais", label: "ACESSORIA REDES SOCIAIS" },
-  { value: "agua", label: "ÁGUA" },
-  { value: "aluguel", label: "ALUGUEL" },
-  { value: "aux_familia", label: "AUXÍLIO FAMÍLIA" },
-  { value: "contador", label: "CONTADOR" },
-  { value: "conteudo_divulgacao", label: "CONTEÚDO PARA DIVULGAÇÃO" },
-  { value: "corretor", label: "CORRETOR(A)" },
-  { value: "energia", label: "ENERGIA" },
-  { value: "fgts", label: "FGTS" },
-  { value: "inss", label: "INSS" },
-  { value: "internet", label: "INTERNET" },
-  { value: "iptu", label: "IPTU" },
-  { value: "plano_telefonico", label: "PLANOS TELEFÔNICOS" },
-  { value: "refeicao", label: "REFEIÇÃO" },
-  { value: "salario", label: "SALÁRIO" },
-  { value: "simples_nacional_nota", label: "SIMPLES NACIONAL (NOTA FISCAL)" },
-  { value: "sistema_consulta", label: "SISTEMA DE CONSULTA" },
-  { value: "trafego_pago", label: "TRÁFEGO PAGO" },
-  { value: "vale_transporte", label: "VALE TRANSPORTE" },
-  { value: "outro", label: "OUTRO" },
-];
-
 export const SITUACAO_PAGAMENTO = [
   { value: "pago", label: "PAGO" },
   { value: "pendente", label: "PENDENTE" },
-];
-
-export const TP_CONVENIO = [
-  { value: "FGTS", label: "FGTS" },
-  { value: "INSS", label: "INSS" },
-  { value: "FEDERAL", label: "FEDERAL" },
-  { value: "ESTADO PIAUÍ", label: "ESTADO PIAUÍ" },
-  { value: "ESTADO MARANHÃO", label: "ESTADO MARANHÃO" },
-  { value: "FORÇAS ARMADAS", label: "FORÇAS ARMADAS" },
-  { value: "MARINHA", label: "MARINHA" },
-  { value: "AERONÁUTICA", label: "AERONÁUTICA" },
-  { value: "PREFEITURA", label: "PREFEITURA" },
-  { value: "BPC-LOAS", label: "BPC-LOAS" },
-];
-
-export const TP_OPERACAO = [
-  { value: "CARTAO BENEFICIO", label: "CARTÃO BENEFÍCIO" },
-  { value: "CARTAO CONSIGNADO", label: "CARTÃO CONSIGNADO" },
-  { value: "NOVO", label: "NOVO" },
-  { value: "NOVO", label: "NOVO (CONTRATO CHEIO)" },
-  { value: "PORTABILIDADE", label: "PORTABILIDADE" },
-  {
-    value: "PORTABILIDADE_REFINANCIAMENTO",
-    label: "REFIN. DA PORTABILIDADE",
-  },
-
-  { value: "REFINANCIAMENTO", label: "REFINANCIAMENTO" },
-  {
-    value: "REFIN_MARGEM",
-    label: "REFIN. + MARGEM",
-  },
-  { value: "SAQUE COMPLEMENTAR CARTAO", label: "SAQUE COMPLEMENTAR CARTÃO" },
-  { value: "OUTROS", label: "OUTROS" },
 ];
 
 export const UF_OBJECT = [
