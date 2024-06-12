@@ -20,10 +20,10 @@ async function cadastrarCliente(req, res) {
 async function editarDadosCliente(req, res) {
   const token = req.headers.authorization;
   const data = req.body;
-  const cpf = req.query.cpf ?? "";
+  const id = req.query.id ?? "";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/clientes/${cpf}/`,
+    `${process.env.NEXT_INTEGRATION_URL}/clientes/${id}/`,
     {
       method: "PUT",
       headers: {

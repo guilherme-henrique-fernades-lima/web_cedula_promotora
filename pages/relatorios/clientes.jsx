@@ -65,6 +65,7 @@ export default function CadastrarCliente() {
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
+
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
   const [dataNascimento, setDataNascimento] = useState(null);
@@ -196,7 +197,6 @@ export default function CadastrarCliente() {
 
   function getPayload() {
     const payload = {
-      id: id,
       cpf: cpf.replace(/\D/g, ""),
       nome: nome.toUpperCase(),
       dt_nascimento: dataNascimento
@@ -264,16 +264,13 @@ export default function CadastrarCliente() {
 
     const payload = getPayload();
 
-    const response = await fetch(
-      `/api/cadastros/cliente/?cpf=${cpf.replace(/\D/g, "")}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-        body: JSON.stringify(payload),
-      }
-    );
+    const response = await fetch(`/api/cadastros/cliente/?id=${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
 
     if (response.ok) {
       toast.success("Dados atualizados com sucesso!");
@@ -403,14 +400,14 @@ export default function CadastrarCliente() {
       align: "center",
       headerAlign: "center",
     },
-    {
-      field: "convenio",
-      headerName: "COD. CONVÊNIO",
-      renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
-      minWidth: 450,
-      align: "center",
-      headerAlign: "center",
-    },
+    // {
+    //   field: "convenio",
+    //   headerName: "COD. CONVÊNIO",
+    //   renderHeader: (params) => <strong>COD. CONVÊNIO</strong>,
+    //   minWidth: 450,
+    //   align: "center",
+    //   headerAlign: "center",
+    // },
     {
       field: "nome_convenio",
       headerName: "CONVÊNIO",
@@ -420,8 +417,6 @@ export default function CadastrarCliente() {
       headerAlign: "center",
     },
   ];
-
-  console.log(clientes);
 
   try {
     var rows = clientes?.map((row) => {
