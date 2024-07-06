@@ -1,0 +1,7 @@
+Nova página de clientes do operador para ele enxergar somente o cliente que cadastrou
+Renomear cliente para só o felipe ver todos
+cadastro de cliente remover o campo telefone 3
+colocar campo senha com texto livre e caracteres
+campo para identificar origem do cliente 
+criar esse campo no configurações
+verificar opção para quando cliente tiver duas espécies do inss

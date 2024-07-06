@@ -41,6 +41,8 @@ export default function FuturosContratos() {
   useEffect(() => {
     if (id) {
       retrieveData(id);
+    } else {
+      clearStatesAndErrors();
     }
   }, [id]);
 
@@ -77,24 +79,24 @@ export default function FuturosContratos() {
 
   function getPayload() {
     const data = {
-      nome_cliente: nomeCliente,
-      cpf_cliente: cpfCliente,
-      nome_rep_legal: nomeRepLegal,
-      cpf_rep_legal: cpfRepLegal,
-      convenio: convenio,
-      operacao: operacao,
-      banco: banco,
-      vl_contrato: parseFloat(vl_contrato),
-      observacoes: observacao,
+      nome_cliente: nomeCliente ? nomeCliente : null,
+      cpf_cliente: cpfCliente ? cpfCliente : null,
+      nome_rep_legal: nomeRepLegal ? nomeRepLegal : null,
+      cpf_rep_legal: cpfRepLegal ? cpfRepLegal : null,
+      convenio: convenio ? convenio : null,
+      operacao: operacao ? operacao : null,
+      banco: banco ? banco : null,
+      vl_contrato: vl_contrato ? parseFloat(vl_contrato) : null,
+      observacoes: observacao ? observacao : null,
       dt_concessao_beneficio: dtConcessaoBeneficio
         ? moment(dtConcessaoBeneficio).format("YYYY-MM-DD")
         : null,
       dt_efetivacao_emprestimo: dtEfetivacaoBeneficio
         ? moment(dtEfetivacaoBeneficio).format("YYYY-MM-DD")
         : null,
-      representante_legal: representanteLegal,
-      iletrado: iletrado,
-      tipo_contrato: tipoContrato,
+      representante_legal: representanteLegal ? representanteLegal : null,
+      iletrado: iletrado ? iletrado : null,
+      tipo_contrato: tipoContrato ? tipoContrato : null,
     };
 
     return data;

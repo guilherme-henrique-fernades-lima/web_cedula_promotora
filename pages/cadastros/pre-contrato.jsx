@@ -29,6 +29,7 @@ import ContentWrapper from "@/components/templates/ContentWrapper";
 import CustomTextField from "@/components/CustomTextField";
 import DatepickerField from "@/components/DatepickerField";
 import BackdropLoadingScreen from "@/components/BackdropLoadingScreen";
+import DatepickerFieldWithValidation from "@/components/DatepickerFieldWithValidation";
 
 //Utils
 import {
@@ -63,6 +64,8 @@ export default function CadastrarPreContrato() {
   useEffect(() => {
     if (id) {
       retrievePreContrato(id, session?.user?.id);
+    } else {
+      clearStatesAndErrors();
     }
   }, [id]);
 
@@ -468,10 +471,7 @@ export default function CadastrarPreContrato() {
       data.dt_pag_comissao ? converterDataParaJS(data.dt_pag_comissao) : null
     );
     setValue("vl_contrato", parseFloat(data.vl_contrato));
-    setValue("vl_parcela", parseFloat(data.vl_parcela));
-    setValue("porcentagem", parseFloat(data.porcentagem));
     setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
-    setValue("tabela", data.tabela);
     setValue("nr_contrato", data.nr_contrato);
     setValue("no_cliente", data.no_cliente);
     setValue("promotora", data.promotora);
@@ -483,6 +483,11 @@ export default function CadastrarPreContrato() {
     setValue("tipo_contrato", data.tipo_contrato);
     setValue("documentacao_salva", data.documento_salvo);
     setValue("representante_legal", data.representante_legal);
+    setValue("dt_digitacao", data.dt_digitacao);
+    setValue("dt_pag_cliente", data.dt_pag_cliente);
+    // setValue("porcentagem", parseFloat(data.porcentagem));
+    // setValue("vl_parcela", parseFloat(data.vl_parcela));
+    // setValue("tabela", data.tabela);
 
     if (session?.user?.is_superuser) {
       setStatusComissao(data.status_comissao);
@@ -537,10 +542,21 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de digitação"
-            value={dt_digitacao}
-            onChange={setDtDigitacao}
+          <Controller
+            name="dt_digitacao"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DatepickerFieldWithValidation
+                label="Data de digitação"
+                value={dt_digitacao}
+                onChange={(newDate) => {
+                  field.onChange(newDate);
+                  setDtDigitacao(newDate);
+                }}
+                error={error}
+                helperText={error?.message}
+              />
+            )}
           />
         </Grid>
 
@@ -722,46 +738,57 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
+          {/* <Controller
             name="vl_parcela"
             control={control}
             defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                thousandSeparator="."
-                decimalSeparator=","
-                decimalScale={2}
-                fixedDecimalScale={true}
-                prefix="R$ "
-                onValueChange={(values) => {
-                  setVlParcela(values?.floatValue);
-                }}
-                error={Boolean(errors.vl_parcela)}
-                size="small"
-                label="Valor da parcela"
-                placeholder="R$ 0,00"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
+            render={({ field }) => ( */}
+          <NumericFormat
+            // {...field}
+            customInput={TextField}
+            thousandSeparator="."
+            decimalSeparator=","
+            decimalScale={2}
+            fixedDecimalScale={true}
+            prefix="R$ "
+            onValueChange={(values) => {
+              setVlParcela(values?.floatValue);
+            }}
+            // error={Boolean(errors.vl_parcela)}
+            size="small"
+            label="Valor da parcela"
+            placeholder="R$ 0,00"
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
+            fullWidth
+            inputProps={{ maxLength: 16 }}
           />
+          {/* )}
+          /> */}
 
-          <Typography
+          {/* <Typography
             sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
           >
             {errors.vl_parcela?.message}
-          </Typography>
+          </Typography> */}
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <DatepickerField
-            label="Data de pagamento ao cliente"
-            value={dt_pag_cliente}
-            onChange={setDtPagCliente}
+          <Controller
+            name="dt_pag_cliente"
+            control={control}
+            render={({ field, fieldState: { error } }) => (
+              <DatepickerFieldWithValidation
+                label="Data de pagamento ao cliente"
+                value={dt_pag_cliente}
+                onChange={(newDate) => {
+                  field.onChange(newDate);
+                  setDtPagCliente(newDate);
+                }}
+                error={error}
+                helperText={error?.message}
+              />
+            )}
           />
         </Grid>
 
@@ -774,40 +801,40 @@ export default function CadastrarPreContrato() {
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-          <Controller
+          {/* <Controller
             name="porcentagem"
             control={control}
             defaultValue=""
-            render={({ field }) => (
-              <NumericFormat
-                {...field}
-                customInput={TextField}
-                decimalScale={2}
-                fixedDecimalScale={true}
-                decimalSeparator=","
-                isNumericString
-                suffix="%"
-                allowEmptyFormatting
-                onValueChange={(values) => {
-                  setPorcentagem(values?.floatValue);
-                }}
-                //Aqui pra baixo textfield
-                error={Boolean(errors.porcentagem)}
-                size="small"
-                label="(%) Porcentagem"
-                placeholder="% de juros"
-                InputLabelProps={{ shrink: true }}
-                autoComplete="off"
-                fullWidth
-                inputProps={{ maxLength: 16 }}
-              />
-            )}
+            render={({ field }) => ( */}
+          <NumericFormat
+            // {...field}
+            customInput={TextField}
+            decimalScale={2}
+            fixedDecimalScale={true}
+            decimalSeparator=","
+            isNumericString
+            suffix="%"
+            allowEmptyFormatting
+            onValueChange={(values) => {
+              setPorcentagem(values?.floatValue);
+            }}
+            //Aqui pra baixo textfield
+            // error={Boolean(errors.porcentagem)}
+            size="small"
+            label="(%) Porcentagem"
+            placeholder="% de juros"
+            InputLabelProps={{ shrink: true }}
+            autoComplete="off"
+            fullWidth
+            inputProps={{ maxLength: 16 }}
+          />
+          {/* )}
           />
           <Typography
             sx={{ color: "#d32f2f", fontSize: "0.75rem", marginLeft: "14px" }}
           >
             {errors.porcentagem?.message}
-          </Typography>
+          </Typography> */}
         </Grid>
 
         <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -860,8 +887,8 @@ export default function CadastrarPreContrato() {
             setValue={setTabela}
             label="Tabela"
             placeholder="Insira o nome da tabela"
-            validateFieldName="tabela"
-            control={control}
+            // validateFieldName="tabela"
+            // control={control}
           />
         </Grid>
 
