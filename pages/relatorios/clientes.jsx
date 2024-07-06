@@ -372,7 +372,11 @@ export default function CadastrarCliente() {
       minWidth: 250,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => formatarTelefone(params.value),
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarTelefone(params.value);
+        }
+      },
     },
     {
       field: "telefone2",
@@ -381,17 +385,25 @@ export default function CadastrarCliente() {
       minWidth: 250,
       align: "center",
       headerAlign: "center",
-      renderCell: (params) => formatarTelefone(params.value),
+      renderCell: (params) => {
+        if (params.value) {
+          return formatarTelefone(params.value);
+        }
+      },
     },
-    {
-      field: "telefone3",
-      headerName: "TELEFONE TRÊS",
-      renderHeader: (params) => <strong>TELEFONE TRÊS</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => formatarTelefone(params.value),
-    },
+    // {
+    //   field: "telefone3",
+    //   headerName: "TELEFONE TRÊS",
+    //   renderHeader: (params) => <strong>TELEFONE TRÊS</strong>,
+    //   minWidth: 250,
+    //   align: "center",
+    //   headerAlign: "center",
+    //   renderCell: (params) => {
+    //     if (params.value) {
+    //       return formatarTelefone(params.value);
+    //     }
+    //   },
+    // },
     {
       field: "observacoes",
       headerName: "OBSERVAÇÃO",
@@ -412,6 +424,14 @@ export default function CadastrarCliente() {
       field: "nome_convenio",
       headerName: "CONVÊNIO",
       renderHeader: (params) => <strong>CONVÊNIO</strong>,
+      minWidth: 450,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "nome_canal_aquisicao",
+      headerName: "CANAL DE AQUISIÇÃO",
+      renderHeader: (params) => <strong>CANAL DE AQUISIÇÃO</strong>,
       minWidth: 450,
       align: "center",
       headerAlign: "center",

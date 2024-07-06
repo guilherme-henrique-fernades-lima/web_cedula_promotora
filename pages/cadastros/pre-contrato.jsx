@@ -483,6 +483,8 @@ export default function CadastrarPreContrato() {
     setValue("tipo_contrato", data.tipo_contrato);
     setValue("documentacao_salva", data.documento_salvo);
     setValue("representante_legal", data.representante_legal);
+    setValue("dt_digitacao", data.dt_digitacao);
+    setValue("dt_pag_cliente", data.dt_pag_cliente);
     // setValue("porcentagem", parseFloat(data.porcentagem));
     // setValue("vl_parcela", parseFloat(data.vl_parcela));
     // setValue("tabela", data.tabela);
