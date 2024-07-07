@@ -41,7 +41,6 @@ import CustomTextField from "@/components/CustomTextField";
 //Utils
 import {
   formatarData,
-  formatarValorBRL,
   converterDataParaJS,
   formatarCPFSemAnonimidade,
   formatarTelefone,
@@ -57,9 +56,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 //Schema validation
 import { clienteCallCenterSchema } from "@/schemas/clienteCallCenterSchema";
 
-var DATA_HOJE = new Date();
-
-export default function RelatorioClientes() {
+export default function RelatorioClientesOperadores() {
   const { data: session } = useSession();
   const [clientes, setClientes] = useState([]);
 
@@ -68,6 +65,7 @@ export default function RelatorioClientes() {
 
   const [loadingButton, setLoadingButton] = useState(false);
   const [id, setId] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [cpf, setCpf] = useState("");
   const [nome, setNome] = useState("");
@@ -100,7 +98,7 @@ export default function RelatorioClientes() {
 
   useEffect(() => {
     if (session?.user?.token) {
-      getClientes();
+      list();
     }
   }, [session?.user, showEditForm]);
 
@@ -169,7 +167,7 @@ export default function RelatorioClientes() {
 
     if (response.ok) {
       toast.success("Cliente excluído com sucesso");
-      getClientes();
+      list();
       setId("");
       handleOpenDialogExcluir();
     } else {
@@ -179,17 +177,31 @@ export default function RelatorioClientes() {
     setLoadingButton(false);
   }
 
-  async function getClientes() {
-    const response = await fetch("/api/relatorios/clientes", {
-      method: "GET",
-      headers: {
-        Authorization: session?.user?.token,
-      },
-    });
+  async function list() {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/relatorios/clientes-operadores/?user_id=${session?.user?.id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
 
-    if (response.ok) {
-      const json = await response.json();
-      setClientes(json);
+      if (response.ok) {
+        const json = await response.json();
+        setClientes(json);
+
+        if (json?.length == 0) {
+          toast.error("Não há clientes na sua carteira!");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -234,7 +246,6 @@ export default function RelatorioClientes() {
       matricula: matricula.toUpperCase(),
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
-      telefone3: telefoneTres.replace(/\D/g, ""),
       observacoes: observacao,
       convenio: convenio == "" ? null : convenio,
       senha: senha,
@@ -289,8 +300,8 @@ export default function RelatorioClientes() {
     setTelefoneTres(data.telefone3 ? data.telefone3 : "");
     setObservacao(data.observacoes);
     setConvenio(data.convenio);
-    setSenha(data.senha);
     setCanalAquisicao(data.canal_aquisicao);
+    setSenha(data.senha);
   }
 
   async function editarDadosCliente() {
@@ -351,19 +362,6 @@ export default function RelatorioClientes() {
             </Tooltip>
           </Stack>
         );
-      },
-    },
-    {
-      field: "username",
-      headerName: "OPERADOR QUE CADASTROU",
-      renderHeader: (params) => <strong>OPERADOR QUE CADASTROU</strong>,
-      minWidth: 250,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params) => {
-        if (params.value) {
-          return params.value.toUpperCase();
-        }
       },
     },
     {
@@ -511,7 +509,6 @@ export default function RelatorioClientes() {
         canal_aquisicao: row.canal_aquisicao,
         nome_canal_aquisicao: row.nome_canal_aquisicao,
         senha: row.senha,
-        username: row.username,
       };
     });
   } catch (err) {
@@ -520,7 +517,7 @@ export default function RelatorioClientes() {
   }
 
   return (
-    <ContentWrapper title="Relação de clientes master">
+    <ContentWrapper title="Relação de clientes dos operadores">
       <Toaster position="bottom-center" reverseOrder={true} />
 
       {showEditForm && (
@@ -665,6 +662,7 @@ export default function RelatorioClientes() {
                 placeholder="Insira a senha do cliente"
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 size="small"
@@ -850,7 +848,7 @@ export default function RelatorioClientes() {
 
       <Fade in={!showEditForm}>
         <Box sx={{ width: "100%", display: !showEditForm ? "block" : "none" }}>
-          {clientes.length == 0 ? (
+          {loading ? (
             <Box
               sx={{
                 width: "100%",

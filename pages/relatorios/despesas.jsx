@@ -57,6 +57,7 @@ var DATA_HOJE = new Date();
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
+  console.log(despesas);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -724,14 +725,33 @@ export default function RelatorioDespesas() {
               >
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
                   Total de despesas:
-                  {(despesas?.data?.length && despesas?.data?.length) ||
-                    formatarValorBRL(0)}
+                  {despesas?.data?.length}
                 </Typography>
                 <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
-                  Valor total:
+                  Valor total despesa:
                   {despesas?.indicadores?.total
                     ? formatarValorBRL(despesas?.indicadores?.total)
                     : formatarValorBRL(0)}
+                </Typography>
+
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Quantidade de comissões:{" "}
+                  {despesas?.indicadores?.qtd_tt_comissao}
+                </Typography>
+
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Valor total de comissões:{" "}
+                  {formatarValorBRL(despesas?.indicadores?.vl_tt_comissao)}
+                </Typography>
+
+                <Box sx={{ borderTop: "1px solid #f1f1f1", width: "100%" }} />
+
+                <Typography sx={{ fontWeight: 700, color: "#212121", ml: 1 }}>
+                  Saldo:{" "}
+                  {formatarValorBRL(
+                    despesas?.indicadores?.vl_tt_comissao -
+                      despesas?.indicadores?.total
+                  )}
                 </Typography>
               </Box>
               <DataTable rows={rows} columns={columns} />
