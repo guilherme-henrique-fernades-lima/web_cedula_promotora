@@ -104,6 +104,12 @@ const ROUTES = [
         url: "/configuracoes/natureza-despesas",
         perm: "app_config_natureza_despesas",
       },
+      {
+        id: 8,
+        title: "Canal de aquisição de clientes",
+        url: "/configuracoes/canal-aquisicao-clientes",
+        perm: "app_config_aquisicao_clientes",
+      },
     ],
     icon: <SettingsIcon />,
     perm: "menu_configuracoes",
@@ -140,30 +146,36 @@ const ROUTES = [
     routes: [
       {
         id: 1,
-        title: "Clientes",
+        title: "Clientes master",
         url: "/relatorios/clientes",
         perm: "app_relatorio_clientes",
       },
       {
         id: 2,
+        title: "Clientes operadores",
+        url: "/relatorios/clientes-operadores",
+        perm: "app_relatorio_clientes_dos_operadores",
+      },
+      {
+        id: 3,
         title: "Contratos",
         url: "/relatorios/contratos",
         perm: "app_relatorio_contratos",
       },
       {
-        id: 3,
+        id: 4,
         title: "Despesas",
         url: "/relatorios/despesas",
         perm: "app_relatorio_despesas",
       },
       {
-        id: 4,
+        id: 5,
         title: "Pré-contratos",
         url: "/relatorios/pre-contratos",
         perm: "app_relatorio_pre_contratos",
       },
       {
-        id: 5,
+        id: 6,
         title: "Futuros contratos",
         url: "/relatorios/futuros-contratos",
         perm: "app_relatorio_futuro_contrato",

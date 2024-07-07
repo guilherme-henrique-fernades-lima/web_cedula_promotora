@@ -14,6 +14,7 @@ import { useSession } from "next-auth/react";
 
 //Custom components
 import ContentWrapper from "../../components/templates/ContentWrapper";
+import CustomTextField from "@/components/CustomTextField";
 
 //Mui components
 import TextField from "@mui/material/TextField";
@@ -64,16 +65,19 @@ export default function CadastrarCliente() {
   const [matricula, setMatricula] = useState("");
   const [telefoneUm, setTelefoneUm] = useState("");
   const [telefoneDois, setTelefoneDois] = useState("");
-  const [telefoneTres, setTelefoneTres] = useState("");
   const [observacao, setObservacao] = useState("");
   const [convenio, setConvenio] = useState("");
+  const [senha, setSenha] = useState("");
+  const [canalAquisicao, setCanalAquisicao] = useState("");
 
   // Picklists
   const [convenioPicklist, setConvenioPicklist] = useState([]);
+  const [canalAquisicaoPicklist, setCanalAquisicaoPicklist] = useState([]);
 
   useEffect(() => {
     if (session?.user?.token) {
       getConveniosPicklist();
+      getCanaisAquisicoesClientesPicklist();
     }
   }, [session?.user?.token]);
 
@@ -98,11 +102,31 @@ export default function CadastrarCliente() {
     }
   }
 
+  async function getCanaisAquisicoesClientesPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/canal-aquisicao-clientes/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setCanalAquisicaoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async function salvarCliente() {
     setLoadingButton(true);
 
     const payload = getPayload();
-    console.log(payload);
 
     const response = await fetch("/api/cadastros/cliente", {
       method: "POST",
@@ -134,9 +158,11 @@ export default function CadastrarCliente() {
       matricula: matricula.toUpperCase(),
       telefone1: telefoneUm.replace(/\D/g, ""),
       telefone2: telefoneDois.replace(/\D/g, ""),
-      telefone3: telefoneTres.replace(/\D/g, ""),
       observacoes: observacao,
       convenio: convenio,
+      senha: senha,
+      created_by_user_id: session?.user?.id,
+      canal_aquisicao: canalAquisicao,
     };
 
     return payload;
@@ -154,8 +180,10 @@ export default function CadastrarCliente() {
     setMatricula("");
     setTelefoneUm("");
     setTelefoneDois("");
-    setTelefoneTres("");
     setObservacao("");
+    setCanalAquisicao("");
+    setSenha("");
+    setConvenio("");
   }
 
   return (
@@ -307,26 +335,24 @@ export default function CadastrarCliente() {
               )}
             </InputMask>
           </Grid>
+
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-            <InputMask
-              mask="(99) 9 9999-9999"
-              maskChar={null}
-              value={telefoneTres}
-              onChange={(e) => setTelefoneTres(e.target.value)}
+            <TextField
+              select
+              fullWidth
+              label="Canal de aquisição"
+              size="small"
+              value={canalAquisicao}
+              onChange={(e) => {
+                setCanalAquisicao(e.target.value);
+              }}
             >
-              {(inputProps) => (
-                <TextField
-                  {...inputProps}
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  label="Telefone três"
-                  placeholder="00 00000-0000"
-                  InputLabelProps={{ shrink: true }}
-                  autoComplete="off"
-                />
-              )}
-            </InputMask>
+              {canalAquisicaoPicklist?.map((option) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           </Grid>
 
           <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
@@ -373,6 +399,15 @@ export default function CadastrarCliente() {
               />
             </Grid>
           )}
+
+          <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <CustomTextField
+              value={senha}
+              setValue={setSenha}
+              label="Senha"
+              placeholder="Insira a senha do cliente"
+            />
+          </Grid>
 
           <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
             <TextField
