@@ -42,6 +42,7 @@ import { preContratoSchema } from "@/schemas/preContratoSchema";
 
 //Icons
 import SaveIcon from "@mui/icons-material/Save";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 export default function CadastrarPreContrato() {
   const { data: session } = useSession();
@@ -71,6 +72,9 @@ export default function CadastrarPreContrato() {
 
   const [openBackdrop, setOpenBackdrop] = useState(false);
   const [loadingButton, setLoadingButton] = useState(false);
+  const [loadingButtonTransmission, setLoadingButtonTransmission] =
+    useState(false);
+
   const [iletrado, setIletrado] = useState("");
   const [tipoContrato, setTipoContrato] = useState("");
   const [documentoSalvo, setDocumentoSalvo] = useState("");
@@ -441,8 +445,6 @@ export default function CadastrarPreContrato() {
   }
 
   function setDataForEdition(data) {
-    console.log(data);
-
     setIletrado(data.iletrado);
     setRepresentanteLegal(data.representante_legal);
     setTipoContrato(data.tipo_contrato);
@@ -465,11 +467,12 @@ export default function CadastrarPreContrato() {
     setQtParcelas(data.qt_parcelas);
     setVlParcela(parseFloat(data.vl_parcela));
     setTabela(data.tabela);
-    setPorcentagem(data.porcentagem);
+    setPorcentagem(parseFloat(data.porcentagem));
     setVlComissao(parseFloat(data.vl_comissao));
     setDtPagComissao(
       data.dt_pag_comissao ? converterDataParaJS(data.dt_pag_comissao) : null
     );
+
     setValue("vl_contrato", parseFloat(data.vl_contrato));
     setValue("cpf", formatarCPFSemAnonimidade(data.cpf));
     setValue("nr_contrato", data.nr_contrato);
@@ -485,9 +488,6 @@ export default function CadastrarPreContrato() {
     setValue("representante_legal", data.representante_legal);
     setValue("dt_digitacao", data.dt_digitacao);
     setValue("dt_pag_cliente", data.dt_pag_cliente);
-    // setValue("porcentagem", parseFloat(data.porcentagem));
-    // setValue("vl_parcela", parseFloat(data.vl_parcela));
-    // setValue("tabela", data.tabela);
 
     if (session?.user?.is_superuser) {
       setStatusComissao(data.status_comissao);
@@ -745,6 +745,7 @@ export default function CadastrarPreContrato() {
             render={({ field }) => ( */}
           <NumericFormat
             // {...field}
+            value={vl_parcela}
             customInput={TextField}
             thousandSeparator="."
             decimalSeparator=","
@@ -814,6 +815,7 @@ export default function CadastrarPreContrato() {
             decimalSeparator=","
             isNumericString
             suffix="%"
+            value={porcentagem}
             allowEmptyFormatting
             onValueChange={(values) => {
               setPorcentagem(values?.floatValue);
@@ -1131,6 +1133,21 @@ export default function CadastrarPreContrato() {
             SALVAR
           </LoadingButton>
         </Grid>
+
+        {/* {id && (
+          <Grid item xs={12} sm={6} md={3} lg={2} xl={2}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              endIcon={<FileUploadIcon />}
+              disableElevation
+              loading={loadingButtonTransmission}
+              fullWidth
+            >
+              TRANSMITIR
+            </LoadingButton>
+          </Grid>
+        )} */}
       </Grid>
     </ContentWrapper>
   );
