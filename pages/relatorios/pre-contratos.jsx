@@ -24,6 +24,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
 
 //Utils
 import {
@@ -54,6 +59,7 @@ export default function RelatorioPreContratos() {
   const [openDialogSendPreContrato, setOpenDialogSendPreContrato] =
     useState(false);
   const [idPreContrato, setIdPreContrato] = useState("");
+  const [hasContrato, setHasContrato] = useState("nao_transmitidos");
 
   useEffect(() => {
     if (session?.user.token) {
@@ -69,7 +75,7 @@ export default function RelatorioPreContratos() {
           "YYYY-MM-DD"
         )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&user_id=${
           session?.user.id
-        }`,
+        }&has_contrato=${hasContrato}`,
         {
           method: "GET",
           headers: {
@@ -373,6 +379,31 @@ export default function RelatorioPreContratos() {
         </Grid>
       </Grid>
 
+      <FormControl component="fieldset">
+        <FormLabel id="demo-radio-buttons-group-label">
+          Filtrar pré-contratos por:
+        </FormLabel>
+        <RadioGroup
+          row
+          value={hasContrato}
+          onChange={(e) => {
+            setHasContrato(e.target.value);
+          }}
+        >
+          <FormControlLabel
+            value="nao_transmitidos"
+            control={<Radio />}
+            label="Não transmitidos"
+          />
+          <FormControlLabel
+            value="transmitidos"
+            control={<Radio />}
+            label="Já transmitidos"
+          />
+          <FormControlLabel value="todos" control={<Radio />} label="Todos" />
+        </RadioGroup>
+      </FormControl>
+
       <Box sx={{ width: "100%" }}>
         <DataTable rows={dataSet} columns={columns} />
       </Box>
@@ -465,6 +496,7 @@ function DialogTransmitirPreContrato({
   const [loading, setLoading] = useState(false);
 
   async function sendPreContrato(data) {
+    console.log(data);
     const payload = {
       id: data.id,
       promotora: data.promotora,
