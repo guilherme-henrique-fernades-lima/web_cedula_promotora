@@ -496,10 +496,9 @@ function DialogTransmitirPreContrato({
   const [loading, setLoading] = useState(false);
 
   async function sendPreContrato(data) {
-    console.log(data);
     const payload = {
-      id: data.id,
       promotora: data.promotora,
+      dt_digitacao: data.dt_digitacao ? data.dt_digitacao : null,
       nr_contrato: data.nr_contrato,
       no_cliente: data.no_cliente,
       cpf: data.cpf,
@@ -509,41 +508,38 @@ function DialogTransmitirPreContrato({
       vl_contrato: data.vl_contrato,
       qt_parcelas: data.qt_parcelas,
       vl_parcela: data.vl_parcela,
-      dt_pag_cliente: data.dt_pag_cliente,
+      dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
       porcentagem: data.porcentagem,
       corretor: data.corretor,
-      dt_digitacao: data.dt_digitacao
-        ? data.dt_digitacao
-        : moment().format("YYYY-MM-DD"),
-      dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
       tabela: data.tabela,
       tipo_contrato: data.tipo_contrato,
       status_comissao: data.status_comissao,
       iletrado: data.iletrado,
       documento_salvo: data.documento_salvo,
+      representante_legal: data.representante_legal,
+      dt_pag_comissao: data.dt_pag_comissao,
+      vl_comissao: data.vl_comissao,
     };
 
     try {
-      setLoading(true);
-
-      const response = await fetch(`/api/relatorios/pre-contratos`, {
-        method: "POST",
-        headers: {
-          Authorization: token,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        setLoading(false);
-        toast.success("Enviado com sucesso");
-        onFinishDelete();
-      }
+      // setLoading(true);
+      // const response = await fetch(`/api/relatorios/pre-contratos`, {
+      //   method: "POST",
+      //   headers: {
+      //     Authorization: token,
+      //   },
+      //   body: JSON.stringify(payload),
+      // });
+      // if (response.ok) {
+      //   setLoading(false);
+      //   toast.success("Enviado com sucesso");
+      //   onFinishDelete();
+      // }
     } catch (error) {
-      console.log(error);
-      toast.success("Erro ao enviar");
+      // console.log(error);
+      // toast.success("Erro ao enviar");
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   }
 
