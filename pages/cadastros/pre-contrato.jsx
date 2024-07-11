@@ -23,6 +23,9 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 
 //Custom components
 import ContentWrapper from "@/components/templates/ContentWrapper";
@@ -72,8 +75,7 @@ export default function CadastrarPreContrato() {
 
   const [openBackdrop, setOpenBackdrop] = useState(false);
   const [loadingButton, setLoadingButton] = useState(false);
-  const [loadingButtonTransmission, setLoadingButtonTransmission] =
-    useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [iletrado, setIletrado] = useState("");
   const [tipoContrato, setTipoContrato] = useState("");
@@ -105,6 +107,12 @@ export default function CadastrarPreContrato() {
   const [corretorPicklist, setCorretorPicklist] = useState([]);
   const [promotoraPicklist, setPromotoraPicklist] = useState([]);
 
+  //State para transmissão do pre contrato
+  const [preContratoToSendContratos, setPreContratoToSendContratos] =
+    useState("");
+  const [openDialogSendPreContrato, setOpenDialogSendPreContrato] =
+    useState(false);
+
   useEffect(() => {
     if (session?.user?.token) {
       getConveniosPicklist();
@@ -114,6 +122,11 @@ export default function CadastrarPreContrato() {
       getBancosPicklist();
     }
   }, [session?.user?.token]);
+
+  function actionsAfterDelete() {
+    setOpenDialogSendPreContrato(false);
+    setPreContratoToSendContratos("");
+  }
 
   function getPayloadCadastrar() {
     const data = {
@@ -421,26 +434,38 @@ export default function CadastrarPreContrato() {
   }
 
   async function getCliente(cpfSearch) {
-    const response = await fetch(
-      `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      }
-    );
+    if (isFetching) {
+      return;
+    }
 
-    if (response.ok) {
-      const json = await response.json();
-      setNoCliente(json.nome);
-      setValue("no_cliente", json.nome);
-    } else {
-      setNoCliente("");
-      resetField("no_cliente");
-      toast.error(
-        "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+    setIsFetching(true);
+    try {
+      const response = await fetch(
+        `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
       );
+
+      if (response.ok) {
+        const json = await response.json();
+        setNoCliente(json.nome);
+        setValue("no_cliente", json.nome);
+      } else {
+        setNoCliente("");
+        resetField("no_cliente");
+        toast.error(
+          "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao buscar cliente:", error);
+      toast.error("Erro ao buscar cliente. Tente novamente mais tarde.");
+    } finally {
+      setIsFetching(false);
     }
   }
 
@@ -580,10 +605,12 @@ export default function CadastrarPreContrato() {
             maskChar={null}
             value={cpf}
             onChange={(e) => {
-              setCpf(e.target.value);
+              const cpf = e.target.value;
 
-              if (e.target.value?.length === 14) {
-                getCliente(e.target.value);
+              setCpf(cpf);
+
+              if (cpf.length === 14) {
+                getCliente(cpf);
               }
             }}
           >
@@ -1134,21 +1161,135 @@ export default function CadastrarPreContrato() {
           </LoadingButton>
         </Grid>
 
-        {/* {id && (
+        {id && session?.user?.is_superuser && (
           <Grid item xs={12} sm={6} md={3} lg={2} xl={2}>
             <LoadingButton
-              type="submit"
-              variant="contained"
+              variant="outlined"
               endIcon={<FileUploadIcon />}
               disableElevation
-              loading={loadingButtonTransmission}
               fullWidth
+              onClick={() => {
+                const payload = getPayloadUpdate();
+                setOpenDialogSendPreContrato(true);
+                setPreContratoToSendContratos(payload);
+              }}
             >
               TRANSMITIR
             </LoadingButton>
           </Grid>
-        )} */}
+        )}
       </Grid>
+
+      <DialogTransmitirPreContrato
+        open={openDialogSendPreContrato}
+        close={setOpenDialogSendPreContrato}
+        preContrato={preContratoToSendContratos}
+        clearPreContrato={setPreContratoToSendContratos}
+        token={session?.user.token}
+        onFinishDelete={actionsAfterDelete}
+        id={id}
+      />
     </ContentWrapper>
+  );
+}
+
+function DialogTransmitirPreContrato({
+  open,
+  close,
+  preContrato,
+  clearPreContrato,
+  token,
+  onFinishDelete,
+  id,
+}) {
+  const [loading, setLoading] = useState(false);
+
+  async function sendPreContrato(data) {
+    const payload = {
+      id: id,
+      promotora: data.promotora,
+      dt_digitacao: data.dt_digitacao ? data.dt_digitacao : null,
+      nr_contrato: data.nr_contrato,
+      no_cliente: data.no_cliente,
+      cpf: data.cpf,
+      convenio: data.convenio,
+      operacao: data.operacao,
+      banco: data.banco,
+      vl_contrato: data.vl_contrato,
+      qt_parcelas: data.qt_parcelas,
+      vl_parcela: data.vl_parcela,
+      dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
+      porcentagem: data.porcentagem ? data.porcentagem : null,
+      corretor: data.corretor,
+      tabela: data.tabela,
+      tipo_contrato: data.tipo_contrato,
+      status_comissao: data.status_comissao ? data.status_comissao : null,
+      iletrado: data.iletrado,
+      documento_salvo: data.documento_salvo,
+      representante_legal: data.representante_legal,
+      dt_pag_comissao: data.dt_pag_comissao,
+      vl_comissao: data.vl_comissao ? data.vl_comissao : null,
+    };
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/relatorios/pre-contratos`, {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        setLoading(false);
+        toast.success("Enviado com sucesso");
+        onFinishDelete();
+      }
+    } catch (error) {
+      console.log(error);
+      toast.success("Erro ao enviar");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog
+      open={open}
+      aria-labelledby="alert-dialog-title"
+      aria-describedby="alert-dialog-description"
+    >
+      <DialogTitle
+        id="alert-dialog-title"
+        sx={{ fontWeight: 700, mb: 1, strong: { color: "red" } }}
+      >
+        <strong>ATENÇÃO!</strong> Verifique se salvou todos os dados antes de
+        transferir o pré-contrato, deseja continuar?
+      </DialogTitle>
+
+      <DialogActions>
+        <Button
+          onClick={() => {
+            close(false);
+            clearPreContrato("");
+          }}
+          color="error"
+        >
+          CANCELAR
+        </Button>
+
+        <LoadingButton
+          onClick={() => {
+            sendPreContrato(preContrato);
+          }}
+          color="success"
+          variant="contained"
+          disableElevation
+          loading={loading}
+        >
+          ENVIAR
+        </LoadingButton>
+      </DialogActions>
+    </Dialog>
   );
 }

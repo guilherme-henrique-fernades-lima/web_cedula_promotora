@@ -59,6 +59,7 @@ export default function CadastrarContrato(props) {
   }, [session?.user?.token]);
 
   const [loadingButton, setLoadingButton] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [id, setId] = useState("");
   const [nr_contrato, setNrContrato] = useState("");
@@ -243,26 +244,37 @@ export default function CadastrarContrato(props) {
   }
 
   async function getCliente(cpfSearch) {
-    const response = await fetch(
-      `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: session?.user?.token,
-        },
-      }
-    );
+    if (isFetching) {
+      return;
+    }
 
-    if (response.ok) {
-      const json = await response.json();
-      setNoCliente(json.nome);
-      setValue("no_cliente", json.nome);
-    } else {
-      setNoCliente("");
-      resetField("no_cliente");
-      toast.error(
-        "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+    try {
+      const response = await fetch(
+        `/api/cadastros/contrato/?cpf=${cpfSearch.replace(/\D/g, "")}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
       );
+
+      if (response.ok) {
+        const json = await response.json();
+        setNoCliente(json.nome);
+        setValue("no_cliente", json.nome);
+      } else {
+        setNoCliente("");
+        resetField("no_cliente");
+        toast.error(
+          "Cliente não existe na base de dados do callcenter, insira manualmente ou cadastre-o."
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao buscar cliente:", error);
+      toast.error("Erro ao buscar cliente. Tente novamente mais tarde.");
+    } finally {
+      setIsFetching(false);
     }
   }
 
@@ -380,10 +392,12 @@ export default function CadastrarContrato(props) {
               maskChar={null}
               value={cpf}
               onChange={(e) => {
-                setCpf(e.target.value);
+                const cpf = e.target.value;
 
-                if (e.target.value?.length === 14) {
-                  getCliente(e.target.value);
+                setCpf(cpf);
+
+                if (cpf.length === 14) {
+                  getCliente(cpf);
                 }
               }}
             >
