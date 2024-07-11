@@ -169,6 +169,7 @@ export default function RelatorioPreContratos() {
                       onClick={() => {
                         setOpenDialogSendPreContrato(true);
                         setPreContratoToSendContratos(params.row);
+                        console.log(params.row);
                       }}
                     >
                       <FileUploadIcon />
@@ -497,6 +498,7 @@ function DialogTransmitirPreContrato({
 
   async function sendPreContrato(data) {
     const payload = {
+      id: data.id,
       promotora: data.promotora,
       dt_digitacao: data.dt_digitacao ? data.dt_digitacao : null,
       nr_contrato: data.nr_contrato,
@@ -509,37 +511,37 @@ function DialogTransmitirPreContrato({
       qt_parcelas: data.qt_parcelas,
       vl_parcela: data.vl_parcela,
       dt_pag_cliente: data.dt_pag_cliente ? data.dt_pag_cliente : null,
-      porcentagem: data.porcentagem,
+      porcentagem: data.porcentagem ? data.porcentagem : null,
       corretor: data.corretor,
       tabela: data.tabela,
       tipo_contrato: data.tipo_contrato,
-      status_comissao: data.status_comissao,
+      status_comissao: data.status_comissao ? data.status_comissao : null,
       iletrado: data.iletrado,
       documento_salvo: data.documento_salvo,
       representante_legal: data.representante_legal,
       dt_pag_comissao: data.dt_pag_comissao,
-      vl_comissao: data.vl_comissao,
+      vl_comissao: data.vl_comissao ? data.vl_comissao : null,
     };
 
     try {
-      // setLoading(true);
-      // const response = await fetch(`/api/relatorios/pre-contratos`, {
-      //   method: "POST",
-      //   headers: {
-      //     Authorization: token,
-      //   },
-      //   body: JSON.stringify(payload),
-      // });
-      // if (response.ok) {
-      //   setLoading(false);
-      //   toast.success("Enviado com sucesso");
-      //   onFinishDelete();
-      // }
+      setLoading(true);
+      const response = await fetch(`/api/relatorios/pre-contratos`, {
+        method: "POST",
+        headers: {
+          Authorization: token,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        setLoading(false);
+        toast.success("Enviado com sucesso");
+        onFinishDelete();
+      }
     } catch (error) {
-      // console.log(error);
-      // toast.success("Erro ao enviar");
+      console.log(error);
+      toast.success("Erro ao enviar");
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   }
 
