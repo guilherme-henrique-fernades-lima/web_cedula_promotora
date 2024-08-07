@@ -142,7 +142,7 @@ export default function CadastrarPreContrato() {
       operacao: operacao,
       banco: banco,
       vl_contrato: parseFloat(vl_contrato),
-      qt_parcelas: qt_parcelas,
+      qt_parcelas: qt_parcelas ? qt_parcelas : null,
       vl_parcela: parseFloat(vl_parcela),
       dt_pag_cliente: dt_pag_cliente
         ? moment(dt_pag_cliente).format("YYYY-MM-DD")
@@ -257,7 +257,7 @@ export default function CadastrarPreContrato() {
   async function save() {
     setLoadingButton(true);
     const payload = getPayloadCadastrar();
-
+    console.log(payload);
     const response = await fetch("/api/cadastros/pre-contrato", {
       method: "POST",
       headers: {
@@ -265,6 +265,8 @@ export default function CadastrarPreContrato() {
       },
       body: JSON.stringify(payload),
     });
+
+    console.log(response);
 
     if (response.ok) {
       toast.success("Operação realizada com sucesso");
