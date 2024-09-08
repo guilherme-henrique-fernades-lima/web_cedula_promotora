@@ -165,6 +165,7 @@ export default function CadastrarPreContrato() {
 
   function getPayloadUpdate(id, superuser) {
     var data = {};
+
     if (id && superuser) {
       data = {
         promotora: promotora,
@@ -196,6 +197,7 @@ export default function CadastrarPreContrato() {
           : null,
         vl_comissao: parseFloat(vl_comissao),
         status_comissao: statusComissao,
+        id_pre_contrato: id ? parseInt(id) : null,
       };
     } else {
       data = {
@@ -257,7 +259,7 @@ export default function CadastrarPreContrato() {
   async function save() {
     setLoadingButton(true);
     const payload = getPayloadCadastrar();
-    console.log(payload);
+
     const response = await fetch("/api/cadastros/pre-contrato", {
       method: "POST",
       headers: {
@@ -265,8 +267,6 @@ export default function CadastrarPreContrato() {
       },
       body: JSON.stringify(payload),
     });
-
-    console.log(response);
 
     if (response.ok) {
       toast.success("Operação realizada com sucesso");
@@ -1171,7 +1171,10 @@ export default function CadastrarPreContrato() {
               disableElevation
               fullWidth
               onClick={() => {
-                const payload = getPayloadUpdate();
+                const payload = getPayloadUpdate(
+                  id,
+                  session?.user?.is_superuser
+                );
                 setOpenDialogSendPreContrato(true);
                 setPreContratoToSendContratos(payload);
               }}
@@ -1231,6 +1234,7 @@ function DialogTransmitirPreContrato({
       representante_legal: data.representante_legal,
       dt_pag_comissao: data.dt_pag_comissao,
       vl_comissao: data.vl_comissao ? data.vl_comissao : null,
+      id_pre_contrato: data.id_pre_contrato,
     };
 
     try {
@@ -1242,6 +1246,12 @@ function DialogTransmitirPreContrato({
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.status === 409) {
+        toast.error("Pré contrato já foi transmitido aos contratos");
+        onFinishDelete();
+      }
+
       if (response.ok) {
         setLoading(false);
         toast.success("Enviado com sucesso");

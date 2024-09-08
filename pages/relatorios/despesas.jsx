@@ -28,6 +28,8 @@ import Stack from "@mui/material/Stack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import Modal from "@mui/material/Modal";
+import Backdrop from "@mui/material/Backdrop";
 
 //Custom componentes
 import ContentWrapper from "../../components/templates/ContentWrapper";
@@ -48,6 +50,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIosRoundedIcon from "@mui/icons-material/ArrowBackIosRounded";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import IosShareIcon from "@mui/icons-material/IosShare";
+import CloseIcon from "@mui/icons-material/Close";
+import SendIcon from "@mui/icons-material/Send";
 
 //Schema validation
 import { despesaSchema } from "@/schemas/despesaSchema";
@@ -57,7 +62,6 @@ var DATA_HOJE = new Date();
 export default function RelatorioDespesas() {
   const { data: session } = useSession();
   const [despesas, setDespesas] = useState([]);
-  console.log(despesas);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
@@ -66,6 +70,7 @@ export default function RelatorioDespesas() {
   const [loadingDataFetch, setLoadingDataFetch] = useState(true);
   const [loadingButton, setLoadingButton] = useState(false);
   const [openDialogExcluir, setOpenDialogExcluir] = useState(false);
+  const [openModalCreateDespesa, setOpenModalCreateDespesa] = useState(false);
 
   //States para dados do formulário
   const [id, setId] = useState("");
@@ -151,6 +156,29 @@ export default function RelatorioDespesas() {
     setLoadingButton(false);
   }
 
+  async function salvarDespesa() {
+    setLoadingButton(true);
+    const payload = getPayload();
+
+    const response = await fetch("/api/cadastros/despesa", {
+      method: "POST",
+      headers: {
+        Authorization: session?.user?.token,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (response.ok) {
+      toast.success("Despesa cadastrada com sucesso!");
+      clearStatesAndErrors();
+      setOpenModalCreateDespesa(false);
+    } else {
+      toast.error("Erro ao cadastrar despesa.");
+    }
+
+    setLoadingButton(false);
+  }
+
   async function getLojas() {
     try {
       const response = await fetch("/api/configuracoes/lojas/?ativas=true", {
@@ -210,7 +238,8 @@ export default function RelatorioDespesas() {
   function clearStatesAndErrors() {
     clearErrors();
     reset();
-    setDataVencimentoDespesa("");
+
+    setDataVencimentoDespesa(null);
     setDescricaoDespesa("");
     setValorDespesa("");
     setSituacaoPagamentoDespesa("");
@@ -260,6 +289,38 @@ export default function RelatorioDespesas() {
     setTipoLoja(data.tipo_loja);
   }
 
+  function incrementarMes(dataString) {
+    const novaData = moment(dataString, "YYYY-MM-DD")
+      .add(1, "months")
+      .format("YYYY-MM-DD");
+    return novaData;
+  }
+
+  function getDataForSendDespesa(data) {
+    clearErrors();
+
+    setValue("descricaoDespesa", data.descricao);
+    setValue("valorDespesa", parseFloat(data.valor));
+    setValue("situacaoPagamentoDespesa", data.situacao);
+    setValue("tipoDespesa", data.tp_despesa);
+    setValue("naturezaDespesa", data.natureza_despesa);
+    setValue("tipoLoja", data.tipo_loja);
+
+    const dtVencimentoAtualizada = data.dt_vencimento
+      ? incrementarMes(data.dt_vencimento)
+      : null;
+
+    setDataVencimentoDespesa(
+      data.dt_vencimento ? converterDataParaJS(dtVencimentoAtualizada) : null
+    );
+    setDescricaoDespesa(data.descricao);
+    setValorDespesa(data.valor);
+    setSituacaoPagamentoDespesa(data.situacao);
+    setNaturezaDespesa(data.natureza_despesa);
+    setTipoDespesa(data.tp_despesa);
+    setTipoLoja(data.tipo_loja);
+  }
+
   const columns = [
     {
       field: "id",
@@ -291,6 +352,17 @@ export default function RelatorioDespesas() {
                 }}
               >
                 <DeleteForeverIcon />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Enviar despesa para o próximo mês" placement="top">
+              <IconButton
+                sx={{ ml: 1 }}
+                onClick={() => {
+                  setOpenModalCreateDespesa(true);
+                  getDataForSendDespesa(params.row);
+                }}
+              >
+                <IosShareIcon />
               </IconButton>
             </Tooltip>
           </Stack>
@@ -790,6 +862,269 @@ export default function RelatorioDespesas() {
           </LoadingButton>
         </DialogActions>
       </Dialog>
+
+      <ModalCreateDespesa
+        open={openModalCreateDespesa}
+        setOpen={setOpenModalCreateDespesa}
+        clearStatesAndErrors={clearStatesAndErrors}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            flexDirection: "column",
+            width: "100%",
+            height: "auto",
+            mt: 5,
+          }}
+          component="form"
+          onSubmit={handleSubmit(() => {
+            salvarDespesa();
+          })}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography
+                sx={{ fontWeight: "bold", fontSize: 16, paddingLeft: 2, mb: 1 }}
+              >
+                ENVIAR DESPESA PARA MÊS SEGUINTE
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <LocalizationProvider dateAdapter={AdapterDateFns} locale={ptBR}>
+                <DesktopDatePicker
+                  leftArrowButtonText="Mês anterior"
+                  rightArrowButtonText="Próximo mês"
+                  label="Data de vencimento"
+                  value={dataVencimentoDespesa}
+                  onChange={(newValue) => {
+                    setDataVencimentoDespesa(newValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      fullWidth
+                      size="small"
+                      autoComplete="off"
+                    />
+                  )}
+                  disableHighlightToday
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                {...register("descricaoDespesa")}
+                error={Boolean(errors.descricaoDespesa)}
+                value={descricaoDespesa}
+                onChange={(e) => {
+                  setDescricaoDespesa(e.target.value);
+                }}
+                size="small"
+                label="Descrição da despesa"
+                placeholder="Insira descrição"
+                InputLabelProps={{ shrink: true }}
+                autoComplete="off"
+                fullWidth
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.descricaoDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="valorDespesa"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <NumericFormat
+                    {...field}
+                    customInput={TextField}
+                    thousandSeparator="."
+                    decimalSeparator=","
+                    decimalScale={2}
+                    fixedDecimalScale={true}
+                    prefix="R$ "
+                    onValueChange={(values) => {
+                      setValorDespesa(values?.floatValue);
+                    }}
+                    error={Boolean(errors.valorDespesa)}
+                    size="small"
+                    label="Valor da despesa"
+                    placeholder="R$ 0,00"
+                    InputLabelProps={{ shrink: true }}
+                    autoComplete="off"
+                    fullWidth
+                    inputProps={{ maxLength: 16 }}
+                  />
+                )}
+              />
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.valorDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                {...register("situacaoPagamentoDespesa")}
+                error={Boolean(errors.situacaoPagamentoDespesa)}
+                select
+                fullWidth
+                label="Situação"
+                size="small"
+                value={situacaoPagamentoDespesa}
+                onChange={(e) => {
+                  setSituacaoPagamentoDespesa(e.target.value);
+                }}
+              >
+                {SITUACAO_PAGAMENTO.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.situacaoPagamentoDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                {...register("naturezaDespesa")}
+                error={Boolean(errors.naturezaDespesa)}
+                select
+                fullWidth
+                label="Natureza da despesa"
+                size="small"
+                value={naturezaDespesa}
+                helperText={errors.naturezaDespesa?.message}
+                onChange={(e) => {
+                  setNaturezaDespesa(e.target.value);
+                }}
+              >
+                {naturezaDespesasPicklist?.map((option) => (
+                  <MenuItem key={option.id} value={option.id}>
+                    {option.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                {...register("tipoDespesa")}
+                error={Boolean(errors.tipoDespesa)}
+                select
+                fullWidth
+                label="Tipo de despesa"
+                size="small"
+                value={tipoDespesa}
+                onChange={(e) => {
+                  setTipoDespesa(e.target.value);
+                }}
+              >
+                {TIPO_DESPESA.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.tipoDespesa?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                {...register("tipoLoja")}
+                error={Boolean(errors.tipoLoja)}
+                select
+                fullWidth
+                label="Loja"
+                size="small"
+                value={parseInt(tipoLoja)}
+                onChange={(e) => {
+                  setTipoLoja(e.target.value);
+                }}
+              >
+                {picklist?.map((loja) => (
+                  <MenuItem value={loja.id} key={loja.id}>
+                    {loja.sg_loja}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Typography sx={{ color: "#f00", fontSize: "12px" }}>
+                {errors.tipoLoja?.message}
+              </Typography>
+            </Grid>
+
+            <Grid item xs={12}>
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                endIcon={<SendIcon />}
+                disableElevation
+                fullWidth
+                loading={loadingButton}
+              >
+                ENVIAR
+              </LoadingButton>
+            </Grid>
+          </Grid>
+        </Box>
+      </ModalCreateDespesa>
     </ContentWrapper>
+  );
+}
+
+function ModalCreateDespesa({ open, setOpen, clearStatesAndErrors, children }) {
+  const handleClose = () => {
+    setOpen(false);
+    clearStatesAndErrors();
+  };
+
+  return (
+    <Modal
+      aria-labelledby="transition-modal-title"
+      aria-describedby="transition-modal-description"
+      open={open}
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 500,
+        },
+      }}
+    >
+      <Fade in={open}>
+        <Box
+          sx={{
+            position: "relative",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            maxWidth: 520,
+            height: "auto",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 2,
+            overflowY: "auto",
+          }}
+        >
+          <IconButton
+            color="error"
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 15, right: 15 }}
+          >
+            <CloseIcon />
+          </IconButton>
+          {children}
+        </Box>
+      </Fade>
+    </Modal>
   );
 }
