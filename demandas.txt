@@ -1,3 +1,0 @@
-
-- Mover o botão de transferir o contrato para a tela de edição do pré contrato e retirar da tabela de relação de pré contratos
-

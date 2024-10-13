@@ -5,9 +5,14 @@ async function list(req, res) {
   const dt_final = req.query.dt_final ?? "";
   const user_id = req.query.user_id ?? "";
   const has_contrato = req.query.has_contrato ?? "";
+  const convenios = req.query.convenios ?? "";
+  const promotoras = req.query.promotoras ?? "";
+  const corretores = req.query.corretores ?? "";
+  const operacoes = req.query.operacoes ?? "";
+  const bancos = req.query.bancos ?? "";
 
   const result = await fetch(
-    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/?dt_inicio=${dt_inicio}&dt_final=${dt_final}&user_id=${user_id}&has_contrato=${has_contrato}`,
+    `${process.env.NEXT_INTEGRATION_URL}/pre-contratos/?dt_inicio=${dt_inicio}&dt_final=${dt_final}&user_id=${user_id}&has_contrato=${has_contrato}&convenios=${convenios}&promotoras=${promotoras}&corretores=${corretores}&operacoes=${operacoes}&bancos=${bancos}`,
     {
       method: "GET",
       headers: {

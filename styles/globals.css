@@ -10,7 +10,7 @@ html,
 body {
   width: "100%";
   overflow-x: hidden;
-  font-family: "Lato", sans-serif;
+  font-family: "Lato", sans-serif !important;
 }
 
 a,
@@ -34,19 +34,20 @@ a {
   text-decoration: none;
 }
 
-/* ::selection {
+::selection {
   background: #1a3d74;
   color: #fff;
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #fff;
+  background: #ccc;
 }
 
 ::-webkit-scrollbar-thumb {
   background: #1a3d74;
-} */
+}

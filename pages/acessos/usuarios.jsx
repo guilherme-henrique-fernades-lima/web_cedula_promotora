@@ -400,17 +400,17 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
             fontSize: "16px",
           }}
         >
-          <strong>Nome de usuário:</strong> {user?.username?.toUpperCase()}{" "}
+          <strong>Usuário:</strong> {user?.username?.toUpperCase()}{" "}
         </Typography>
 
         {user.is_active ? (
           <Typography
             variant="span"
             sx={{
-              color: "#155e03",
+              backgroundColor: "#155e03",
+              color: "#fff",
               fontFamily: "Lato, sans-serif",
               fontSize: "12px",
-              border: "2px solid #155e03",
               borderRadius: "4px",
               fontWeight: "bold",
               padding: "3px 5px",
@@ -423,10 +423,10 @@ function CardUser({ user, handleOpenModalDetailsUser }) {
           <Typography
             variant="span"
             sx={{
-              color: "#970b06",
+              backgroundColor: "#970b06",
+              color: "#fff",
               fontFamily: "Lato, sans-serif",
               fontSize: "12px",
-              border: "2px solid #970b06",
               borderRadius: "4px",
               fontWeight: "bold",
               padding: "3px 5px",
