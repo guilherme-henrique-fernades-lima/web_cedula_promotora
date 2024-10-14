@@ -29,6 +29,12 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
+import Typography from "@mui/material/Typography";
+import Autocomplete from "@mui/material/Autocomplete";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Avatar from "@mui/material/Avatar";
+import Collapse from "@mui/material/Collapse";
 
 //Utils
 import {
@@ -42,6 +48,8 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 
 var DATA_HOJE = new Date();
 
@@ -49,8 +57,10 @@ export default function RelatorioPreContratos() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
-  const [dataSet, setDataset] = useState([]);
+  const [loadingDataset, setLoadingDataset] = useState(false);
+
+  const [dataSet, setDataset] = useState({});
+
   const [dataInicio, setDataInicio] = useState(DATA_HOJE.setDate(1));
   const [dataFim, setDataFim] = useState(new Date());
   const [openDialogDelete, setOpenDialogDelete] = useState(false);
@@ -61,21 +71,56 @@ export default function RelatorioPreContratos() {
   const [idPreContrato, setIdPreContrato] = useState("");
   const [hasContrato, setHasContrato] = useState("nao_transmitidos");
 
+  const [open, setOpen] = useState(false);
+  const handleToggle = () => {
+    setOpen(!open); // Inverte o estado ao clicar no botão
+  };
+
+  //States dos filtros
+  const [conveniosFilter, setConveniosFilter] = useState([]);
+  const [operacoesFilter, setOperacoesFilter] = useState([]);
+  const [bancosFilter, setBancosFilter] = useState([]);
+  const [promotorasFilter, setPromotorasFilter] = useState([]);
+  const [corretoresFilter, setCorretoresFilter] = useState([]);
+
+  //States dos dados dos picklists
+  const [convenioPicklist, setConvenioPicklist] = useState([]);
+  const [operacaoPicklist, setOperacaoPicklist] = useState([]);
+  const [bancoPicklist, setBancoPicklist] = useState([]);
+  const [corretorPicklist, setCorretorPicklist] = useState([]);
+  const [promotoraPicklist, setPromotoraPicklist] = useState([]);
+
   useEffect(() => {
     if (session?.user.token) {
       list();
     }
   }, [session?.user]);
 
+  useEffect(() => {
+    if (session?.user?.token) {
+      getConveniosPicklist();
+      getOperacoesPicklist();
+      getCorretoresPicklist();
+      getPromotorasPicklist();
+      getBancosPicklist();
+    }
+  }, [session?.user?.token]);
+
   async function list() {
     try {
-      setLoading(true);
+      setLoadingDataset(true);
       const response = await fetch(
         `/api/relatorios/pre-contratos/?dt_inicio=${moment(dataInicio).format(
           "YYYY-MM-DD"
         )}&dt_final=${moment(dataFim).format("YYYY-MM-DD")}&user_id=${
           session?.user.id
-        }&has_contrato=${hasContrato}`,
+        }&has_contrato=${hasContrato}&convenios=${handleQuery(
+          conveniosFilter
+        )}&promotoras=${handleQuery(promotorasFilter)}&corretores=${handleQuery(
+          corretoresFilter
+        )}&operacoes=${handleQuery(operacoesFilter)}&bancos=${handleQuery(
+          bancosFilter
+        )}`,
         {
           method: "GET",
           headers: {
@@ -92,7 +137,7 @@ export default function RelatorioPreContratos() {
       console.error("Erro ao obter dados", error);
     }
 
-    setLoading(false);
+    setLoadingDataset(false);
   }
 
   function actionsAfterDelete() {
@@ -101,6 +146,120 @@ export default function RelatorioPreContratos() {
     list();
     setIdPreContrato("");
     setPreContratoToSendContratos("");
+  }
+
+  async function getPromotorasPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/promotoras/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setPromotoraPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getBancosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/bancos/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setBancoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getCorretoresPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/corretores/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setCorretorPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getConveniosPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/convenios/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setConvenioPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function getOperacoesPicklist() {
+    try {
+      const response = await fetch(
+        "/api/configuracoes/picklists/operacoes/?ativas=true",
+        {
+          method: "GET",
+          headers: {
+            Authorization: session?.user?.token,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setOperacaoPicklist(json);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function handleQuery(array) {
+    const arrayData = [];
+    for (var i = 0; i < array?.length; i++) {
+      arrayData.push(array[i]["id"]);
+    }
+
+    return arrayData;
   }
 
   const columns = [
@@ -169,7 +328,6 @@ export default function RelatorioPreContratos() {
                       onClick={() => {
                         setOpenDialogSendPreContrato(true);
                         setPreContratoToSendContratos(params.row);
-                        console.log(params.row);
                       }}
                     >
                       <FileUploadIcon />
@@ -359,7 +517,6 @@ export default function RelatorioPreContratos() {
   return (
     <ContentWrapper title="Relação de pré contratos">
       <Toaster position="bottom-center" reverseOrder={true} />
-
       <Grid container spacing={1} sx={{ mt: 1, mb: 2 }}>
         <Grid item xs={12} sm={6} md={3} lg={3} xl={2}>
           <DatepickerField
@@ -374,12 +531,17 @@ export default function RelatorioPreContratos() {
         </Grid>
 
         <Grid item xs={12} sm={12} md={2} lg={2} xl={1}>
-          <Button variant="contained" disableElevation fullWidth onClick={list}>
+          <LoadingButton
+            variant="contained"
+            disableElevation
+            fullWidth
+            onClick={list}
+            loading={loadingDataset}
+          >
             PESQUISAR
-          </Button>
+          </LoadingButton>
         </Grid>
       </Grid>
-
       <FormControl component="fieldset">
         <FormLabel id="demo-radio-buttons-group-label">
           Filtrar pré-contratos por:
@@ -405,10 +567,262 @@ export default function RelatorioPreContratos() {
         </RadioGroup>
       </FormControl>
 
-      <Box sx={{ width: "100%" }}>
-        <DataTable rows={dataSet} columns={columns} />
-      </Box>
+      {session?.user?.is_superuser && (
+        <>
+          <Grid container sx={{ width: "100%", mt: 1 }} spacing={1}>
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+              <Autocomplete
+                multiple
+                size="small"
+                limitTags={1}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onChange={(event, value) => {
+                  setCorretoresFilter(value);
+                }}
+                clearOnEscape
+                options={corretorPicklist}
+                getOptionLabel={(option) => option.name}
+                value={corretoresFilter}
+                renderInput={(params) => (
+                  <TextField {...params} label="Corretores" />
+                )}
+                clearText="Resetar opções"
+                closeText="Ver opções"
+                renderTags={(tagValue, getTagProps) => {
+                  return tagValue.map((option, index) => (
+                    <Chip
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      label={option.name}
+                      size="small"
+                    />
+                  ));
+                }}
+              />
+            </Grid>
 
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+              <Autocomplete
+                multiple
+                size="small"
+                limitTags={2}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onChange={(event, value) => {
+                  setBancosFilter(value);
+                }}
+                clearOnEscape
+                options={bancoPicklist}
+                getOptionLabel={(option) => option.name}
+                value={bancosFilter}
+                renderInput={(params) => (
+                  <TextField {...params} label="Bancos" />
+                )}
+                clearText="Resetar opções"
+                closeText="Ver opções"
+                renderTags={(tagValue, getTagProps) => {
+                  return tagValue.map((option, index) => (
+                    <Chip
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      label={option.name}
+                      size="small"
+                    />
+                  ));
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+              <Autocomplete
+                multiple
+                size="small"
+                limitTags={1}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onChange={(event, value) => {
+                  setOperacoesFilter(value);
+                }}
+                clearOnEscape
+                options={operacaoPicklist}
+                getOptionLabel={(option) => option.name}
+                value={operacoesFilter}
+                renderInput={(params) => (
+                  <TextField {...params} label="Operações" />
+                )}
+                clearText="Resetar opções"
+                closeText="Ver opções"
+                renderTags={(tagValue, getTagProps) => {
+                  return tagValue.map((option, index) => (
+                    <Chip
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      label={option.name}
+                      size="small"
+                    />
+                  ));
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+              <Autocomplete
+                multiple
+                size="small"
+                limitTags={2}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onChange={(event, value) => {
+                  setConveniosFilter(value);
+                }}
+                clearOnEscape
+                options={convenioPicklist}
+                getOptionLabel={(option) => option.name}
+                value={conveniosFilter}
+                renderInput={(params) => (
+                  <TextField {...params} label="Convênios" />
+                )}
+                clearText="Resetar opções"
+                closeText="Ver opções"
+                renderTags={(tagValue, getTagProps) => {
+                  return tagValue.map((option, index) => (
+                    <Chip
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      label={option.name}
+                      size="small"
+                    />
+                  ));
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={6} lg={4} xl={3}>
+              <Autocomplete
+                multiple
+                size="small"
+                limitTags={2}
+                filterSelectedOptions
+                disableCloseOnSelect
+                onChange={(event, value) => {
+                  setPromotorasFilter(value);
+                }}
+                clearOnEscape
+                options={promotoraPicklist}
+                getOptionLabel={(option) => option.name}
+                value={promotorasFilter}
+                renderInput={(params) => (
+                  <TextField {...params} label="Promotoras" />
+                )}
+                clearText="Resetar opções"
+                closeText="Ver opções"
+                renderTags={(tagValue, getTagProps) => {
+                  return tagValue.map((option, index) => (
+                    <Chip
+                      key={option.id}
+                      {...getTagProps({ index })}
+                      label={option.name}
+                      size="small"
+                    />
+                  ));
+                }}
+              />
+            </Grid>
+          </Grid>
+          {!(Object.keys(dataSet).length === 0 || dataSet.length === 0) && (
+            <Box
+              sx={{
+                maxWidth: 500,
+                width: "100%",
+                border: "1px solid rgba(224, 224, 224, 1)",
+                borderRadius: 1,
+                mt: 2,
+              }}
+            >
+              <Typography sx={{ m: 2, fontSize: 18, fontWeight: "bold" }}>
+                Ranking por valor de venda
+              </Typography>
+
+              {dataSet?.indicadores?.apuracao.map((item, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    padding: 1,
+                    borderTop: `1px solid ${
+                      index === 0 ? "#ebebeb" : "transparent"
+                    }`,
+                  }}
+                >
+                  <Typography>
+                    <strong>{index + 1}° - </strong>
+                    {item.corretor}
+                  </Typography>
+
+                  <Typography>
+                    {formatarValorBRL(item.valor_total)} | Qtd: {item.qtd_total}
+                  </Typography>
+                </Box>
+              ))}
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  width: "100%",
+                  padding: 1,
+                  backgroundColor: "#ebebeb",
+                  borderTop: "1px solid #ebebeb",
+                }}
+              >
+                <Typography sx={{ fontWeight: "bold" }}>Total:</Typography>
+                <Typography sx={{ fontWeight: "bold" }}>
+                  {formatarValorBRL(dataSet?.indicadores?.valor_total || 0)} |
+                  Qtd: {dataSet?.indicadores?.qtd_total || 0}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+
+          <Button
+            sx={{ mt: 3 }}
+            variant="contained"
+            onClick={handleToggle}
+            disableElevation
+            endIcon={
+              open ? (
+                <KeyboardArrowUpRoundedIcon />
+              ) : (
+                <KeyboardArrowDownRoundedIcon />
+              )
+            }
+          >
+            {open ? "Ocultar Detalhes" : "Exibir Detalhes"}
+          </Button>
+
+          <Box sx={{ width: "100%" }}>
+            <Collapse in={open}>
+              <ApuracaoRankingVendas data={dataSet?.indicadores?.apuracao} />
+            </Collapse>
+          </Box>
+        </>
+      )}
+
+      <Box sx={{ width: "100%" }}>
+        <DataTable
+          rows={
+            Object.keys(dataSet).length === 0 || dataSet.length === 0
+              ? []
+              : dataSet?.pre_contratos
+          }
+          columns={columns}
+        />
+      </Box>
       <DialogExcluirPreContrato
         open={openDialogDelete}
         close={setOpenDialogDelete}
@@ -416,7 +830,6 @@ export default function RelatorioPreContratos() {
         token={session?.user.token}
         onFinishDelete={actionsAfterDelete}
       />
-
       <DialogTransmitirPreContrato
         open={openDialogSendPreContrato}
         close={setOpenDialogSendPreContrato}
@@ -579,5 +992,260 @@ function DialogTransmitirPreContrato({
         </LoadingButton>
       </DialogActions>
     </Dialog>
+  );
+}
+
+const styleGrid = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "flex-start",
+  flexDirection: "column",
+  padding: 1,
+  height: "100%",
+};
+
+const styleBox = {
+  display: "flex",
+  alignItems: "flex-start",
+  justifyContent: "space-between",
+  flexDirection: "row",
+  padding: 1,
+  width: "100%",
+};
+
+function ApuracaoRankingVendas({ data }) {
+  return (
+    <>
+      {data?.map((item, index) => (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "flex-start",
+            width: "100%",
+            flexDirection: "column",
+            padding: 2,
+            borderRadius: 1,
+            marginTop: 3,
+            // border: "1px solid rgba(224, 224, 224, 1)",
+            backgroundColor: "#ebebeb",
+          }}
+        >
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              mb: 2,
+            }}
+          >
+            {/* <Avatar
+              alt="Foto do usuário"
+              src="https://randomuser.me/api/portraits/men/67.jpg"
+              sx={{ width: 66, height: 66 }}
+            /> */}
+
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                // marginLeft: 2,
+                fontSize: 20,
+              }}
+            >
+              {item.corretor}
+            </Typography>
+          </Box>
+          <Typography
+            sx={{
+              marginLeft: 2,
+              fontSize: 16,
+            }}
+          >
+            <strong>Valor total:</strong> {formatarValorBRL(item.valor_total)}
+          </Typography>
+          <Typography
+            sx={{
+              marginBottom: 1,
+              marginLeft: 2,
+              fontSize: 16,
+            }}
+          >
+            <strong>Qtd. de pré contratos:</strong> {item.qtd_total}
+          </Typography>
+
+          <Grid container>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={4} sx={styleGrid}>
+              <Box
+                sx={{
+                  width: "100%",
+                  // border: "1px solid rgba(224, 224, 224, 1)",
+                  borderRadius: 1,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginTop: 1,
+                    marginBottom: 1,
+                    fontWeight: "bold",
+                    marginLeft: 2,
+                  }}
+                >
+                  BANCOS
+                </Typography>
+
+                {item?.bancos.map((banco, index, array) => (
+                  <Box
+                    sx={{
+                      ...styleBox,
+                      borderBottom:
+                        index !== array.length - 1
+                          ? "1px solid rgba(224, 224, 224, 1)"
+                          : "none",
+                    }}
+                  >
+                    <Typography>
+                      <strong>{index + 1}° -</strong> {banco?.nome_banco}
+                    </Typography>
+                    <Typography>
+                      Valor: {formatarValorBRL(parseFloat(banco?.vlr_total))} |
+                      Qtd: {banco.qtd}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={4} sx={styleGrid}>
+              <Box
+                sx={{
+                  width: "100%",
+                  // border: "1px solid rgba(224, 224, 224, 1)",
+                  borderRadius: 1,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginTop: 1,
+                    marginBottom: 1,
+                    fontWeight: "bold",
+                    marginLeft: 2,
+                  }}
+                >
+                  OPERAÇÕES
+                </Typography>
+
+                {item?.operacoes.map((operacao, index, array) => (
+                  <Box
+                    sx={{
+                      ...styleBox,
+                      borderBottom:
+                        index !== array.length - 1
+                          ? "1px solid rgba(224, 224, 224, 1)"
+                          : "none",
+                    }}
+                  >
+                    <Typography>
+                      <strong>{index + 1}° -</strong> {operacao?.nome_operacao}
+                    </Typography>
+                    <Typography>
+                      Valor: {formatarValorBRL(parseFloat(operacao?.vlr_total))}{" "}
+                      | Qtd: {operacao.qtd}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={4} sx={styleGrid}>
+              <Box
+                sx={{
+                  width: "100%",
+                  // border: "1px solid rgba(224, 224, 224, 1)",
+                  borderRadius: 1,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginTop: 1,
+                    marginBottom: 1,
+                    fontWeight: "bold",
+                    marginLeft: 2,
+                  }}
+                >
+                  CONVÊNIOS
+                </Typography>
+
+                {item?.convenios.map((convenio, index, array) => (
+                  <Box
+                    sx={{
+                      ...styleBox,
+                      borderBottom:
+                        index !== array.length - 1
+                          ? "1px solid rgba(224, 224, 224, 1)"
+                          : "none",
+                    }}
+                  >
+                    <Typography>
+                      <strong>{index + 1}° -</strong> {convenio?.nome_convenio}
+                    </Typography>
+                    <Typography>
+                      Valor: {formatarValorBRL(parseFloat(convenio?.vlr_total))}{" "}
+                      | Qtd: {convenio.qtd}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={4} sx={styleGrid}>
+              <Box
+                sx={{
+                  width: "100%",
+                  borderRadius: 1,
+                  backgroundColor: "#fff",
+                }}
+              >
+                <Typography
+                  sx={{
+                    marginTop: 1,
+                    marginBottom: 1,
+                    fontWeight: "bold",
+                    marginLeft: 2,
+                  }}
+                >
+                  PROMOTORAS
+                </Typography>
+
+                {item?.promotoras.map((promotora, index, array) => (
+                  <Box
+                    sx={{
+                      ...styleBox,
+                      borderBottom:
+                        index !== array.length - 1
+                          ? "1px solid rgba(224, 224, 224, 1)"
+                          : "none",
+                    }}
+                  >
+                    <Typography>
+                      <strong>{index + 1}° -</strong>{" "}
+                      {promotora?.nome_promotora}
+                    </Typography>
+                    <Typography>
+                      Valor:{" "}
+                      {formatarValorBRL(parseFloat(promotora?.vlr_total))} |
+                      Qtd: {promotora.qtd}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Grid>
+          </Grid>
+        </Box>
+      ))}
+    </>
   );
 }
