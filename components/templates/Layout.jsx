@@ -95,7 +95,7 @@ export default function Layout({ children }) {
                 {open ? <ChevronLeftIcon /> : <MenuIcon />}
               </IconButton>
 
-              {/* <LogoCedulaPromotora /> */}
+              <LogoCedulaPromotora />
             </Toolbar>
 
             <Box
