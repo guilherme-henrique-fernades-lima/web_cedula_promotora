@@ -51,11 +51,25 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import KeyboardArrowUpRoundedIcon from "@mui/icons-material/KeyboardArrowUpRounded";
 
+//Hooks
+import useBancoPicklist from "@/hooks/useBancoPicklist";
+import usePromotoraPicklist from "@/hooks/usePromotoraPicklist";
+import useOperacaoPicklist from "@/hooks/useOperacaoPicklist";
+import useCorretorPicklist from "@/hooks/useCorretorPicklist";
+import useConvenioPicklist from "@/hooks/useConvenioPicklist";
+
 var DATA_HOJE = new Date();
 
 export default function RelatorioPreContratos() {
   const { data: session } = useSession();
   const router = useRouter();
+
+  const { bancoPicklist, loadingBancoPicklist } = useBancoPicklist();
+  const { promotoraPicklist, loadingPromotoraPicklist } =
+    usePromotoraPicklist();
+  const { operacaoPicklist, loadingOperacaoPicklist } = useOperacaoPicklist();
+  const { corretorPicklist, loadingCorretorPicklist } = useCorretorPicklist();
+  const { convenioPicklist, loadingConvenioPicklist } = useConvenioPicklist();
 
   const [loadingDataset, setLoadingDataset] = useState(false);
 
@@ -84,27 +98,17 @@ export default function RelatorioPreContratos() {
   const [corretoresFilter, setCorretoresFilter] = useState([]);
 
   //States dos dados dos picklists
-  const [convenioPicklist, setConvenioPicklist] = useState([]);
-  const [operacaoPicklist, setOperacaoPicklist] = useState([]);
-  const [bancoPicklist, setBancoPicklist] = useState([]);
-  const [corretorPicklist, setCorretorPicklist] = useState([]);
-  const [promotoraPicklist, setPromotoraPicklist] = useState([]);
+  // const [convenioPicklist, setConvenioPicklist] = useState([]);
+  // const [corretorPicklist, setCorretorPicklist] = useState([]);
+  // const [operacaoPicklist, setOperacaoPicklist] = useState([]);
+  // const [bancoPicklist, setBancoPicklist] = useState([]);
+  // const [promotoraPicklist, setPromotoraPicklist] = useState([]);
 
   useEffect(() => {
     if (session?.user.token) {
       list();
     }
   }, [session?.user]);
-
-  useEffect(() => {
-    if (session?.user?.token) {
-      getConveniosPicklist();
-      getOperacoesPicklist();
-      getCorretoresPicklist();
-      getPromotorasPicklist();
-      getBancosPicklist();
-    }
-  }, [session?.user?.token]);
 
   async function list() {
     try {
@@ -146,111 +150,6 @@ export default function RelatorioPreContratos() {
     list();
     setIdPreContrato("");
     setPreContratoToSendContratos("");
-  }
-
-  async function getPromotorasPicklist() {
-    try {
-      const response = await fetch(
-        "/api/configuracoes/picklists/promotoras/?ativas=true",
-        {
-          method: "GET",
-          headers: {
-            Authorization: session?.user?.token,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        setPromotoraPicklist(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getBancosPicklist() {
-    try {
-      const response = await fetch(
-        "/api/configuracoes/picklists/bancos/?ativas=true",
-        {
-          method: "GET",
-          headers: {
-            Authorization: session?.user?.token,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        setBancoPicklist(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getCorretoresPicklist() {
-    try {
-      const response = await fetch(
-        "/api/configuracoes/picklists/corretores/?ativas=true",
-        {
-          method: "GET",
-          headers: {
-            Authorization: session?.user?.token,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        setCorretorPicklist(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getConveniosPicklist() {
-    try {
-      const response = await fetch(
-        "/api/configuracoes/picklists/convenios/?ativas=true",
-        {
-          method: "GET",
-          headers: {
-            Authorization: session?.user?.token,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        setConvenioPicklist(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  async function getOperacoesPicklist() {
-    try {
-      const response = await fetch(
-        "/api/configuracoes/picklists/operacoes/?ativas=true",
-        {
-          method: "GET",
-          headers: {
-            Authorization: session?.user?.token,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        setOperacaoPicklist(json);
-      }
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   function handleQuery(array) {
@@ -1018,6 +917,7 @@ function ApuracaoRankingVendas({ data }) {
     <>
       {data?.map((item, index) => (
         <Box
+          key={index}
           sx={{
             display: "flex",
             alignItems: "flex-start",
@@ -1097,6 +997,7 @@ function ApuracaoRankingVendas({ data }) {
 
                 {item?.bancos.map((banco, index, array) => (
                   <Box
+                    key={index}
                     sx={{
                       ...styleBox,
                       borderBottom:
@@ -1139,6 +1040,7 @@ function ApuracaoRankingVendas({ data }) {
 
                 {item?.operacoes.map((operacao, index, array) => (
                   <Box
+                    key={index}
                     sx={{
                       ...styleBox,
                       borderBottom:
@@ -1181,6 +1083,7 @@ function ApuracaoRankingVendas({ data }) {
 
                 {item?.convenios.map((convenio, index, array) => (
                   <Box
+                    key={index}
                     sx={{
                       ...styleBox,
                       borderBottom:
@@ -1222,6 +1125,7 @@ function ApuracaoRankingVendas({ data }) {
 
                 {item?.promotoras.map((promotora, index, array) => (
                   <Box
+                    key={index}
                     sx={{
                       ...styleBox,
                       borderBottom:

@@ -37,6 +37,7 @@ export default function Usuarios() {
   const { data: session } = useSession();
 
   const [dataset, setDataset] = useState([]);
+  console.log("🚀 ~ Usuarios ~ dataset:", dataset);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [openDetailsUser, setOpenDetailsUser] = useState(false);
@@ -79,6 +80,7 @@ export default function Usuarios() {
     const payload = {
       username: username,
       email: email,
+      sistema_origem: "cedula",
     };
 
     return payload;
@@ -226,7 +228,7 @@ export default function Usuarios() {
           <>
             {dataset?.map((item, index) => (
               <>
-                {item?.id != 23 && (
+                {![23, 26].includes(item?.id) && (
                   <CardUser
                     key={index}
                     user={item}
