@@ -4,6 +4,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import BiotechRoundedIcon from "@mui/icons-material/BiotechRounded";
 
 const ROUTES = [
   {
@@ -184,6 +185,20 @@ const ROUTES = [
     icon: <SubjectIcon />,
     perm: "menu_relatorios",
   },
+  // {
+  //   id: 6,
+  //   title: "Laboratório",
+  //   routes: [
+  //     {
+  //       id: 1,
+  //       title: "Teste",
+  //       url: "/lab",
+  //       perm: "app_relatorio_futuro_contrato",
+  //     },
+  //   ],
+  //   icon: <BiotechRoundedIcon />,
+  //   perm: "menu_relatorios",
+  // },
 ];
 
 function permsApps(array) {
